@@ -1,0 +1,3748 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Şampiyonlar Düellosu</title>
+    <!-- Comfortaa Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Kodları */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comfortaa', cursive;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: backgroundPulse 10s infinite alternate;
+        }
+
+        @keyframes backgroundPulse {
+            from {
+                background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            }
+            to {
+                background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            }
+        }
+
+        .container, .game-container, .student-selection-container, .admin-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+            text-align: left;
+            transform: scale(0.95);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.5s forwards;
+        }
+
+.logout-button {
+    background-color: #dc3545; /* Kırmızı renk */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px; /* Köşeleri yuvarla */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 1.1em;
+    margin-top: 20px; /* Üstten boşluk */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.logout-button:hover {
+    background-color: #c82333; /* Hover sırasında biraz daha koyu kırmızı */
+    transform: scale(1.05);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.2);
+}
+
+
+select {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    border: 2px solid #ff8a00;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 1.1em;
+    color: #333;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hover ve odaklanma efekti */
+select:hover, select:focus {
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    border-color: #f7786b;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
+
+/* Menü seçenekleri */
+option {
+    background-color: white;
+    color: #333;
+    padding: 10px;
+    font-size: 1em;
+}
+
+        @keyframes fadeInUp {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+#main-screen {
+    display: flex;
+    flex-direction: column; /* İçeriği dikey hizalar */
+    align-items: center; /* Yatayda ortalar */
+    justify-content: center; /* Dikeyde ortalar */
+    gap: 20px; /* Elemanlar arasındaki boşluk */
+    position: relative; /* Efektler için gerekli */
+    padding: 30px;
+    width: 80%; /* Genişlik (ekranın %80'i) */
+    max-width: 900px; /* Maksimum genişlik */
+    min-height: 300px; /* Minimum yükseklik */
+    background: linear-gradient(135deg, #ffffff, #f1f1f1); /* Arka plan gradyanı */
+    border: 5px solid transparent;
+    border-radius: 20px; /* Köşe yuvarlama */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Yumuşak gölge */
+    overflow: hidden; /* Taşmaları gizler */
+    z-index: 1; /* Diğer elemanlarla çakışmayı önler */
+}
+
+/* Hareketli ışık efekti */
+#main-screen::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -150%;
+    width: 300%;
+    height: 200%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+    animation: lightMove 5s infinite linear; /* Hareketli ışık efekti */
+    z-index: 0;
+    pointer-events: none; /* Etkileşimden kaçınır */
+}
+
+/* Çerçeve parlaması */
+@keyframes glowingBorder {
+    0% {
+        box-shadow: 0 0 5px #ff8a00, 0 0 10px #ff8a00;
+    }
+    50% {
+        box-shadow: 0 0 15px #fbc2eb, 0 0 20px #fbc2eb;
+    }
+    100% {
+        box-shadow: 0 0 5px #a6c1ee, 0 0 10px #a6c1ee;
+    }
+}
+
+@keyframes lightMove {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .student-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%;
+            animation: bounceIn 1s;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .student-photo {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ff8a00;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .student-photo:hover {
+            transform: rotate(360deg);
+        }
+
+        .student-name {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px #ff8a00;
+        }
+
+        .student-cup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+            animation: popIn 0.5s;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .game-cup-image {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+            animation: none;
+        }
+
+        @keyframes rotateCup {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .game-cup-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ff8a00;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 55%;
+            align-items: flex-start;
+            animation: slideButtons 0.7s ease forwards;
+        }
+
+        @keyframes slideButtons {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+.buttons {
+    display: flex; /* Flexbox düzeni */
+    flex-direction: column; /* Butonları dikey hizalar */
+    align-items: stretch; /* Butonları çerçeveye tam yayar */
+    justify-content: center; /* Butonlar arasında eşit hizalama */
+    gap: 20px; /* Butonlar arasında dikey boşluk */
+    padding: 10px; /* Çerçeve içi boşluk */
+    width: 100%; /* Çerçeve genişliği */
+    max-width: 900px; /* Maksimum genişlik */
+    margin: 0 auto; /* Ortalamak için */
+    box-sizing: border-box; /* Padding ve border dahil */
+}
+
+.buttons button {
+    width: 100%; /* Butonlar çerçeveye tam sığar */
+    padding: 18px; /* İçerik boşluğu */
+    border: none;
+    border-radius: 12px; /* Köşeleri yuvarlar */
+    font-size: 1.1em; /* Yazı boyutu */
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.buttons button::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition: all 0.5s;
+}
+
+.buttons button:hover::before {
+    width: 0%;
+    height: 0%;
+    opacity: 0;
+}
+
+.buttons button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.single-player {
+    background-color: #ff6f61;
+}
+
+.oyundakiler-button {
+    background-color: #6b5b95;
+}
+
+.oyundakiler-button:hover {
+    transform: scale(1.07);
+    opacity: 0.9;
+}
+
+.kupa-siralama-button {
+    background-color: #f7cac9;
+    color: black !important;
+    background-image: linear-gradient(135deg, #edf500, #8ff514);
+    box-shadow: 0 0 15px rgba(247, 202, 201, 0.7);
+    position: relative;
+    overflow: hidden;
+}
+
+.kupa-siralama-button::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(247, 202, 201, 0.2);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+
+        @keyframes shine {
+            0% {
+                transform: rotate(45deg) translate(-100%, -100%);
+            }
+            100% {
+                transform: rotate(45deg) translate(100%, 100%);
+            }
+        }
+
+        .admin-button {
+            background-color: #88b04b;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, transform 0.2s;
+            margin: 25px auto 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .admin-button img {
+            width: 28px;
+            height: 28px;
+        }
+
+        .admin-button:hover {
+            background-color: #6aa844;
+            transform: scale(1.1);
+        }
+
+        .game-container, .student-selection-container, .admin-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
+            display: none;
+            flex-direction: column;
+            gap: 25px;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .table-section {
+            background-color: #fff3e0;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .table-section h3 {
+            margin-bottom: 15px;
+            color: #ff8a00;
+            font-size: 1.5em;
+            border-bottom: 2px solid #ff8a00;
+            padding-bottom: 5px;
+        }
+
+        .table-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .table-section select, .table-section input {
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            border: 2px solid #ff8a00;
+            border-radius: 8px;
+            font-size: 1.2em;
+            color: #333;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+
+        .table-section select:focus, .table-section input:focus {
+            border-color: #f7786b;
+            outline: none;
+        }
+
+        .back-button, .start-game-button, .login-button, .admin-back-button, .duel-start-button, .ranking-back-button, .close-ranking-button {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1.1em;
+            margin-top: 25px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .back-button, .admin-back-button, .ranking-back-button, .close-ranking-button {
+            background-color: #555;
+            color: white;
+            width: 100%;
+            max-width: 220px;
+        }
+
+        .back-button:hover, .admin-back-button:hover, .ranking-back-button:hover, .close-ranking-button:hover {
+            background-color: #333;
+            transform: scale(1.05);
+        }
+
+        .start-game-button, .duel-start-button {
+            background-color: #28a745;
+            color: white;
+            opacity: 0.7;
+            cursor: not-allowed;
+            width: 100%;
+            max-width: 220px;
+        }
+
+        .start-game-button.active, .duel-start-button.active {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .start-game-button:hover.active, .duel-start-button:hover.active {
+            transform: scale(1.05);
+        }
+
+        .login-button {
+            background-color: #007BFF;
+            color: white;
+            opacity: 0.7;
+            cursor: not-allowed;
+            width: 100%;
+            max-width: 220px;
+            transition: opacity 0.3s;
+        }
+
+        .login-button.active {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .login-button:hover.active {
+            transform: scale(1.05);
+        }
+
+        .admin-student-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .admin-student-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 12px;
+            background-color: #e0f7fa;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .admin-student-list li:hover {
+            background-color: #b2ebf2;
+        }
+
+        .admin-student-list li button {
+            padding: 10px 16px;
+            background-color: #17a2b8;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        .admin-student-list li button:hover {
+            background-color: #138496;
+        }
+
+        .error {
+            color: red;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+.single-player-game-container, .duel-game-container {
+    display: none; /* Bu konteyner başlangıçta görünmez */
+    flex-direction: column; /* İçerikleri dikey olarak hizalar */
+    gap: 25px; /* İçerikler arasındaki boşluk 25 piksel */
+    width: 100%; /* Konteyner genişliği ekranın tamamını kaplar */
+    max-width: none; /* Genişlik sınırı yok */
+    justify-content: center; /* İçerikleri dikeyde ortalar */
+    align-items: center; /* İçerikleri yatayda ortalar */
+    padding: 30px; /* Kenar boşlukları (çerçevenin içindeki içeriklerin etrafındaki boşluk) */
+    animation: fadeIn 0.5s forwards; /* Görünür hale geldiğinde fadeIn animasyonu oynar */
+}
+
+
+        .question-number {
+            margin-bottom: 15px;
+            font-size: 1.0em;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 1px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            height: 25px;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            width: 0%;
+            background-color: #28a745;
+            transition: width 0.4s ease;
+        }
+
+        .timer-container {
+            margin-bottom: 1px;
+        }
+
+        .timer {
+            font-size: 1.0em;
+            color: #ff0000;
+            font-weight: bold;
+            animation: pulseTimer 1.5s infinite;
+        }
+
+        @keyframes pulseTimer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .question-container {
+    display: flex;
+    flex-direction: column; /* Dikey hizalama */
+    align-items: center; /* Yatayda ortalama */
+    justify-content: center; /* Dikeyde ortalama */
+    width: 100%; /* Çerçevenin genişliği */
+    max-width: 700px; /* Maksimum genişlik azaltıldı */
+    text-align: center; /* Metni ortala */
+    min-height: 300px; /* Çerçeve yüksekliği azaltıldı */
+    padding: 15px; /* Daha az boşluk */
+    border: 2px solid #ff8a00; /* Çerçeve kalınlığı azaltıldı */
+    border-radius: 10px; /* Köşe yuvarlama küçültüldü */
+    background-color: #fffbea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Gölge küçültüldü */
+    overflow: hidden; /* Çerçeve dışına taşmaları gizle */
+}
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .question-image {
+    max-width: 100%; /* Resmin genişliği çerçeveye sığacak şekilde */
+    max-height: 60%; /* Resmin yüksekliğini sınırla */
+    object-fit: contain; /* Resmin orantılı şekilde sığmasını sağla */
+    margin: 0 auto; /* Resmi yatayda ortala */
+    display: block; /* Blok element olarak davranır */
+}
+
+        @keyframes fadeInImage {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .question-text {
+    font-size: 1.1em; /* Soru metni boyutunu ayarla */
+    font-weight: bold;
+    margin-bottom: 10px; /* Resim ile metin arasında boşluk */
+    word-wrap: break-word; /* Uzun kelimeleri kır */
+    text-align: center; /* Metni ortala */
+    max-width: 100%; /* Çerçeve sınırları içinde kalmasını sağla */
+}
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .options-container {
+            display: flex;
+            gap: 20px;
+            flex-direction: row;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+            flex-wrap: wrap; 
+            animation: fadeInOptions 0.5s;
+        }
+
+        @keyframes fadeInOptions {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .option-button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s, opacity 0.3s;
+            flex: 1 1 30%;
+            min-width: 160px;
+            max-width: 350px;
+            font-size: 1.0em;
+            margin: 3px 2;
+            white-space: normal;
+            word-wrap: break-word;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button::after {
+            content: '';
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.2);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        .option-button:hover::after {
+            width: 0%;
+            height: 0%;
+            opacity: 0;
+        }
+
+        .option-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+            opacity: 0.95;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .option-button.correct {
+            background-color: #28a745 !important;
+            animation: pulseCorrect 0.5s;
+        }
+
+        @keyframes pulseCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .option-button.wrong {
+            background-color: #dc3545 !important;
+            animation: shakeWrong 0.5s;
+        }
+
+        @keyframes shakeWrong {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .option-chosen {
+            border: 4px solid #ff8a00;
+            box-shadow: 0 0 15px rgba(255,138,0,0.5);
+        }
+
+        .option-faded {
+            opacity: 0.5;
+        }
+
+        .score-container {
+            font-size: 2em;
+            color: #333;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            animation: fadeInScore 0.5s;
+        }
+
+        @keyframes fadeInScore {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+.score-message {
+    font-size: 1.1em; /* Yazı boyutunu çerçeveye uygun olacak şekilde ayarlayın */
+    font-weight: bold;
+    margin-top: 25px;
+    animation: glow 1.5s infinite alternate;
+    text-align: center; /* Metni ortala */
+    max-width: 90%; /* Çerçevenin genişliğine uygun olacak şekilde sınırla */
+    white-space: normal; /* Alt satıra geçmesini sağla */
+    word-wrap: break-word; /* Uzun kelimeleri kırarak alt satıra geçir */
+    overflow: visible; /* Çerçeve dışına taşmayı engelle */
+    margin: 0 auto; /* Yatayda ortala */
+    line-height: 1.2; /* Satırlar arasındaki mesafeyi ayarla */
+}
+
+        .score-message.blue {
+            color: #007BFF;
+        }
+
+        .score-message.green {
+            color: #28a745;
+        }
+
+        .score-message.purple {
+            color: #6f42c1;
+            text-shadow: 0 0 15px #6f42c1, 0 0 25px #6f42c1, 0 0 35px #6f42c1;
+            animation: glowMukemmel 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 25px rgba(0, 123, 255, 1);
+            }
+        }
+
+        @keyframes glowMukemmel {
+            from {
+                text-shadow: 0 0 15px rgba(111, 66, 193, 0.5);
+            }
+            to {
+                text-shadow: 0 0 25px rgba(111, 66, 193, 1), 0 0 35px rgba(111, 66, 193, 0.7);
+            }
+        }
+
+        .final-image {
+            width: 220px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: fadeInImage 1s;
+        }
+
+        /* Yeni Eklenen Stil: End Game Button (Geri Dön) */
+        .end-game-button {
+            background-color: #007BFF; /* Mavi renk */
+            color: white;
+            padding: 8px 17px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 0.8em;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .end-game-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Yeni +1 Efekti */
+        .animated-plus-one {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            color: #28a745;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 1;
+            animation: plusOneMove 1s forwards;
+        }
+
+        @keyframes plusOneMove {
+            0% {
+                opacity:1;
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(1);
+            }
+            100% {
+                opacity:0;
+                transform: translate(-50%, -50%) translate(300px, -300px) scale(0.5);
+            }
+        }
+
+        /* "Oyunda" Butonu İçin Ek Stil */
+        .oyunda-button {
+            background-color: #f59e0b; /* Turuncu renk */
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 8px 14px;
+            font-size: 1em;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transition: background-color 0.3s;
+        }
+
+        .oyunda-button:hover {
+            background-color: #d97706;
+            opacity: 0.7; /* Hover etkisini kaldırmak için */
+            transform: none;
+        }
+
+        /* Alert, Prompt, Invitation Modals */
+        .alert-overlay, .prompt-overlay, .invitation-overlay {
+            position: fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items:center;
+            justify-content:center;
+            z-index:1000000;
+            animation: fadeInModal 0.3s;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-content, .prompt-content, .invitation-content {
+            background:#fff;
+            padding:25px;
+            border-radius:15px;
+            width:90%;
+            max-width:350px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.3);
+            display:flex;
+            flex-direction: column;
+            gap:20px;
+            animation: slideDownModal 0.3s;
+        }
+
+        @keyframes slideDownModal {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-message, .prompt-message, .invitation-message {
+            font-size:1.2em;
+            color:#333;
+            text-align: center;
+        }
+
+        .alert-ok-button, .prompt-ok-button, .prompt-cancel-button, .invitation-accept-button, .invitation-decline-button {
+            background-color: #007BFF;
+            color:white;
+            border:none;
+            border-radius:8px;
+            padding:12px 25px;
+            cursor:pointer;
+            transition: background-color 0.3s;
+            font-size:1em;
+            font-weight: bold;
+        }
+
+        .alert-ok-button:hover, .prompt-ok-button:hover, .prompt-cancel-button:hover, .invitation-accept-button:hover, .invitation-decline-button:hover {
+            background-color: #0056b3;
+        }
+
+        .prompt-input {
+            width:100%;
+            padding:12px;
+            border:2px solid #ff8a00;
+            border-radius:8px;
+            font-size:1.1em;
+            transition: border-color 0.3s;
+        }
+
+        .prompt-input:focus {
+            border-color: #f7786b;
+            outline: none;
+        }
+
+        .prompt-buttons, .invitation-buttons {
+            display:flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .prompt-cancel-button, .invitation-decline-button {
+            background-color:#dc3545;
+        }
+
+        .prompt-cancel-button:hover, .invitation-decline-button:hover {
+            background-color:#c82333;
+        }
+
+        /* Düello Seçim Ekranı */
+        .duel-selection-container {
+            display: none;
+            position: relative;
+            overflow:hidden;
+            padding-bottom: 140px;
+            text-align:center;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        /* İki oyuncuyu eşit orantıda yerleştirmek için space-evenly kullandık */
+.duel-bottom-info {
+    display: flex;
+    justify-content: space-evenly; /* Kartlar arasında eşit boşluk */
+    align-items: center; /* Kartları yatayda ortala */
+    width: 100%; /* Genişlik tüm alanı kaplasın */
+    padding: 10px 0; /* Üst ve alt boşluk */
+}
+
+
+.duel-player-info {
+    display: flex;
+    flex-direction: column; /* Resim ve ismi dikey hizalar */
+    align-items: center; /* Yatayda ortalar */
+    justify-content: center; /* Dikeyde ortalar */
+    text-align: center; /* Yazıyı ortala */
+    gap: 10px; /* Resim ile isim arasındaki boşluk */
+    width: 100%; /* Kartın genişliği */
+}
+
+.duel-player-photo {
+    width: 80px; /* Resim genişliği */
+    height: 80px; /* Resim yüksekliği */
+    border-radius: 50%; /* Yuvarlak resim */
+    object-fit: cover; /* Resmi çerçeveye sığdır */
+    border: 3px solid #ff8a00; /* Çerçeve rengi */
+    margin-bottom: 5px; /* Resim ile isim arasındaki boşluk */
+}
+
+
+.duel-player-photo:hover {
+    transform: rotate(360deg);
+}
+
+.duel-player-name {
+    font-size: 1em; /* Yazı boyutu */
+    font-weight: bold; /* Yazı kalınlığı */
+    color: #333; /* Yazı rengi */
+    text-align: center; /* Yazıyı ortala */
+    white-space: normal; /* Yazının satır kaydırmasını etkinleştir */
+    word-wrap: break-word; /* Uzun kelimeleri kaydır */
+    overflow-wrap: break-word; /* Modern tarayıcı desteği */
+    max-width: 100%; /* Çerçeve sınırında kal */
+    line-height: 1.2; /* Satırlar arası boşluğu azalt */
+}
+
+
+
+        .duel-controls {
+            display:flex;
+            flex-direction: column;
+            gap:15px;
+            align-items:center;
+            justify-content:center;
+            margin-top:30px;
+        }
+
+        .duel-start-button {
+            display:inline-block;
+            margin:0 auto;
+            background-color: #28a745;
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transition: background-color 0.3s, transform 0.3s, opacity 0.3s;
+            font-size:1.1em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .duel-start-button.active {
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .duel-start-button:hover.active {
+            transform: scale(1.05);
+            background-color: #218838;
+        }
+
+        .duel-game-container {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+            max-width: none;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .players-info-row {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            animation: slideInPlayers 0.5s forwards;
+        }
+
+        @keyframes slideInPlayers {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .duel-player-score {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+            overflow:hidden;
+            position: relative;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .duel-player-score img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #ff8a00;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+.duel-player-score .duel-player-name {
+    font-size: 0.8em; /* Yazı boyutunu biraz küçültebilirsiniz */
+    font-weight: bold;
+    color: #333;
+    white-space: normal; /* Uzun metinlerin satır atlamasına izin verir */
+    word-wrap: break-word; /* Uzun kelimelerin uygun yerlerde kırılmasını sağlar */
+    text-align: center; /* Metni ortalar */
+    overflow: hidden; /* Çerçevenin dışına taşmayı engeller */
+    text-shadow: 1px 1px #ff8a00;
+    max-width: 150px; /* Çerçevenin genişliğine göre uyarlanır */
+    display: -webkit-box; /* Çok satırlı metni sınırlamak için */
+    -webkit-line-clamp: 2; /* Maksimum 2 satır göster */
+    -webkit-box-orient: vertical;
+}
+
+        .duel-player-correct-count {
+            font-size: 1.5em;
+            margin-top: 8px;
+            color: #28a745;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            animation: bounceCount 0.6s;
+        }
+
+        @keyframes bounceCount {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+.winner-message {
+    font-size: 1.5em; /* Yazı boyutu başlangıç değeri */
+    font-weight: bold; /* Yazı kalınlığı */
+    color: #11b819; /* Yazı rengi */
+    text-align: center; /* Yazıyı ortala */
+    animation: glowMukemmel 1.5s infinite alternate; /* Animasyon */
+    margin-bottom: 25px; /* Alt boşluk */
+    text-shadow: 3px 4px #8cd900; /* Yazı gölgesi */
+    word-wrap: break-word; /* Uzun kelimeleri kaydır */
+    overflow-wrap: break-word; /* Modern tarayıcılar için kelime kaydırma */
+    white-space: normal; /* Satır kaydırmayı etkinleştir */
+    padding: 10px; /* Çerçeve kenar boşluğu */
+    line-height: 1.2; /* Satır aralığını sıkılaştır */
+}
+
+        .score-flash {
+            animation: scoreFlash 0.8s ease;
+        }
+
+        @keyframes scoreFlash {
+            0% {transform: scale(1) rotate(0deg); color:#28a745;}
+            30% {transform: scale(1.5) rotate(10deg); color:#28a745;}
+            60% {transform: scale(1.3) rotate(-10deg); color:#28a745;}
+            100% {transform: scale(1) rotate(0deg); color:#28a745;}
+        }
+
+        /* Oyundakiler Modal */
+        .players-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.6);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:1000000;
+            animation: fadeInModal 0.3s;
+        }
+
+        .players-content {
+            background:#fff;
+            padding:30px;
+            border-radius:15px;
+            width:90%;
+            max-width:450px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.3);
+            display:flex;
+            flex-direction:column;
+            gap:25px;
+            animation: slideDownModal 0.3s;
+        }
+
+        .players-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .players-header h3 {
+            margin:0;
+            font-size:1.8em;
+            color:#ff8a00;
+            text-shadow: 1px 1px #f7786b;
+        }
+
+        .players-close {
+            background: none;
+            border:none;
+            font-size:1.5em;
+            cursor:pointer;
+            color:#ff6f61;
+            transition: color 0.3s;
+        }
+
+        .players-close:hover {
+            color:#e63946;
+        }
+
+        .players-list {
+            list-style:none;
+            padding:0;
+            margin:0;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+
+        .players-list li {
+            display:flex;
+            align-items:center;
+            gap:15px;
+            background:#f0f0f0;
+            padding:12px;
+            border-radius:8px;
+            justify-content: space-between;
+            transition: background-color 0.3s;
+        }
+
+        .players-list li:hover {
+            background-color: #e0e0e0;
+        }
+
+        .players-list img {
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            object-fit:cover;
+            border:3px solid #ff8a00;
+        }
+
+        .players-list .player-name {
+            font-size:1.1em;
+            color:#333;
+            flex:1;
+            text-shadow: 1px 1px #ff8a00;
+        }
+
+        /* Yeni Eklenen Stil: Ranking Panel (Yan Panel) */
+        .ranking-panel {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Başlangıçta görünmez */
+            width: 450px;
+            max-width: 90%;
+            height: 100%;
+            background-color: #fffbea;
+            box-shadow: -3px 0 10px rgba(0,0,0,0.3);
+            transition: right 0.3s ease;
+            z-index: 1000000;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+            animation: slideInPanel 0.3s forwards;
+        }
+
+        @keyframes slideInPanel {
+            from { right: -100%; }
+            to { right: 0; }
+        }
+
+        .ranking-panel.open {
+            right: 0; /* Açıldığında görünür */
+        }
+
+        .ranking-panel h2 {
+            font-size: 2.2em;
+            color: #ff8a00;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            text-shadow: 1px 1px #f7786b;
+        }
+
+        /* Ranking Panel İçin Geri Dön Butonu */
+        .ranking-back-button {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            background-color: #555;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1.1em;
+            margin-top: 30px;
+            align-self: center;
+            width: 100%;
+            max-width: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .ranking-back-button:hover {
+            background-color: #333;
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .ranking-table th, .ranking-table td {
+            border: 2px solid #ff8a00;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .ranking-table th {
+            background-color: #ffe5d9;
+            color: #ff8a00;
+            font-weight: bold;
+            text-shadow: 1px 1px #f7786b;
+        }
+
+        .ranking-table tr:nth-child(even) {
+            background-color: #fff3e0;
+        }
+
+        .ranking-table tr:hover {
+            background-color: #ffe5d9;
+        }
+
+        .ranking-player-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff8a00;
+        }
+
+        /* Top 3 özel stiller */
+        .ranking-table tr.top-1 {
+            background-color: #FFD700 !important; /* Altın */
+            animation: pulse 2s infinite;
+        }
+
+        .ranking-table tr.top-2 {
+            background-color: #C0C0C0 !important; /* Gümüş */
+            animation: pulse 2s infinite;
+        }
+
+        .ranking-table tr.top-3 {
+            background-color: #CD7F32 !important; /* Bronz */
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 25px rgba(0,0,0,0.5);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            }
+        }
+    
+/* Crazy Animated Ranking Table */
+.ranking-table-container {
+    max-height: 80%;
+    overflow-y: auto;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #4e54c8, #8f94fb);
+    padding: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    animation: pulseBackground 5s infinite alternate;
+}
+
+@keyframes pulseBackground {
+    0% {
+        background: linear-gradient(145deg, #4e54c8, #8f94fb);
+    }
+    50% {
+        background: linear-gradient(145deg, #e055fd, #8a54f5);
+    }
+    100% {
+        background: linear-gradient(145deg, #4e54c8, #8f94fb);
+    }
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 1rem;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.ranking-table th {
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: #000;
+    font-weight: bold;
+    padding: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.ranking-table th::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+    opacity: 0.7;
+    pointer-events: none;
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.ranking-table td {
+    padding: 15px;
+    text-align: center;
+    background: linear-gradient(135deg, #f6f7f8, #e2e2e2);
+    color: #333;
+    border: none;
+    position: relative;
+    transition: all 0.5s ease-in-out;
+}
+
+.ranking-table tr:hover td {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: #ffffff;
+    transform: scale(1.05) rotateX(10deg);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.ranking-table tr.top-1 td {
+    background: linear-gradient(135deg, #f4d03f, #16a085);
+    color: black;
+    font-weight: bold;
+    animation: rainbowShine 5s infinite alternate;
+}
+
+.ranking-table tr.top-2 td {
+    background: linear-gradient(135deg, #silver, #d1d8e0);
+    color: black;
+    font-weight: bold;
+    animation: rainbowShine 5s infinite alternate;
+}
+
+.ranking-table tr.top-3 td {
+    background: linear-gradient(135deg, #cd7f32, #8b4513);
+    color: black;
+    font-weight: bold;
+    animation: rainbowShine 5s infinite alternate;
+}
+
+@keyframes rainbowShine {
+    0% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.5);
+    }
+    100% {
+        filter: brightness(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .ranking-table {
+        font-size: 0.8rem;
+    }
+
+    .ranking-table th, .ranking-table td {
+        padding: 10px;
+    }
+}
+
+
+/* Enhanced Top 3 Styling */
+.ranking-table tr.top-1 td {
+    background: linear-gradient(145deg, #FFD700, #FFA500);
+    color: white;
+    font-weight: bold;
+    animation: glowGold 3s infinite alternate;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+}
+
+.ranking-table tr.top-2 td {
+    background: linear-gradient(145deg, #C0C0C0, #A9A9A9);
+    color: white;
+    font-weight: bold;
+    animation: glowSilver 3s infinite alternate;
+    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.5);
+}
+
+.ranking-table tr.top-3 td {
+    background: linear-gradient(145deg, #CD7F32, #8B4513);
+    color: white;
+    font-weight: bold;
+    animation: glowBronze 3s infinite alternate;
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.5);
+}
+
+@keyframes glowGold {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5) hue-rotate(10deg); }
+    100% { filter: brightness(1); }
+}
+
+@keyframes glowSilver {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5) hue-rotate(10deg); }
+    100% { filter: brightness(1); }
+}
+
+@keyframes glowBronze {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5) hue-rotate(10deg); }
+    100% { filter: brightness(1); }
+}
+
+
+/* Removing Glow from Top 3 */
+.ranking-table tr.top-1 td,
+.ranking-table tr.top-2 td,
+.ranking-table tr.top-3 td {
+    animation: none;
+}
+
+/* Removing Shimmer Effect from Header */
+.ranking-table th::after {
+    animation: none;
+    background: none;
+}
+
+</style>
+</head>
+<body>
+    <!-- Oyundakiler Modal -->
+    <div class="players-overlay" id="playersOverlay">
+        <div class="players-content">
+            <div class="players-header">
+                <h3>Oyundakiler</h3>
+                <button class="players-close" id="playersCloseButton">✖</button>
+            </div>
+            <ul class="players-list" id="playersList"></ul>
+        </div>
+    </div>
+
+    <!-- Öğrenci Seçimi Ekranı -->
+    <div class="container student-selection-container" id="student-selection-screen">
+        <h2>Öğrenci Seçimi</h2>
+        <div class="table-section">
+            <h3>Öğrenci Seçme</h3>
+            <label for="selection-class-select">Sınıfı Seç:</label>
+            <select id="selection-class-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="selection-name-select">Öğrenciyi Seç:</label>
+            <select id="selection-name-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="student-password-input">Şifre Giriniz:</label>
+            <input type="password" id="student-password-input" placeholder="Şifre" disabled>
+        </div>
+        <button class="login-button" id="login-button" disabled>Giriş</button>
+        <button class="admin-button" id="admin-button">
+            <img src="https://cdn.pixabay.com/photo/2019/10/06/11/40/lock-4529981_1280.png" alt="Admin">
+        </button>
+        <div class="error" id="student-selection-error"></div>
+    </div>
+
+    <!-- Ana Ekran -->
+    <div class="container" id="main-screen" style="display: none;">
+        <div class="student-info">
+            <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
+            <div class="student-name" id="student-name"></div>
+            <div class="student-cup">
+                <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk0M3A2MWR2aTJxenhoMjJ2dmRybXFzNjRlam9oNGlpM3p2eW0zayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/wX7I4l8SfFyG8rqhsd/giphy.webp" alt="Game Cup" class="game-cup-image">
+                <span class="game-cup-score" id="game-cup-score">0</span>
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="single-player">Tek Kişilik Oyun</button>
+            <button class="oyundakiler-button" id="oyundakiler-button">Oyundakiler</button>
+            <!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
+            <button class="kupa-siralama-button" id="kupa-siralama-button">
+                🏆 Kupa Sıralaması
+            </button>
+	    <button class="logout-button" id="logout-button">Çıkış Yap</button>
+        </div>
+    </div>
+
+    <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
+    <div class="ranking-panel" id="rankingPanel" style="display: none;">
+        <h2>Kupa Sıralaması</h2>
+        <div class="ranking-table-container">
+            <table class="ranking-table" id="ranking-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Fotoğraf</th>
+                        <th>İsim</th>
+                        <th>Sınıf</th>
+                        <th>Kupa Skoru</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-table-body">
+                    <!-- Sıralama verileri buraya eklenecek -->
+                </tbody>
+            </table>
+        </div>
+        <button class="ranking-back-button" id="rankingBackButton">Geri Dön</button>
+    </div>
+
+    <!-- Tek Kişilik Oyun Ekranı -->
+    <div class="game-container" id="single-player-screen">
+        <h2>Tek Kişilik Oyun</h2>
+        <div class="table-section">
+            <h3>Konu Belirleme</h3>
+            <label for="class-select">Sınıf Seç:</label>
+            <select id="class-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="subject-select">Ders Seç:</label>
+            <select id="subject-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="topic-select">Konu Seç:</label>
+            <select id="topic-select">
+                <option value="">Seçiniz</option>
+            </select>
+        </div>
+        <button class="start-game-button" id="start-game-button" disabled>Oyuna Başla</button>
+        <button class="back-button">Geri Dön</button>
+    </div>
+
+    <!-- Admin Ekranı -->
+    <div class="container admin-container" id="admin-screen">
+        <h2>Admin Paneli</h2>
+        <div class="table-section">
+            <h3>Sınıf Seçimi ve PIN Doğrulama</h3>
+            <label for="admin-class-select">Sınıf Seç:</label>
+            <select id="admin-class-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="admin-pin-input">Sınıf PIN'i Gir:</label>
+            <input type="password" id="admin-pin-input" placeholder="PIN">
+
+            <button class="login-button" id="admin-login-button" disabled>PIN Doğrula</button>
+        </div>
+        <div class="table-section" id="admin-student-section" style="display: none;">
+            <h3>Öğrenciler</h3>
+            <ul class="admin-student-list" id="admin-student-list"></ul>
+        </div>
+        <button class="admin-back-button">Geri Dön</button>
+    </div>
+
+    <!-- Tek Kişilik Oyun Sorular Ekranı -->
+    <div class="single-player-game-container" id="single-player-game-screen">
+        <div class="progress-container">
+            <div class="question-number" id="question-number">Soru 1/10</div>
+            <div class="progress-bar">
+                <div class="progress-bar-inner" id="progress-bar-inner"></div>
+            </div>
+        </div>
+        <div class="timer-container">
+            <div class="timer" id="timer">45</div>
+        </div>
+        <div class="question-container">
+            <img src="" alt="Soru Resmi" class="question-image" id="question-image" style="display: none;">
+            <div class="question-text" id="question-text">Soru metni burada olacak.</div>
+        </div>
+        <div class="options-container" id="options-container"></div>
+        <div class="score-container" id="score-container">
+            <span id="score"></span>
+            <div class="score-message" id="score-message"></div>
+            <img id="score-image" class="final-image" style="display:none;" alt="Sonuç Resmi">
+            <!-- "Geri Dön" butonu -->
+            <button class="end-game-button" id="final-back-button">Geri Dön</button>
+        </div>
+    </div>
+
+    <!-- Düello Seçim Ekranı -->
+    <div class="duel-selection-container" id="duel-selection-screen">
+        <h2>Ortak Seçim Ekranı</h2>
+        <div class="table-section">
+            <h3>Konu Belirleme</h3>
+            <label for="duel-class-select">Sınıf Seç:</label>
+            <select id="duel-class-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="duel-subject-select">Ders Seç:</label>
+            <select id="duel-subject-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="duel-topic-select">Konu Seç:</label>
+            <select id="duel-topic-select">
+                <option value="">Seçiniz</option>
+            </select>
+        </div>
+        <div class="duel-controls">
+            <button class="duel-start-button" id="duel-start-button" disabled>Düelloya Başla</button>
+        </div>
+
+        <div class="duel-bottom-info">
+            <div class="duel-player-info" id="duel-inviter-info">
+                <img src="" class="duel-player-photo" id="duel-inviter-photo">
+                <div class="duel-player-name" id="duel-inviter-name"></div>
+            </div>
+            <div class="duel-player-info" id="duel-invited-info">
+                <img src="" class="duel-player-photo" id="duel-invited-photo">
+                <div class="duel-player-name" id="duel-invited-name"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Düello Oyun Ekranı -->
+    <div class="duel-game-container" id="duel-game-screen">
+        <div class="progress-container">
+            <div class="question-number" id="duel-question-number">Soru 1/10</div>
+            <div class="progress-bar">
+                <div class="progress-bar-inner" id="duel-progress-bar-inner"></div>
+            </div>
+        </div>
+        <div class="timer-container">
+            <div class="timer" id="duel-timer">45</div>
+        </div>
+        <div class="question-container">
+            <img src="" alt="Soru Resmi" class="question-image" id="duel-question-image" style="display: none;">
+            <div class="question-text" id="duel-question-text">Soru metni burada olacak.</div>
+        </div>
+        <div class="options-container" id="duel-options-container"></div>
+
+        <div class="players-info-row">
+            <div class="duel-player-score" id="duel-player-inviter-score">
+                <img id="duel-player-inviter-photo" src="">
+                <div class="duel-player-name" id="duel-player-inviter-name"></div>
+                <div class="duel-player-correct-count" id="inviter-correct-count">0</div>
+            </div>
+            <div class="duel-player-score" id="duel-player-invited-score">
+                <img id="duel-player-invited-photo" src="">
+                <div class="duel-player-name" id="duel-player-invited-name"></div>
+                <div class="duel-player-correct-count" id="invited-correct-count">0</div>
+            </div>
+        </div>
+
+        <div class="score-container" id="duel-final-container">
+            <div class="winner-message" id="winner-message"></div>
+            <button class="end-game-button" id="duel-final-back-button">Oyunu Sonlandır</button>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="alert-overlay" id="alertOverlay">
+        <div class="alert-content">
+            <div class="alert-message" id="alertMessage"></div>
+            <button class="alert-ok-button" id="alertOkButton">Tamam</button>
+        </div>
+    </div>
+
+    <!-- Prompt Modal -->
+    <div class="prompt-overlay" id="promptOverlay">
+        <div class="prompt-content">
+            <div class="prompt-message" id="promptMessage"></div>
+            <input type="text" class="prompt-input" id="promptInput">
+            <div class="prompt-buttons">
+                <button class="prompt-cancel-button" id="promptCancelButton">İptal</button>
+                <button class="prompt-ok-button" id="promptOkButton">Tamam</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Davet Modalı -->
+    <div class="invitation-overlay" id="invitationOverlay">
+        <div class="invitation-content">
+            <div class="invitation-message" id="invitationMessage"></div>
+            <div class="invitation-buttons">
+                <button class="invitation-decline-button" id="invitationDeclineButton">Reddet</button>
+                <button class="invitation-accept-button" id="invitationAcceptButton">Kabul Et</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arka Plan Müziği için Audio Elementi -->
+    <audio id="duelBackgroundMusic" src="https://github.com/d4rkd4/audio-assets/raw/refs/heads/main/OYUN%202%20ARKA%20PLAN%20M%C3%9CZ%C4%B0%C4%9E%C4%B0.mp3" preload="auto"></audio>
+    <!-- Kazanan Ekranı için Yeni Audio Elementi -->
+    <audio id="winnerMusic" src="https://github.com/d4rkd4/audio-assets/raw/refs/heads/main/Awards%20Fanfare%20Winner%20Nomination%20Ceremony%20Background%20Music.mp3" preload="auto"></audio>
+    <!-- Tek Kişilik Oyun Müziği için Yeni Audio Elementi -->
+    <audio id="singlePlayerQuestionMusic" src="https://github.com/d4rkd4/winnerarkaplan/raw/refs/heads/main/soru%20arka.mp3" preload="auto"></audio>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script>
+        // JavaScript Kodları
+
+        // Audio Elementlerini Seçme
+        const duelMusic = document.getElementById('duelBackgroundMusic');
+        const winnerMusic = document.getElementById('winnerMusic');
+        const singlePlayerQuestionMusic = document.getElementById('singlePlayerQuestionMusic');
+
+        // "Oyunu Sonlandır" butonuna eklenen event listener
+document.getElementById('duel-final-back-button').addEventListener('click', async () => {
+    await showAlert('🏆 Kupa verileriniz güncellendi.');
+    if (currentDuelRef) {
+        try {
+            await currentDuelRef.remove();
+            currentDuelRef = null;
+            isInviter = false;
+            duelGameStarted = false;
+            window.location.reload();
+        } catch (error) {
+            console.error("Düello referansı kaldırılırken hata:", error);
+            await showAlert('Düello referansı kaldırılırken hata oluştu.');
+        }
+    } else {
+        window.location.reload();
+    }
+});
+
+
+        window.addEventListener('beforeunload', () => {
+            if (selectedStudent && selectedStudent.studentId) {
+                database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).set(false)
+                .then(() => console.log("inDuel set to false"))
+                .catch(err => console.error("Failed to update inDuel status:", err));
+
+                // Eğer bir düello referansı varsa, düelloyu kaldır ve diğer oyuncunun inDuel durumunu false yap
+                if (currentDuelRef) {
+                    currentDuelRef.once('value').then(async (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            const inviterRef = database.ref(`classes/${data.inviter.classId}/students/${data.inviter.studentId}/inDuel`);
+                            const invitedRef = database.ref(`classes/${data.invited.classId}/students/${data.invited.studentId}/inDuel`);
+                            try {
+                                await inviterRef.set(false);
+                                await invitedRef.set(false);
+                                await currentDuelRef.remove();
+                            } catch (error) {
+                                console.error("Düello referansı kaldırılırken hata:", error);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        // Lütfen kendi firebaseConfig değerlerinizi girin
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_DOMAIN",
+            databaseURL: "https://sampiyonlar-ligi-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // Diğer değişkenler
+        let classNameMap = {};
+        let duelEnded = false; // Eklendi
+
+        const playersOverlay = document.getElementById('playersOverlay');
+        const playersCloseButton = document.getElementById('playersCloseButton');
+        const playersList = document.getElementById('playersList');
+        const oyundakilerButton = document.getElementById('oyundakiler-button');
+        const invitationOverlay = document.getElementById('invitationOverlay');
+        const invitationMessage = document.getElementById('invitationMessage');
+
+        playersCloseButton.addEventListener('click', () => {
+            playersOverlay.style.display = 'none';
+        });
+
+        let loggedinPlayerRef = null;
+        let selectedStudent = {
+            classId: '',
+            studentId: '',
+            studentName: ''
+        };
+
+        const studentPhoto = document.getElementById('student-photo');
+        const studentName = document.getElementById('student-name');
+
+        async function addLoggedInPlayer(student) {
+            const newRef = database.ref('loggedinPlayers').push();
+            await newRef.set({
+                name: student.studentName,
+                photo: (studentPhoto.src && studentPhoto.src !== "") ? studentPhoto.src : "",
+                classId: student.classId,
+                studentId: student.studentId
+            });
+            newRef.onDisconnect().remove();
+            loggedinPlayerRef = newRef;
+        }
+
+        async function showLoggedInPlayers() {
+            playersList.innerHTML = '';
+            const snapshot = await database.ref('loggedinPlayers').once('value');
+            let playersArr = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    const player = child.val();
+                    playersArr.push({ ...player, key: child.key });
+                });
+
+                // Sınıf adına göre sırala (aynı sınıftakiler önce)
+                const sameClassPlayers = playersArr.filter(p => p.classId === selectedStudent.classId && p.studentId !== selectedStudent.studentId);
+                const otherClassPlayers = playersArr.filter(p => p.classId !== selectedStudent.classId);
+                playersArr = [...sameClassPlayers, ...otherClassPlayers];
+
+                for (const player of playersArr) {
+                    let photoURL = "https://via.placeholder.com/50";
+                    try {
+                        const photoSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/photo`).once('value');
+                        if (photoSnapshot.exists()) {
+                            photoURL = photoSnapshot.val();
+                        }
+                    } catch (e) {
+                        console.error('Fotoğraf alınamadı:', e);
+                    }
+
+                    // "Oyunda" butonu için inDuel kontrolü
+                    let inDuel = false;
+                    try {
+                        const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
+                        if (inDuelSnapshot.exists()) {
+                            inDuel = inDuelSnapshot.val();
+                        }
+                    } catch (e) {
+                        console.error('inDuel durumu alınamadı:', e);
+                    }
+
+                    const li = document.createElement('li');
+                    const img = document.createElement('img');
+                    img.src = photoURL;
+
+                    const span = document.createElement('span');
+                    span.className = 'player-name';
+                    let clsName = classNameMap[player.classId] ? classNameMap[player.classId] : player.classId;
+                    span.textContent = `${player.name} / (${clsName})`;
+
+                    if (inDuel) {
+                        // "Oyunda" Butonu
+                        const oyundaButton = document.createElement('button');
+                        oyundaButton.textContent = 'Oyunda';
+                        oyundaButton.className = 'oyunda-button'; // Yeni sınıf kullanıldı
+                        oyundaButton.disabled = true; // Tıklanamaz
+                        li.appendChild(img);
+                        li.appendChild(span);
+                        li.appendChild(oyundaButton);
+                    } else {
+                        // "Davet Et" Butonu
+                        const davetButton = document.createElement('button');
+                        davetButton.textContent = 'Davet Et';
+                        davetButton.className = 'davet-et-button';
+                        davetButton.style.backgroundColor = '#17a2b8';
+                        davetButton.style.color = 'white';
+                        davetButton.style.border = 'none';
+                        davetButton.style.borderRadius = '6px';
+                        davetButton.style.padding = '8px 14px';
+                        davetButton.style.cursor = 'pointer';
+                        davetButton.style.transition = 'background-color 0.3s';
+                        davetButton.addEventListener('mouseover', () => {
+                            davetButton.style.backgroundColor = '#138496';
+                        });
+                        davetButton.addEventListener('mouseout', () => {
+                            davetButton.style.backgroundColor = '#17a2b8';
+                        });
+                        davetButton.addEventListener('click', () => {
+                            sendInvitation(player);
+                        });
+                        li.appendChild(img);
+                        li.appendChild(span);
+                        li.appendChild(davetButton);
+                    }
+
+                    playersList.appendChild(li);
+                }
+            } else {
+                const li = document.createElement('li');
+                li.textContent = "Şu an oyunda kimse yok.";
+                playersList.appendChild(li);
+            }
+            playersOverlay.style.display = 'flex';
+        }
+        oyundakilerButton.addEventListener('click', showLoggedInPlayers);
+
+        const studentSelectionScreen = document.getElementById('student-selection-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const singlePlayerScreen = document.getElementById('single-player-screen');
+        const adminScreen = document.getElementById('admin-screen');
+        const singlePlayerGameScreen = document.getElementById('single-player-game-screen');
+        const duelSelectionScreen = document.getElementById('duel-selection-screen');
+        const duelGameScreen = document.getElementById('duel-game-screen');
+        const rankingPanel = document.getElementById('rankingPanel'); // Ranking Panel ID
+
+        const loginButton = document.getElementById('login-button');
+        const adminButton = document.getElementById('admin-button');
+        const singlePlayerButton = document.querySelector('.single-player');
+        const backButtons = document.querySelectorAll('.back-button');
+        const adminBackButton = document.querySelector('.admin-back-button');
+        const startGameButton = document.getElementById('start-game-button');
+        const finalBackButton = document.getElementById('final-back-button');
+
+        const adminClassSelect = document.getElementById('admin-class-select');
+        const adminPinInput = document.getElementById('admin-pin-input');
+        const adminLoginButton = document.getElementById('admin-login-button');
+        const adminStudentSection = document.getElementById('admin-student-section');
+        const adminStudentList = document.getElementById('admin-student-list');
+
+        const selectionClassSelect = document.getElementById('selection-class-select');
+        const selectionNameSelect = document.getElementById('selection-name-select');
+
+        const classSelect = document.getElementById('class-select');
+        const subjectSelect = document.getElementById('subject-select');
+        const topicSelect = document.getElementById('topic-select');
+
+        const studentPasswordInput = document.getElementById('student-password-input');
+        const studentSelectionError = document.getElementById('student-selection-error');
+
+        let gameQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionNumber = document.getElementById('question-number');
+        const progressBarInner = document.getElementById('progress-bar-inner');
+        const questionImage = document.getElementById('question-image');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const scoreContainer = document.getElementById('score-container');
+        const scoreDisplay = document.getElementById('score');
+        const scoreMessage = document.getElementById('score-message');
+        const scoreImage = document.getElementById('score-image');
+        const timerElement = document.getElementById('timer');
+
+        const duelClassSelect = document.getElementById('duel-class-select');
+        const duelSubjectSelect = document.getElementById('duel-subject-select');
+        const duelTopicSelect = document.getElementById('duel-topic-select');
+        const duelStartButton = document.getElementById('duel-start-button');
+
+        const duelInviterPhoto = document.getElementById('duel-inviter-photo');
+        const duelInviterName = document.getElementById('duel-inviter-name');
+        const duelInvitedPhoto = document.getElementById('duel-invited-photo');
+        const duelInvitedName = document.getElementById('duel-invited-name');
+
+        const duelQuestionNumber = document.getElementById('duel-question-number');
+        const duelProgressBarInner = document.getElementById('duel-progress-bar-inner');
+        const duelTimerElement = document.getElementById('duel-timer');
+        const duelQuestionImage = document.getElementById('duel-question-image');
+        const duelQuestionText = document.getElementById('duel-question-text');
+        const duelOptionsContainer = document.getElementById('duel-options-container');
+
+        const inviterCorrectCountEl = document.getElementById('inviter-correct-count');
+        const invitedCorrectCountEl = document.getElementById('invited-correct-count');
+
+        const duelFinalContainer = document.getElementById('duel-final-container');
+        const winnerMessage = document.getElementById('winner-message');
+
+        // Ranking Panel Elements
+        const kupaSiralamaButton = document.getElementById('kupa-siralama-button');
+        const rankingTableBody = document.getElementById('ranking-table-body');
+        const rankingBackButton = document.getElementById('rankingBackButton');
+
+        let timer;
+        let timeLeft = 45;
+
+        let duelTimer;
+        let duelTimeLeft = 45;
+
+        let currentDuelRef = null;
+        let isInviter = false;
+        let currentInvitation = null;
+
+        let duelQuestions = [];
+        let duelCurrentQuestionIndex = 0;
+        let duelInviterScore = 0;
+        let duelInvitedScore = 0;
+        let duelClassId = "";
+        let duelSubjectId = "";
+        let duelTopicId = "";
+        let duelQuestionLocked = false;
+        let duelGameStarted = false;
+
+window.onload = () => {
+    const storedStudent = localStorage.getItem('selectedStudent');
+    if (storedStudent) {
+        selectedStudent = JSON.parse(storedStudent);
+        mainScreen.style.display = 'flex';
+        studentSelectionScreen.style.display = 'none';
+        studentSelectionError.textContent = '';
+        studentPasswordInput.value = '';
+
+        database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`).once('value').then(photoSnapshot => {
+            if (photoSnapshot.exists()) {
+                const photoURL = photoSnapshot.val();
+                studentPhoto.src = photoURL;
+                studentPhoto.style.display = 'block';
+            } else {
+                studentPhoto.style.display = 'none';
+            }
+        }).catch(error => {
+            console.error("Fotoğraf çekilirken hata:", error);
+            studentPhoto.style.display = 'none';
+        });
+
+        studentName.textContent = selectedStudent.studentName;
+        addLoggedInPlayer(selectedStudent);
+        startInvitationListener(selectedStudent.studentId);
+        fetchAndDisplayGameCup();
+    } else {
+        studentSelectionScreen.style.display = 'flex';
+    }
+    fetchClassesForSelection();
+    fetchAdminClasses();
+    fetchChampionData();
+};
+
+
+
+        async function fetchAllClasses() {
+            const snapshot = await database.ref('classes').once('value');
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const classId = childSnapshot.key;
+                    const className = childSnapshot.val().name;
+                    classNameMap[classId] = className;
+                });
+            }
+        }
+        fetchAllClasses();
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                console.log("Kullanıcı oturum açtı:", user);
+            } else {
+                console.log("Kullanıcı oturum açmadı.");
+            }
+        });
+
+loginButton.addEventListener('click', async () => {
+    selectedStudent.classId = selectionClassSelect.value;
+    selectedStudent.studentId = selectionNameSelect.value;
+    selectedStudent.studentName = selectionNameSelect.options[selectionNameSelect.selectedIndex].text;
+    const enteredPassword = studentPasswordInput.value.trim();
+
+    if (selectedStudent.classId && selectedStudent.studentId) {
+        if (enteredPassword === "") {
+            studentSelectionError.textContent = 'Lütfen şifrenizi giriniz.';
+            return;
+        }
+
+        database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/password`).once('value').then(async snapshot => {
+            if (snapshot.exists()) {
+                const correctPassword = snapshot.val();
+                if (enteredPassword === correctPassword) {
+                    studentSelectionScreen.style.display = 'none';
+                    mainScreen.style.display = 'flex';
+                    studentSelectionError.textContent = '';
+                    studentPasswordInput.value = '';
+
+                    database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`).once('value').then(photoSnapshot => {
+                        if (photoSnapshot.exists()) {
+                            const photoURL = photoSnapshot.val();
+                            studentPhoto.src = photoURL;
+                            studentPhoto.style.display = 'block';
+                        } else {
+                            studentPhoto.style.display = 'none';
+                        }
+                    }).catch(error => {
+                        console.error("Fotoğraf çekilirken hata:", error);
+                        studentPhoto.style.display = 'none';
+                    });
+
+                    studentName.textContent = selectedStudent.studentName;
+                    await addLoggedInPlayer(selectedStudent);
+                    startInvitationListener(selectedStudent.studentId);
+                    fetchAndDisplayGameCup(); // gameCup puanını çek ve göster
+
+                    // **Oturum Bilgilerini localStorage'a Kaydet**
+                    localStorage.setItem('selectedStudent', JSON.stringify(selectedStudent));
+                } else {
+                    studentSelectionError.textContent = 'Yanlış şifre. Lütfen tekrar deneyiniz.';
+                }
+            } else {
+                studentSelectionError.textContent = 'Bu öğrenci için şifre tanımlanmamış.';
+            }
+        }).catch(error => {
+            console.error("Şifre kontrol hata:", error);
+            studentSelectionError.textContent = 'Şifre kontrol edilirken hata oluştu.';
+        });
+    }
+});
+
+
+        adminButton.addEventListener('click', () => {
+            studentSelectionScreen.style.display = 'none';
+            mainScreen.style.display = 'none';
+            adminScreen.style.display = 'flex';
+        });
+
+        backButtons.forEach(backButton => {
+            backButton.addEventListener('click', () => {
+                const currentScreen = backButton.parentElement;
+                if(currentScreen.id === 'duel-selection-screen' && currentDuelRef) {
+                    // Düello referansını kaldır ve sayfayı yenile
+                    currentDuelRef.remove().then(() => {
+                        // Her iki oyuncunun inDuel durumunu false yap
+                        currentDuelRef.once('value').then(async (snapshot) => {
+                            if (snapshot.exists()) {
+                                const data = snapshot.val();
+                                const inviterRef = database.ref(`classes/${data.inviter.classId}/students/${data.inviter.studentId}/inDuel`);
+                                const invitedRef = database.ref(`classes/${data.invited.classId}/students/${data.invited.studentId}/inDuel`);
+                                try {
+                                    await inviterRef.set(false);
+                                    await invitedRef.set(false);
+                                } catch (error) {
+                                    console.error("inDuel güncellenirken hata:", error);
+                                }
+                            }
+                        });
+                        currentDuelRef = null;
+                        isInviter = false;
+                        duelGameStarted = false;
+                        window.location.reload();
+                    }).catch(error => {
+                        console.error("Düello referansı kaldırılırken hata:", error);
+                        showAlert('Düello referansı kaldırılırken hata oluştu.');
+                    });
+                } else {
+                    currentScreen.style.display = 'none';
+                    mainScreen.style.display = 'flex';
+                    resetGameScreens();
+                }
+            });
+        });
+
+        adminBackButton.addEventListener('click', () => {
+            adminScreen.style.display = 'none';
+            studentSelectionScreen.style.display = 'flex';
+            resetAdminScreens();
+        });
+
+        singlePlayerButton.addEventListener('click', () => {
+            mainScreen.style.display = 'none';
+            singlePlayerScreen.style.display = 'flex';
+        });
+
+        startGameButton.addEventListener('click', () => {
+            const selectedClass = classSelect.value;
+            const selectedSubject = subjectSelect.value;
+            const selectedTopic = topicSelect.value;
+
+            if (selectedClass && selectedSubject && selectedTopic) {
+                fetchQuestions(selectedClass, selectedSubject, selectedTopic);
+            } else {
+                showAlert('Lütfen tüm alanları doldurunuz.');
+            }
+        });
+
+        adminLoginButton.addEventListener('click', () => {
+            const selectedClass = adminClassSelect.value;
+            const enteredPin = adminPinInput.value;
+
+            if (selectedClass === "" || enteredPin === "") {
+                showAlert('Lütfen sınıf ve PIN girin.');
+                return;
+            }
+
+            database.ref(`classes/${selectedClass}/pin`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    const correctPin = snapshot.val();
+                    if (enteredPin === correctPin) {
+                        fetchAdminStudents(selectedClass);
+                        adminStudentSection.style.display = 'block';
+                        studentSelectionError.textContent = '';
+                    } else {
+                        showAlert('Yanlış PIN.');
+                    }
+                } else {
+                    showAlert('Bu sınıf için PIN yok.');
+                }
+            }).catch(error => {
+                console.error("PIN kontrol hata:", error);
+                showAlert('PIN kontrol edilirken hata oluştu.');
+            });
+        });
+
+        async function handlePasswordUpdate(classId, studentId) {
+            const newPassword = await showPrompt('Yeni şifreyi giriniz:');
+            if (newPassword !== null) {
+                if (newPassword.trim() !== "") {
+                    database.ref(`classes/${classId}/students/${studentId}/password`).set(newPassword.trim()).then(() => {
+                        showAlert('Şifre oluşturuldu/güncellendi.');
+                    }).catch(error => {
+                        console.error("Şifre güncellenirken hata:", error);
+                        showAlert('Şifre güncellerken hata oluştu.');
+                    });
+                } else {
+                    showAlert('Şifre boş olamaz.');
+                }
+            }
+        }
+
+        function fetchAdminStudents(classId) {
+            adminStudentList.innerHTML = '';
+            database.ref(`classes/${classId}/students`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const studentId = childSnapshot.key;
+                        const studentName = childSnapshot.val().name;
+
+                        const listItem = document.createElement('li');
+                        listItem.textContent = studentName;
+
+                        const passwordButton = document.createElement('button');
+                        passwordButton.textContent = 'Şifre Oluştur/Güncelle';
+                        passwordButton.addEventListener('click', () => {
+                            handlePasswordUpdate(classId, studentId);
+                        });
+
+                        listItem.appendChild(passwordButton);
+                        adminStudentList.appendChild(listItem);
+                    });
+                } else {
+                    adminStudentList.innerHTML = '<li>Bu sınıfa ait öğrenci yok.</li>';
+                }
+            }).catch(error => {
+                console.error("Öğrenciler çekilirken hata:", error);
+                showAlert('Öğrenciler çekilirken hata oluştu.');
+            });
+        }
+
+        function fetchStudents(classId, studentNameSelectElement) {
+            studentNameSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+            if (classId === "") return;
+
+            database.ref(`classes/${classId}/students`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const studentId = childSnapshot.key;
+                        const studentName = childSnapshot.val().name;
+
+                        const option = document.createElement('option');
+                        option.value = studentId;
+                        option.textContent = studentName;
+                        studentNameSelectElement.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "Bu sınıfa ait öğrenci yok";
+                    studentNameSelectElement.appendChild(option);
+                }
+            }).catch(error => {
+                console.error("Öğrenci çekme hata:", error);
+            });
+        }
+
+        function fetchChampionData() {
+            database.ref('championData/headings').once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const classId = childSnapshot.key;
+                        const className = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
+                        const option = document.createElement('option');
+                        option.value = classId;
+                        option.textContent = className;
+                        classSelect.appendChild(option);
+                    });
+                } else {
+                    console.warn("championData/headings boş.");
+                }
+            }).catch(error => {
+                console.error("Sınıf bilgileri hata:", error);
+            });
+        }
+
+        function fetchLessons(classId, subjectSelectElement) {
+            subjectSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+            if (subjectSelectElement.id === 'duel-subject-select') {
+                duelTopicSelect.innerHTML = '<option value="">Seçiniz</option>';
+            } else {
+                topicSelect.innerHTML = '<option value="">Seçiniz</option>';
+            }
+
+            if (classId === "") return;
+
+            database.ref(`championData/headings/${classId}/lessons`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const lessonId = childSnapshot.key;
+                        const lessonName = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
+
+                        const option = document.createElement('option');
+                        option.value = lessonId;
+                        option.textContent = lessonName;
+                        subjectSelectElement.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "Bu sınıfa ait ders yok";
+                    subjectSelectElement.appendChild(option);
+                }
+            }).catch(error => {
+                console.error("Ders bilgileri hata:", error);
+            });
+        }
+
+        function fetchTopics(classId, lessonId, topicSelectElement) {
+            topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+
+            if (lessonId === "") return;
+
+            database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const topicId = childSnapshot.key;
+                        const topicName = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
+
+                        const option = document.createElement('option');
+                        option.value = topicId;
+                        option.textContent = topicName;
+                        topicSelectElement.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "Bu derse ait konu yok";
+                    topicSelectElement.appendChild(option);
+                }
+            }).catch(error => {
+                console.error("Konu bilgileri hata:", error);
+            });
+        }
+
+        const singlePlayerSelects = singlePlayerScreen.querySelectorAll('select');
+        singlePlayerSelects.forEach(select => {
+            select.addEventListener('change', checkSinglePlayerSelections);
+        });
+
+        adminPinInput.addEventListener('input', () => {
+            if (adminClassSelect.value !== "" && adminPinInput.value !== "") {
+                adminLoginButton.classList.add('active');
+                adminLoginButton.disabled = false;
+            } else {
+                adminLoginButton.classList.remove('active');
+                adminLoginButton.disabled = true;
+            }
+        });
+
+        function checkSinglePlayerSelections() {
+            let allSelected = true;
+            singlePlayerSelects.forEach(select => {
+                if (select.value === "") {
+                    allSelected = false;
+                }
+            });
+
+            if (allSelected) {
+                startGameButton.classList.add('active');
+                startGameButton.disabled = false;
+            } else {
+                startGameButton.classList.remove('active');
+                startGameButton.disabled = true;
+            }
+        }
+
+        selectionClassSelect.addEventListener('change', () => {
+            const selectedClass = selectionClassSelect.value;
+            if (selectedClass === "") {
+                selectionNameSelect.innerHTML = '<option value="">Seçiniz</option>';
+                checkLoginButtonState();
+                return;
+            }
+            fetchStudents(selectedClass, selectionNameSelect);
+            checkLoginButtonState();
+        });
+
+        selectionNameSelect.addEventListener('change', () => {
+            checkLoginButtonState();
+        });
+
+        function checkLoginButtonState() {
+            if (selectionClassSelect.value !== "" && selectionNameSelect.value !== "") {
+                loginButton.classList.add('active');
+                loginButton.disabled = false;
+                studentPasswordInput.disabled = false;
+            } else {
+                loginButton.classList.remove('active');
+                loginButton.disabled = true;
+                studentPasswordInput.disabled = true;
+                studentPasswordInput.value = '';
+            }
+        }
+
+        classSelect.addEventListener('change', () => {
+            const selectedClass = classSelect.value;
+            fetchLessons(selectedClass, subjectSelect);
+        });
+
+        subjectSelect.addEventListener('change', () => {
+            const selectedClass = classSelect.value;
+            const selectedLesson = subjectSelect.value;
+            fetchTopics(selectedClass, selectedLesson, topicSelect);
+        });
+
+        function resetGameScreens() {
+            // Tek Kişilik Oyun Ekranı
+            singlePlayerSelects.forEach(select => {
+                select.value = "";
+            });
+            startGameButton.classList.remove('active');
+            startGameButton.disabled = true;
+
+            scoreContainer.style.display = 'none';
+            scoreDisplay.textContent = '';
+            scoreMessage.textContent = '';
+            scoreMessage.className = 'score-message';
+            scoreImage.style.display = 'none';
+
+            // Düello Oyun Ekranı
+            duelQuestionNumber.textContent = 'Soru 1/10';
+            duelProgressBarInner.style.width = '0%';
+            duelTimerElement.textContent = '45';
+            duelTimerElement.style.color = '#ff0000';
+
+            // Yeni eklenen sıfırlamalar
+            gameQuestions = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            clearInterval(timer);
+
+            // Tek Kişilik Oyun Müziğini Durdur
+            singlePlayerQuestionMusic.pause();
+            singlePlayerQuestionMusic.currentTime = 0;
+
+            // Düello Oyun Müziğini Durdur
+            duelMusic.pause();
+            duelMusic.currentTime = 0;
+        }
+
+        function resetAdminScreens() {
+            adminClassSelect.value = "";
+            adminPinInput.value = "";
+            adminLoginButton.disabled = true;
+            adminLoginButton.classList.remove('active');
+            adminStudentSection.style.display = 'none';
+            adminStudentList.innerHTML = '';
+            studentSelectionError.textContent = '';
+        }
+
+// "Çıkış Yap" Butonunu Seçme
+const logoutButton = document.getElementById('logout-button');
+
+// "Çıkış Yap" Butonuna Event Listener Ekleme
+logoutButton.addEventListener('click', () => {
+    // 1. Oturum Bilgilerini localStorage'dan Temizleme
+    localStorage.removeItem('selectedStudent');
+
+    // 2. Firebase'deki loggedinPlayers Listesinden Kullanıcıyı Kaldırma
+    if (loggedinPlayerRef) {
+        loggedinPlayerRef.remove().then(() => {
+            console.log("Kullanıcı Firebase'den başarıyla kaldırıldı.");
+        }).catch(error => {
+            console.error("Firebase'den kullanıcı kaldırılırken hata oluştu:", error);
+            showAlert('Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.');
+            return; // Hata durumunda sayfa yenilenmesin
+        });
+    }
+
+    // 3. Sayfayı Yenileme
+    window.location.reload();
+});
+
+
+        function fetchQuestions(classId, subjectId, topicId) {
+            const questionsRef = database.ref(`championData/headings/${classId}/lessons/${subjectId}/topics/${topicId}/questions`);
+            questionsRef.once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    const allQuestions = [];
+                    snapshot.forEach(childSnapshot => {
+                        const questionData = childSnapshot.val();
+                        allQuestions.push(questionData);
+                    });
+
+                    if (allQuestions.length < 10) {
+                        showAlert('Bu konuya ait yeterli soru yok.');
+                        return;
+                    }
+
+                    gameQuestions = shuffleArray(allQuestions).slice(0, 10);
+                    currentQuestionIndex = 0;
+                    score = 0;
+
+                    singlePlayerScreen.style.display = 'none';
+                    singlePlayerGameScreen.style.display = 'flex';
+                    scoreContainer.style.display = 'none';
+                    displayCurrentQuestion();
+
+                    // Tek Kişilik Oyun Müziğini Başlat
+                    singlePlayerQuestionMusic.currentTime = 0;
+                    singlePlayerQuestionMusic.play().catch(error => {
+                        console.error("Tek Kişilik Oyun Müziği Çalınamadı:", error);
+                    });
+                } else {
+                    showAlert('Bu konuya ait soru bulunamadı.');
+                }
+            }).catch(error => {
+                console.error("Sorular çekme hata:", error);
+                showAlert('Sorular çekilirken hata oluştu.');
+            });
+        }
+
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function displayCurrentQuestion() {
+            if (currentQuestionIndex >= gameQuestions.length) {
+                endGame();
+                return;
+            }
+
+            const currentQuestion = gameQuestions[currentQuestionIndex];
+            questionNumber.textContent = `Soru ${currentQuestionIndex + 1}/10`;
+            const progressPercentage = ((currentQuestionIndex) / 10) * 100;
+            progressBarInner.style.width = `${progressPercentage}%`;
+
+            if (currentQuestion.question.startsWith('http')) {
+                questionImage.src = currentQuestion.question;
+                questionImage.style.display = 'block';
+                questionText.textContent = '';
+            } else {
+                questionImage.style.display = 'none';
+                questionText.textContent = currentQuestion.question;
+            }
+
+            const options = [
+                { text: currentQuestion.correct, correct: true },
+                { text: currentQuestion.wrong1, correct: false },
+                { text: currentQuestion.wrong2, correct: false }
+            ];
+            const shuffledOptions = shuffleArray(options);
+
+            optionsContainer.innerHTML = '';
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option-button');
+                button.textContent = option.text;
+                button.dataset.correct = option.correct;
+                button.addEventListener('click', selectOption);
+                optionsContainer.appendChild(button);
+            });
+
+            // Görünürlük ayarları
+            questionNumber.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'block';
+            document.querySelector('.timer-container').style.display = 'block';
+            document.querySelector('.question-container').style.display = 'flex';
+            optionsContainer.style.display = 'flex';
+
+            // Timer'ı sıfırla ve başlat
+            resetTimer();
+            startTimer();
+        }
+
+        function selectOption(e) {
+            const selectedButton = e.target;
+            const isCorrect = selectedButton.dataset.correct === 'true';
+
+            document.querySelectorAll('.option-button').forEach(button => {
+                button.disabled = true;
+                if (button !== selectedButton) {
+                    button.classList.add('option-faded');
+                } else {
+                    button.classList.add('option-chosen');
+                }
+            });
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct');
+                score++;
+            } else {
+                selectedButton.classList.add('wrong');
+                document.querySelectorAll('.option-button').forEach(button => {
+                    if (button.dataset.correct === 'true') {
+                        button.classList.add('correct');
+                    }
+                });
+            }
+
+            clearInterval(timer);
+
+            setTimeout(() => {
+                proceedToNextQuestion();
+            }, 1000);
+        }
+
+        function proceedToNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < 10) {
+                displayCurrentQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            questionNumber.style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.querySelector('.timer-container').style.display = 'none';
+            document.querySelector('.question-container').style.display = 'none';
+            optionsContainer.style.display = 'none';
+
+            scoreContainer.style.display = 'flex';
+            scoreDisplay.textContent = `Doğru Sayısı: ${score}/10`;
+
+            let message = '';
+            let messageClass = '';
+            let imageUrl = '';
+            scoreMessage.style.display = 'block';
+
+            if (score === 10) {
+                message = 'ŞAHANE';
+                messageClass = 'purple';
+                imageUrl = 'https://i.giphy.com/YX8IKLsJJXagt5rZMV.webp';
+            } else if (score >= 8 && score <= 9) {
+                message = 'Gayet İyi';
+                messageClass = 'green';
+                imageUrl = 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHAxM2E0cGY1bmJxcXdvbDYxYXBrZjRncXV0dzJwMXZ4bzJ1bWxzNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/AFmZwgpOXOqWwtcVve/giphy.webp';
+            } else if (score >= 6 && score <= 7) {
+                message = 'Daha iyisi olabilir.';
+                messageClass = 'green';
+                imageUrl = 'https://cdn.pixabay.com/photo/2019/10/28/14/35/emoticon-4584554_960_720.png';
+            } else if (score >= 3 && score <= 5) {
+                message = 'Kendini Geliştirmen Gerek.';
+                messageClass = 'blue';
+                imageUrl = 'https://cdn.pixabay.com/photo/2019/10/28/14/35/emoticon-4584554_960_720.png';
+            } else {
+                message = 'Başarısız Sonuç';
+                messageClass = 'red';
+                imageUrl = 'https://media.tenor.com/rPTWl04F5igAAAAM/byuntear-emoji.gif';
+            }
+
+            scoreMessage.textContent = message;
+            if (messageClass !== '') {
+                scoreMessage.classList.add(messageClass);
+            } else {
+                scoreMessage.textContent = '';
+            }
+
+            scoreImage.src = imageUrl;
+            scoreImage.style.display = 'block';
+
+            // Müzik çalma işlemi burada
+            if (score > 9) { // Örneğin, belirli bir başarı düzeyinde müzik çalınır
+                winnerMusic.currentTime = 0;
+                winnerMusic.play().catch(error => {
+                    console.error("Kazanan müziği çalınamadı:", error);
+                });
+            }
+        }
+
+        // "Geri Dön" butonu için event listener
+        finalBackButton.addEventListener('click', () => {
+            // Müzikleri durdur
+            stopAllMusic();
+
+            // Ekranları sıfırla ve ana ekrana dön
+            singlePlayerGameScreen.style.display = 'none';
+            mainScreen.style.display = 'flex';
+            resetGameScreens();
+        });
+
+        // Tüm müzikleri durdurma fonksiyonu
+        function stopAllMusic() {
+            if (!duelMusic.paused) {
+                duelMusic.pause();
+                duelMusic.currentTime = 0;
+            }
+            if (!winnerMusic.paused) {
+                winnerMusic.pause();
+                winnerMusic.currentTime = 0;
+            }
+            if (!singlePlayerQuestionMusic.paused) {
+                singlePlayerQuestionMusic.pause();
+                singlePlayerQuestionMusic.currentTime = 0;
+            }
+        }
+
+        // Kupa Sıralaması Butonuna Event Listener (Yan Panel Açma)
+        kupaSiralamaButton.addEventListener('click', () => {
+            rankingPanel.classList.add('open');
+            loadRanking(); // Sıralamayı yükle
+        });
+
+        // Ranking Back Button Event Listener (Yan Panel Kapatma)
+        rankingBackButton.addEventListener('click', () => {
+            rankingPanel.classList.remove('open');
+        });
+
+        // Bu event listener, düello oyununun sonunda "Oyunu Sonlandır" butonunu özel işlevle değiştirir.
+        // "Oyunu Sonlandır" butonunun işlevi, önce uyarıyı gösterir, ardından eski işlevini sürdürür.
+        // Ayrıca, kazanan ekranında müziğin çalmasını sağlar.
+        // (Bu kısım artık düello bitişte kazanan ekranında müzik çaldığı için kaldırıldı)
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 45;
+            timerElement.textContent = timeLeft;
+            timerElement.style.color = '#ff0000';
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    markQuestionAsWrong();
+                    setTimeout(() => {
+                        proceedToNextQuestion();
+                    }, 1000);
+                }
+            }, 1000);
+        }
+
+        function markQuestionAsWrong() {
+            document.querySelectorAll('.option-button').forEach(button => {
+                if (button.dataset.correct === 'true') {
+                    button.classList.add('correct');
+                } else {
+                    button.classList.add('wrong');
+                }
+                button.disabled = true;
+            });
+        }
+
+        function fetchClassesForSelection() {
+            database.ref('classes').once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const classId = childSnapshot.key;
+                        const className = childSnapshot.val().name ? childSnapshot.val().name : classId; // Sınıf adını alıyoruz
+
+                        console.log(`Class ID: ${classId}, Class Name: ${className}`);
+
+                        // Sınıf adı mevcut olduğu için doğrudan ekleyebiliriz
+                        const option = document.createElement('option');
+                        option.value = classId;
+                        option.textContent = className;
+                        selectionClassSelect.appendChild(option);
+                    });
+                } else {
+                    console.warn("Seçim için sınıf yok.");
+                }
+            }).catch(error => {
+                console.error("Seçim için sınıf çekme hata:", error);
+            });
+        }
+
+        // Alert fonksiyonu
+        const alertOverlay = document.getElementById('alertOverlay');
+        const alertMessage = document.getElementById('alertMessage');
+        const alertOkButton = document.getElementById('alertOkButton');
+
+        function showAlert(message) {
+            alertMessage.textContent = message; // Sabit mesaj için textContent kullanıldı
+            alertOverlay.style.display = 'flex';
+            return new Promise(resolve => {
+                alertOkButton.onclick = () => {
+                    alertOverlay.style.display = 'none';
+                    resolve();
+                };
+            });
+        }
+
+        // Prompt fonksiyonu
+        const promptOverlay = document.getElementById('promptOverlay');
+        const promptMessage = document.getElementById('promptMessage');
+        const promptInput = document.getElementById('promptInput');
+        const promptCancelButton = document.getElementById('promptCancelButton');
+        const promptOkButton = document.getElementById('promptOkButton');
+
+        function showPrompt(message) {
+            promptMessage.textContent = message;
+            promptInput.value = '';
+            promptOverlay.style.display = 'flex';
+
+            return new Promise(resolve => {
+                promptOkButton.onclick = () => {
+                    const val = promptInput.value;
+                    promptOverlay.style.display = 'none';
+                    resolve(val);
+                };
+
+                promptCancelButton.onclick = () => {
+                    promptOverlay.style.display = 'none';
+                    resolve(null);
+                };
+            });
+        }
+
+        // Davet Etme ve Dinleme
+        async function sendInvitation(player) {
+            try {
+                const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
+                const isInDuel = inDuelSnapshot.exists() ? inDuelSnapshot.val() : false;
+
+                if (isInDuel) {
+                    showAlert(`${player.name} zaten bir düelloda!`);
+                    return;
+                }
+
+                const invitationRef = database.ref(`invitations/${player.studentId}`);
+                invitationRef.set({
+                    invitedByName: selectedStudent.studentName,
+                    invitedByClassId: selectedStudent.classId,
+                    invitedByStudentId: selectedStudent.studentId,
+                    invitedByPhoto: studentPhoto.src ? studentPhoto.src : ""
+                }).then(() => {
+                    showAlert(`${player.name} davet edildi!`);
+                }).catch(error => {
+                    console.error("Davet gönderme hatası:", error);
+                    showAlert('Davet gönderilirken bir hata oluştu.');
+                });
+            } catch (error) {
+                console.error("Düello kontrolü hata:", error);
+                showAlert('Düello durumu kontrol edilirken hata oluştu.');
+            }
+        }
+
+        function startInvitationListener(studentId) {
+            // Davetleri dinle
+            database.ref(`invitations/${studentId}`).on('value', snapshot => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    currentInvitation = { ...data };
+                    showInvitationModal(data);
+                } else {
+                    if (invitationOverlay.style.display === 'flex' && !currentInvitation) {
+                        invitationOverlay.style.display = 'none';
+                    }
+                    currentInvitation = null;
+                }
+            });
+
+            // Düelloları dinle
+            database.ref('duels').orderByChild('inviter/studentId').equalTo(studentId).on('child_added', snapshot => {
+                if (currentDuelRef == null) {
+                    currentDuelRef = snapshot.ref;
+                    isInviter = true;
+                    switchToDuelScreen(snapshot.key);
+                }
+            });
+
+            database.ref('duels').orderByChild('invited/studentId').equalTo(studentId).on('child_added', snapshot => {
+                if (currentDuelRef == null) {
+                    currentDuelRef = snapshot.ref;
+                    isInviter = false;
+                    switchToDuelScreen(snapshot.key);
+                }
+            });
+
+            // Düello referansı silindiğinde (örneğin, bir oyuncu bağlantısını kestiğinde)
+            database.ref('duels').on('child_removed', snapshot => {
+                if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) { // duelEnded kontrolü eklendi
+                    showAlert('Rakibin bağlantısı kesildi. Tekrar giriş yapınız.')
+                        .then(() => {
+                            window.location.reload();
+                        });
+                }
+            });
+        }
+
+        function showInvitationModal(data) {
+            invitationMessage.textContent = `${data.invitedByName} (${classNameMap[data.invitedByClassId] ? classNameMap[data.invitedByClassId] : data.invitedByClassId}) seni düelloya davet ediyor.`;
+            invitationOverlay.style.display = 'flex';
+        }
+
+        const invitationDeclineButton = document.getElementById('invitationDeclineButton');
+        const invitationAcceptButton = document.getElementById('invitationAcceptButton');
+
+        invitationDeclineButton.addEventListener('click', () => {
+            if (currentInvitation && selectedStudent.studentId) {
+                database.ref(`invitations/${selectedStudent.studentId}`).remove();
+                invitationOverlay.style.display = 'none';
+                currentInvitation = null;
+            }
+        });
+
+        invitationAcceptButton.addEventListener('click', async () => {
+            if (currentInvitation && selectedStudent.studentId) {
+                try {
+                    const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
+                    const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+
+                    if (isInDuel) {
+                        showAlert(`Zaten bir düellodasın!`);
+                        invitationOverlay.style.display = 'none';
+                        currentInvitation = null;
+                        return;
+                    }
+
+                    // Yeni: "Oyundakiler" ekranını kapat
+                    playersOverlay.style.display = 'none';
+
+                    invitationOverlay.style.display = 'none';
+                    await createDuelSession(currentInvitation.invitedByStudentId, currentInvitation.invitedByClassId, currentInvitation.invitedByName, currentInvitation.invitedByPhoto);
+                    await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+                } catch (error) {
+                    console.error("Düello başlatılırken hata:", error);
+                    showAlert('Düello başlatılırken bir hata oluştu.');
+                }
+            }
+        });
+
+        async function createDuelSession(inviterId, inviterClassId, inviterName, inviterPhoto) {
+            const duelRef = database.ref('duels').push();
+            await duelRef.set({
+                inviter: {
+                    classId: inviterClassId,
+                    studentId: inviterId,
+                    name: inviterName,
+                    photo: inviterPhoto
+                },
+                invited: {
+                    classId: selectedStudent.classId,
+                    studentId: selectedStudent.studentId,
+                    name: selectedStudent.studentName,
+                    photo: (studentPhoto.src && studentPhoto.src !== "") ? studentPhoto.src : ""
+                },
+                selections: {
+                    class: "",
+                    subject: "",
+                    topic: ""
+                },
+                gameStarted: false,
+                questions: [] // Soru listesi eklendi
+            });
+
+            // Düello başladıktan sonra inDuel bayraklarını ayarla
+            await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(true);
+            await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).set(true);
+
+            duelRef.onDisconnect().remove();
+
+            currentDuelRef = duelRef;
+            isInviter = true; // Başlatan taraf inviter olur
+            switchToDuelScreen(duelRef.key);
+        }
+
+        function switchToDuelScreen(duelKey) {
+            mainScreen.style.display = 'none';
+            singlePlayerScreen.style.display = 'none';
+            singlePlayerGameScreen.style.display = 'none';
+
+            duelSelectionScreen.style.display = 'flex';
+
+            // Ranking panel kapat
+            rankingPanel.classList.remove('open');
+
+            database.ref('championData/headings').once('value').then(snapshot => {
+                duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const cid = childSnapshot.key;
+                        const cname = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
+                        const option = document.createElement('option');
+                        option.value = cid;
+                        option.textContent = cname;
+                        duelClassSelect.appendChild(option);
+                    });
+                }
+            });
+
+            // Yeni: Oyundakiler overlay'ini kapat
+            playersOverlay.style.display = 'none';
+
+            currentDuelRef.on('value', snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    duelInviterPhoto.src = data.inviter.photo ? data.inviter.photo : "https://via.placeholder.com/80";
+                    duelInviterName.textContent = data.inviter.name;
+
+                    duelInvitedPhoto.src = data.invited.photo ? data.invited.photo : "https://via.placeholder.com/80";
+                    duelInvitedName.textContent = data.invited.name;
+
+                    duelClassSelect.value = data.selections.class || "";
+                    duelSubjectSelect.value = data.selections.subject || "";
+                    duelTopicSelect.value = data.selections.topic || "";
+
+                    if (data.gameStarted && !duelGameStarted) {
+                        duelGameStarted = true; 
+                        duelEnded = false; // Duel başladığında bayrağı sıfırla
+                        startDuelGame(data);
+                    }
+
+                    if (!isInviter) {
+                        duelClassSelect.disabled = true;
+                        duelSubjectSelect.disabled = true;
+                        duelTopicSelect.disabled = true;
+                        duelStartButton.disabled = true;
+                    } else {
+                        checkDuelSelections();
+                    }
+                } else {
+                    // Duel reference removed (diğer oyuncu çıkmış olabilir)
+                    if (!duelEnded) { // duelEnded kontrolü eklenerek sadece düello bitmemişse uyarı göster
+                        showAlert('Rakibin bağlantısı kesildi. Tekrar giriş yapınız.')
+                            .then(() => {
+                                window.location.reload();
+                            });
+                    }
+                }
+            });
+
+            // Müzik çalma işlevini her iki oyuncu için garanti altına almak adına ek kullanıcı etkileşimi
+            // Düello ekranına geçiş yapıldığında küçük bir etkileşim sağlamak için gizli bir buton ekleyebiliriz
+            // Bu sayede tarayıcıların autoplay politikalarına uyum sağlanır
+            const hiddenPlayButton = document.createElement('button');
+            hiddenPlayButton.style.display = 'none';
+            hiddenPlayButton.id = 'hiddenPlayButton';
+            duelSelectionScreen.appendChild(hiddenPlayButton);
+
+            hiddenPlayButton.addEventListener('click', () => {
+                duelMusic.play().then(() => {
+                    duelMusic.loop = true;
+                }).catch(error => {
+                    console.error("Müzik çalınamadı:", error);
+                });
+            });
+
+            // Gizli butonu otomatik olarak tetiklemek
+            setTimeout(() => {
+                hiddenPlayButton.click();
+            }, 1000);
+        }
+
+        function resetDuelGameState() {
+            duelQuestionNumber.textContent = 'Soru 1/10';
+            duelProgressBarInner.style.width = '0%';
+            duelTimerElement.textContent = '45';
+            duelTimerElement.style.color = '#ff0000';
+            inviterCorrectCountEl.textContent = "0";
+            invitedCorrectCountEl.textContent = "0";
+
+            duelQuestions = [];
+            duelCurrentQuestionIndex = 0;
+            duelInviterScore = 0;
+            duelInvitedScore = 0;
+            clearInterval(duelTimer);
+            duelQuestionLocked = false;
+            duelGameStarted = false;
+            duelEnded = true; // Duel bittiğinde bayrağı ayarla
+
+            // Düello Oyun Müziğini Durdur
+            duelMusic.pause();
+            duelMusic.currentTime = 0;
+        }
+
+        duelClassSelect.addEventListener('change', () => {
+            if (isInviter) {
+                fetchLessons(duelClassSelect.value, duelSubjectSelect);
+                updateDuelSelection('class', duelClassSelect.value);
+            }
+        });
+
+        duelSubjectSelect.addEventListener('change', () => {
+            if (isInviter) {
+                fetchTopics(duelClassSelect.value, duelSubjectSelect.value, duelTopicSelect);
+                updateDuelSelection('subject', duelSubjectSelect.value);
+            }
+        });
+
+        duelTopicSelect.addEventListener('change', () => {
+            if (isInviter) {
+                updateDuelSelection('topic', duelTopicSelect.value);
+            }
+        });
+
+        function updateDuelSelection(field, value) {
+            currentDuelRef.child('selections').child(field).set(value);
+            checkDuelSelections();
+        }
+
+        function checkDuelSelections() {
+            if (isInviter) {
+                const c = duelClassSelect.value;
+                const s = duelSubjectSelect.value;
+                const t = duelTopicSelect.value;
+                if (c !== "" && s !== "" && t !== "") {
+                    duelStartButton.classList.add('active');
+                    duelStartButton.disabled = false;
+                } else {
+                    duelStartButton.classList.remove('active');
+                    duelStartButton.disabled = true;
+                }
+            }
+        }
+
+        duelStartButton.addEventListener('click', async () => {
+            duelClassId = duelClassSelect.value;
+            duelSubjectId = duelSubjectSelect.value;
+            duelTopicId = duelTopicSelect.value;
+
+            const questionsRef = database.ref(`championData/headings/${duelClassId}/lessons/${duelSubjectId}/topics/${duelTopicId}/questions`);
+            const snapshot = await questionsRef.once('value');
+            if (snapshot.exists()) {
+                const allQuestions = [];
+                snapshot.forEach(cs => {
+                    allQuestions.push(cs.val());
+                });
+                if (allQuestions.length < 10) {
+                    showAlert('Bu konuya ait yeterli soru yok.');
+                    return;
+                }
+                let chosen = shuffleArray(allQuestions).slice(0,10);
+                chosen = chosen.map(q => {
+                    let options = [
+                        { text: q.correct, correct: true },
+                        { text: q.wrong1, correct: false },
+                        { text: q.wrong2, correct: false }
+                    ];
+                    let shuffled = shuffleArray(options);
+                    return {
+                        question: q.question,
+                        options: shuffled
+                    };
+                });
+                await currentDuelRef.child('questions').set(chosen);
+                await currentDuelRef.child('gameStarted').set(true);
+                showAlert("Düello Başlatıldı!");
+            } else {
+                showAlert("Bu konuya ait soru bulunamadı.");
+            }
+        });
+
+        function startDuelGame(data) {
+            // Düello başlarken final ekranı ve skorları resetleyelim
+            duelFinalContainer.style.display='none';
+            winnerMessage.textContent = '';
+
+            duelSelectionScreen.style.display = 'none';
+            duelGameScreen.style.display = 'flex';
+
+            document.getElementById('duel-player-inviter-photo').src = data.inviter.photo ? data.inviter.photo : "https://via.placeholder.com/80";
+            document.getElementById('duel-player-inviter-name').textContent = data.inviter.name;
+            document.getElementById('duel-player-invited-photo').src = data.invited.photo ? data.invited.photo : "https://via.placeholder.com/80";
+            document.getElementById('duel-player-invited-name').textContent = data.invited.name;
+
+            duelInviterScore = 0;
+            duelInvitedScore = 0;
+            inviterCorrectCountEl.textContent = "0";
+            invitedCorrectCountEl.textContent = "0";
+
+            duelCurrentQuestionIndex = 0;
+            if (data.questions) {
+                duelQuestions = data.questions;
+                loadDuelQuestion();
+            }
+
+            listenToResponses();
+
+            // Düello oyunu başladığında arka plan müziğini çal
+            duelMusic.currentTime = 0;
+            duelMusic.play().then(() => {
+                duelMusic.loop = true;
+            }).catch(error => {
+                console.error("Müzik çalınamadı:", error);
+            });
+        }
+
+        function loadDuelQuestion() {
+            if (duelCurrentQuestionIndex >= 10) {
+                endDuelGame();
+                return;
+            }
+            duelQuestionLocked = false;
+            const currentQuestion = duelQuestions[duelCurrentQuestionIndex];
+            duelQuestionNumber.textContent = `Soru ${duelCurrentQuestionIndex + 1}/10`;
+            const progressPercentage = ((duelCurrentQuestionIndex) / 10) * 100;
+            duelProgressBarInner.style.width = `${progressPercentage}%`;
+
+            if (currentQuestion.question.startsWith('http')) {
+                duelQuestionImage.src = currentQuestion.question;
+                duelQuestionImage.style.display = 'block';
+                duelQuestionText.textContent = '';
+            } else {
+                duelQuestionImage.style.display = 'none';
+                duelQuestionText.textContent = currentQuestion.question;
+            }
+
+            duelOptionsContainer.innerHTML = '';
+            currentQuestion.options.forEach((option, idx) => {
+                const button = document.createElement('button');
+                button.classList.add('option-button');
+                button.textContent = option.text;
+                button.dataset.correct = option.correct;
+                button.dataset.optionIndex = idx;
+                button.addEventListener('click', duelSelectOption);
+                duelOptionsContainer.appendChild(button);
+            });
+
+            resetDuelTimer();
+            startDuelTimer();
+            currentDuelRef.child('responses').child(duelCurrentQuestionIndex).remove();
+        }
+
+        function resetDuelTimer() {
+            clearInterval(duelTimer);
+            duelTimeLeft = 45;
+            duelTimerElement.textContent = duelTimeLeft;
+            duelTimerElement.style.color = '#ff0000';
+        }
+
+        function startDuelTimer() {
+            duelTimer = setInterval(() => {
+                duelTimeLeft--;
+                duelTimerElement.textContent = duelTimeLeft;
+
+                if (duelTimeLeft <= 0 && !duelQuestionLocked) {
+                    clearInterval(duelTimer);
+                    duelQuestionLocked = true;
+                    revealDuelAnswerAfterTimeout();
+                }
+            }, 1000);
+        }
+
+        function duelSelectOption(e) {
+            if (duelQuestionLocked) return;
+            const selectedButton = e.target;
+            const chosenOptionText = selectedButton.textContent;
+            const isCorrect = selectedButton.dataset.correct === 'true';
+            const playerId = selectedStudent.studentId;
+
+            duelOptionsContainer.querySelectorAll('.option-button').forEach(b => {
+                b.disabled = true;
+                if (b !== selectedButton) {
+                    b.classList.add('option-faded');
+                } else {
+                    b.classList.add('option-chosen');
+                }
+            });
+
+            currentDuelRef.child('responses').child(duelCurrentQuestionIndex).child(playerId).set({
+                chosen: chosenOptionText,
+                correct: isCorrect
+            });
+        }
+
+        function listenToResponses() {
+            currentDuelRef.child('responses').on('value', snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    currentDuelRef.once('value', dsnap => {
+                        const ddata = dsnap.val();
+                        const invId = ddata.inviter.studentId;
+                        const inId = ddata.invited.studentId;
+
+                        const answeredCount = Object.keys(data[duelCurrentQuestionIndex] || {}).length;
+                        if (answeredCount === 2 && !duelQuestionLocked) {
+                            duelQuestionLocked = true;
+                            clearInterval(duelTimer);
+                            revealDuelAnswerAfterTimeout();
+                        }
+                    });
+                }
+            });
+        }
+
+        // Yeni +1 Efekti Fonksiyonu
+        function showScoreIncrementEffect(scoreElement) {
+            const plusOne = document.createElement('div');
+            plusOne.classList.add('animated-plus-one');
+            plusOne.textContent = '+1';
+            document.body.appendChild(plusOne);
+
+            // Get center position
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            // Get the scoreElement's position
+            const rect = scoreElement.getBoundingClientRect();
+            const targetX = rect.left + rect.width / 2;
+            const targetY = rect.top + rect.height / 2;
+
+            // Calculate translation
+            const deltaX = targetX - centerX;
+            const deltaY = targetY - centerY;
+
+            // Animate
+            plusOne.animate([
+                { transform: `translate(-50%, -50%) translate(0px, 0px) scale(1)`, opacity: 1 },
+                { transform: `translate(-50%, -50%) translate(${deltaX}px, ${deltaY}px) scale(0.5)`, opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'ease-out'
+            });
+
+            // Remove the element after animation
+            setTimeout(() => {
+                plusOne.remove();
+            }, 1000);
+        }
+
+        function revealDuelAnswerAfterTimeout() {
+            setTimeout(() => {
+                revealDuelAnswer();
+            }, 500);
+        }
+
+        function revealDuelAnswer() {
+            currentDuelRef.child('responses').child(duelCurrentQuestionIndex).once('value').then(resSnap => {
+                const responses = resSnap.val() || {};
+                currentDuelRef.once('value').then(dSnap => {
+                    const ddata = dSnap.val();
+                    const invId = ddata.inviter.studentId;
+                    const inId = ddata.invited.studentId;
+
+                    const optionButtons = duelOptionsContainer.querySelectorAll('.option-button');
+                    optionButtons.forEach(btn => {
+                        if (btn.dataset.correct === 'true') {
+                            btn.classList.add('correct');
+                        } else {
+                            btn.classList.add('wrong');
+                        }
+                    });
+
+                    let inviterOldScore = duelInviterScore;
+                    let invitedOldScore = duelInvitedScore;
+
+                    if (responses[invId] && responses[invId].correct) duelInviterScore++;
+                    if (responses[inId] && responses[inId].correct) duelInvitedScore++;
+
+                    if (duelInviterScore > inviterOldScore) {
+                        inviterCorrectCountEl.textContent = duelInviterScore;
+                        inviterCorrectCountEl.classList.add('score-flash');
+                        showScoreIncrementEffect(inviterCorrectCountEl);
+                        setTimeout(()=>inviterCorrectCountEl.classList.remove('score-flash'),1000);
+                    }
+
+                    if (duelInvitedScore > invitedOldScore) {
+                        invitedCorrectCountEl.textContent = duelInvitedScore;
+                        invitedCorrectCountEl.classList.add('score-flash');
+                        showScoreIncrementEffect(invitedCorrectCountEl);
+                        setTimeout(()=>invitedCorrectCountEl.classList.remove('score-flash'),1000);
+                    }
+
+                    setTimeout(() => {
+                        duelCurrentQuestionIndex++;
+                        loadDuelQuestion();
+                    }, 1500);
+                });
+            });
+        }
+
+        function endDuelGame() {
+            currentDuelRef.off('value');
+            currentDuelRef.child('responses').off('value');
+
+            let message = '';
+            let winnerId = null;
+            let loserId = null;
+            let classId = null;
+
+            currentDuelRef.once('value').then(dSnap => {
+                const ddata = dSnap.val();
+
+                if (duelInviterScore > duelInvitedScore) {
+                    message = `Kazanan: ${ddata.inviter.name}`;
+                    winnerId = ddata.inviter.studentId;
+                    loserId = ddata.invited.studentId;
+                    classId = ddata.inviter.classId;
+                } else if (duelInvitedScore > duelInviterScore) {
+                    message = `Kazanan: ${ddata.invited.name}`;
+                    winnerId = ddata.invited.studentId;
+                    loserId = ddata.inviter.studentId;
+                    classId = ddata.invited.classId;
+                } else {
+                    message = "Berabere Kaldınız!";
+                }
+
+                if (winnerId && loserId && classId) {
+                    // Kazananın puanını +3, kaybedenin puanını -1 (en az 0)
+                    const winnerRef = database.ref(`classes/${classId}/students/${winnerId}/gameCup`);
+                    winnerRef.transaction(current => {
+                        return (current || 0) + 3;
+                    });
+
+                    const loserRef = database.ref(`classes/${classId}/students/${loserId}/gameCup`);
+                    loserRef.transaction(current => {
+                        return Math.max((current || 0) - 1, 0);
+                    });
+
+                    // Refresh gameCup display for logged-in player if they are the winner or loser
+                    if (winnerId === selectedStudent.studentId || loserId === selectedStudent.studentId) {
+                        fetchAndDisplayGameCup();
+                    }
+                }
+
+                // Display winner message
+                duelQuestionNumber.style.display = 'none';
+                document.querySelector('#duel-game-screen .progress-container').style.display = 'none';
+                document.querySelector('#duel-game-screen .timer-container').style.display = 'none';
+                document.querySelector('#duel-game-screen .question-container').style.display = 'none';
+                duelOptionsContainer.style.display = 'none';
+
+                winnerMessage.textContent = message;
+                duelFinalContainer.style.display = 'flex';
+
+                // Kazanan ekranında müziği çal
+                if (message.startsWith('Kazanan') || message === "Berabere Kaldınız!") {
+                    winnerMusic.currentTime = 0;
+                    winnerMusic.play().catch(error => {
+                        console.error("Kazanan müziği çalınamadı:", error);
+                    });
+                }
+
+                // Kazanan ekranına geldiğinde arka plan müziğini durdur
+                duelMusic.pause();
+                duelMusic.currentTime = 0;
+
+                // Duelin bittiğini belirt
+                duelEnded = true;
+            });
+        }
+
+        function fetchAdminClasses() {
+            database.ref('classes').once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    adminClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+                    snapshot.forEach(childSnapshot => {
+                        const classId = childSnapshot.key;
+                        const classData = childSnapshot.val();
+                        const className = classData.name ? classData.name : classId; // Sınıf adını alıyoruz
+
+                        console.log(`Admin Panel - Class ID: ${classId}, Class Name: ${className}`);
+
+                        // Sınıf adı mevcut olduğu için doğrudan ekleyebiliriz
+                        const option = document.createElement('option');
+                        option.value = classId;
+                        option.textContent = className;
+                        adminClassSelect.appendChild(option);
+                    });
+                } else {
+                    console.warn("Admin için sınıf bulunamadı.");
+                }
+            }).catch(error => {
+                console.error("Admin sınıf çekme hata:", error);
+            });
+
+            adminClassSelect.addEventListener('change', () => {
+                if (adminClassSelect.value !== "" && adminPinInput.value !== "") {
+                    adminLoginButton.classList.add('active');
+                    adminLoginButton.disabled = false;
+                } else {
+                    adminLoginButton.classList.remove('active');
+                    adminLoginButton.disabled = true;
+                }
+            });
+        }
+
+        // Fetch and display gameCup for the logged-in student
+        function fetchAndDisplayGameCup() {
+            database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/gameCup`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    document.getElementById('game-cup-score').textContent = snapshot.val();
+                } else {
+                    // Initialize gameCup to 0
+                    database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/gameCup`).set(0);
+                    document.getElementById('game-cup-score').textContent = '0';
+                }
+            }).catch(error => {
+                console.error("gameCup çekilirken hata:", error);
+                document.getElementById('game-cup-score').textContent = '0';
+            });
+        }
+
+        async function loadRanking() {
+            rankingTableBody.innerHTML = ''; // Temizle
+
+            // Tüm öğrencileri çek ve sıralama yap
+            const snapshot = await database.ref('classes').once('value');
+            let players = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(classSnapshot => {
+                    const classId = classSnapshot.key;
+                    const className = classSnapshot.val().name ? classSnapshot.val().name : classId;
+                    const studentsSnapshot = classSnapshot.child('students');
+                    if (studentsSnapshot.exists()) {
+                        studentsSnapshot.forEach(studentSnapshot => {
+                            const studentId = studentSnapshot.key;
+                            const studentData = studentSnapshot.val();
+                            const gameCup = studentData.gameCup || 0;
+                            const photo = studentData.photo || 'https://via.placeholder.com/50';
+                            players.push({
+                                name: studentData.name || 'Anonim',
+                                className: className,
+                                gameCup: gameCup,
+                                photo: photo
+                            });
+                        });
+                    }
+                });
+
+                // Oyun kupasına göre sırala (büyükten küçüğe)
+                players.sort((a, b) => b.gameCup - a.gameCup);
+
+                // İlk 25 oyuncuyu al
+                const topPlayers = players.slice(0, 25);
+
+                topPlayers.forEach((player, index) => {
+                    const tr = document.createElement('tr');
+                    // Rank
+                    const rankTd = document.createElement('td');
+                    rankTd.textContent = index + 1;
+                    tr.appendChild(rankTd);
+
+                    // Fotoğraf
+                    const photoTd = document.createElement('td');
+                    const img = document.createElement('img');
+                    img.src = player.photo;
+                    img.alt = `${player.name} Fotoğrafı`;
+                    img.className = 'ranking-player-photo';
+                    photoTd.appendChild(img);
+                    tr.appendChild(photoTd);
+
+                    // İsim
+                    const nameTd = document.createElement('td');
+                    nameTd.textContent = player.name;
+                    tr.appendChild(nameTd);
+
+                    // Sınıf
+                    const classTd = document.createElement('td');
+                    classTd.textContent = player.className;
+                    tr.appendChild(classTd);
+
+                    // Kupa Skoru
+                    const scoreTd = document.createElement('td');
+                    scoreTd.textContent = player.gameCup;
+                    tr.appendChild(scoreTd);
+
+                    // Top 3 için özel sınıflar ekle
+                    if (index === 0) {
+                        tr.classList.add('top-1');
+                    } else if (index === 1) {
+                        tr.classList.add('top-2');
+                    } else if (index === 2) {
+                        tr.classList.add('top-3');
+                    }
+
+                    rankingTableBody.appendChild(tr);
+                });
+            } else {
+                rankingTableBody.innerHTML = '<tr><td colspan="5">Henüz sıralama yapılmadı.</td></tr>';
+            }
+        }
+    </script>
+
+    <script>
+        // Ensure the script runs after the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const kupaSiralamaButton = document.getElementById('kupa-siralama-button');
+            const rankingBackButton = document.getElementById('rankingBackButton');
+            const rankingPanel = document.getElementById('rankingPanel');
+
+            // Hide the ranking panel initially
+            rankingPanel.style.display = 'none';
+
+            // Show the ranking panel when the button is clicked
+            if (kupaSiralamaButton) {
+                kupaSiralamaButton.addEventListener('click', () => {
+                    rankingPanel.style.display = 'flex';
+                });
+            }
+
+            // Hide the ranking panel when the back button is clicked
+            if (rankingBackButton) {
+                rankingBackButton.addEventListener('click', () => {
+                    rankingPanel.style.display = 'none';
+                });
+            }
+        });
+    </script>
+    </body>
+    
+</html>
