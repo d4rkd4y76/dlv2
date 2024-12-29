@@ -69,47 +69,145 @@
 
 
 select {
-    font-family: 'Comfortaa', cursive !important;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
     background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
     border: 2px solid #ff8a00;
     border-radius: 12px;
-    padding: 12px 35px 12px 12px;
+    padding: 12px;
     font-size: 1.1em;
     color: #333;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
-    cursor: pointer;
-    width: 100%;
-    position: relative;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
 }
 
-select option {
-    font-family: 'Comfortaa', cursive !important;
-    background-color: white;
-    color: #333;
+.friends-button {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.friends-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+}
+
+.friends-container {
+    display: none;
+    flex-direction: column;
+    gap: 25px;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.search-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+}
+
+.search-box input {
+    flex: 1;
     padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
     font-size: 1em;
 }
 
-/* Firefox için özel stil */
-@-moz-document url-prefix() {
-    select {
-        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-        text-indent: 0.01px;
-        text-overflow: '';
-        padding-right: 35px;
-    }
+#search-button {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-/* Edge ve IE için özel stil */
-select::-ms-expand {
-    display: none;
+.search-results, .friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.friend-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    gap: 15px;
+}
+
+.friend-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.friend-info {
+    flex: 1;
+}
+
+.friend-name {
+    font-weight: bold;
+    color: #111827;
+}
+
+.friend-class {
+    color: #6b7280;
+    font-size: 0.9em;
+}
+
+.add-friend-button {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-friend-button:hover {
+    background: #059669;
+    transform: scale(1.05);
+}
+
+.friend-status {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.status-offline {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.status-online {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-in-game {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 /* Hover ve odaklanma efekti */
@@ -929,14 +1027,20 @@ option {
         }
 
         /* Düello Seçim Ekranı */
-        .duel-selection-container {
-            display: none;
-            position: relative;
-            overflow:hidden;
-            padding-bottom: 140px;
-            text-align:center;
-            animation: fadeIn 0.5s forwards;
-        }
+.duel-selection-container {
+    display: none;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    margin: auto;
+    position: relative;
+    z-index: 1000;
+}
 
         /* İki oyuncuyu eşit orantıda yerleştirmek için space-evenly kullandık */
 .duel-bottom-info {
@@ -1600,8 +1704,37 @@ option {
                 🏆 Kupa Sıralaması
             </button>
 	    <button class="logout-button" id="logout-button">Çıkış Yap</button>
+	    <button class="friends-button" id="friends-button">
+               👥 Arkadaşlar
+            </button>
         </div>
     </div>
+
+<!-- Arkadaşlar Ekranı -->
+<div class="friends-container" id="friends-screen" style="display: none;">
+    <h2>Arkadaşlar</h2>
+    
+    <!-- Arama Bölümü -->
+    <div class="search-section">
+        <div class="search-box">
+            <input type="text" id="friend-search" placeholder="Arkadaş Ara...">
+            <button id="search-button">🔍 Ara</button>
+        </div>
+        <div class="search-results" id="search-results">
+            <!-- Arama sonuçları buraya gelecek -->
+        </div>
+    </div>
+
+    <!-- Arkadaş Listesi -->
+    <div class="friends-list-section">
+        <h3>Arkadaş Listem</h3>
+        <div class="friends-list" id="friends-list">
+            <!-- Arkadaş listesi buraya gelecek -->
+        </div>
+    </div>
+
+    <button class="back-button">Geri Dön</button>
+</div>
 
     <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
     <div class="ranking-panel" id="rankingPanel" style="display: none;">
@@ -1844,14 +1977,14 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
 
         // Lütfen kendi firebaseConfig değerlerinizi girin
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_DOMAIN",
-            databaseURL: "https://sampiyonlar-ligi-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+  apiKey: "AIzaSyCETl3W4_EblmlP3Ejq03JfgBIGLTLK7kM",
+  authDomain: "sampiyonlar-ligi.firebaseapp.com",
+  databaseURL: "https://sampiyonlar-ligi-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "sampiyonlar-ligi",
+  storageBucket: "sampiyonlar-ligi.firebasestorage.app",
+  messagingSenderId: "248285384149",
+  appId: "1:248285384149:web:39116a8e31ef61d16f815c"
+};
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
@@ -2182,6 +2315,338 @@ loginButton.addEventListener('click', async () => {
     }
 });
 
+// Ana değişkenler
+const friendsButton = document.querySelector('.friends-button');
+const friendsScreen = document.getElementById('friends-screen');
+const friendSearchInput = document.getElementById('friend-search');
+const searchButton = document.getElementById('search-button');
+const searchResults = document.getElementById('search-results');
+const friendsList = document.getElementById('friends-list');
+
+// Arkadaşlar butonuna tıklama olayı
+friendsButton.addEventListener('click', () => {
+    mainScreen.style.display = 'none';
+    friendsScreen.style.display = 'flex';
+    loadFriendsList(); // Arkadaş listesini yükle
+});
+
+// Geri dön butonu için olay dinleyici
+friendsScreen.querySelector('.back-button').addEventListener('click', () => {
+    friendsScreen.style.display = 'none';
+    mainScreen.style.display = 'flex';
+});
+
+// Arkadaş arama işlevi
+searchButton.addEventListener('click', searchFriends);
+friendSearchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        searchFriends();
+    }
+});
+
+async function searchFriends() {
+    const searchTerm = friendSearchInput.value.toLowerCase().trim();
+    if (searchTerm === '') return;
+
+    searchResults.innerHTML = '<div class="loading">Aranıyor...</div>';
+    
+    try {
+        const snapshot = await database.ref('classes').once('value');
+        const results = [];
+        
+        if (snapshot.exists()) {
+            snapshot.forEach(classSnapshot => {
+                const className = classSnapshot.val().name;
+                const students = classSnapshot.child('students').val();
+                
+                if (students) {
+                    Object.entries(students).forEach(([studentId, studentData]) => {
+                        if (studentData.name && 
+                            studentData.name.toLowerCase().includes(searchTerm) &&
+                            studentId !== selectedStudent.studentId) { // Kendisi hariç
+                            results.push({
+                                id: studentId,
+                                classId: classSnapshot.key,
+                                className: className,
+                                ...studentData
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        displaySearchResults(results);
+    } catch (error) {
+        console.error('Arama hatası:', error);
+        searchResults.innerHTML = '<div class="error">Arama sırasında bir hata oluştu.</div>';
+    }
+}
+
+function displaySearchResults(results) {
+    searchResults.innerHTML = '';
+    
+    if (results.length === 0) {
+        searchResults.innerHTML = '<div class="no-results">Sonuç bulunamadı</div>';
+        return;
+    }
+
+    results.forEach(student => {
+        // Öğrencinin sınıf adını düzgün şekilde al
+        student.className = classNameMap[student.classId] || student.classId;
+        const card = createFriendCard(student, true);
+        searchResults.appendChild(card);
+    });
+}
+
+function createFriendCard(student, isSearchResult = false) {
+    const card = document.createElement('div');
+    card.className = 'friend-card';
+    
+    const photo = document.createElement('img');
+    photo.src = student.photo || 'https://via.placeholder.com/50';
+    photo.className = 'friend-photo';
+    
+    const info = document.createElement('div');
+    info.className = 'friend-info';
+    info.innerHTML = `
+        <div class="friend-name">${student.name}</div>
+        <div class="friend-class">${classNameMap[student.classId] || student.classId}</div>
+    `;
+    
+    card.appendChild(photo);
+    card.appendChild(info);
+
+    if (isSearchResult) {
+        const addButton = document.createElement('button');
+        addButton.className = 'add-friend-button';
+        addButton.innerHTML = '+';
+        addButton.onclick = () => addFriend(student);
+        card.appendChild(addButton);
+    } else {
+        // Arkadaş listesindeki kartlar için durum göstergesi
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'friend-status';
+        
+        // Davet butonu
+        const davetButton = document.createElement('button');
+        davetButton.className = 'davet-et-button';
+        davetButton.textContent = 'Davet Et';
+        davetButton.style.backgroundColor = '#17a2b8';
+        davetButton.style.color = 'white';
+        davetButton.style.border = 'none';
+        davetButton.style.borderRadius = '6px';
+        davetButton.style.padding = '8px 14px';
+        davetButton.style.cursor = 'pointer';
+        davetButton.style.transition = 'background-color 0.3s';
+
+        davetButton.addEventListener('mouseover', () => {
+            davetButton.style.backgroundColor = '#138496';
+        });
+        davetButton.addEventListener('mouseout', () => {
+            davetButton.style.backgroundColor = '#17a2b8';
+        });
+
+        davetButton.addEventListener('click', () => {
+            const playerData = {
+                studentId: student.friendId,
+                classId: student.friendClassId,
+                name: student.friendName
+            };
+            sendInvitation(playerData);
+        });
+
+        // Oyunda değilse ve aktifse davet butonunu göster
+        database.ref(`loggedinPlayers`).orderByChild('studentId').equalTo(student.friendId).once('value', snapshot => {
+            if (snapshot.exists()) {
+                database.ref(`classes/${student.friendClassId}/students/${student.friendId}/inDuel`).once('value', duelSnapshot => {
+                    if (duelSnapshot.exists() && duelSnapshot.val() === true) {
+                        statusDiv.textContent = 'Oyunda';
+                        statusDiv.className = 'friend-status status-in-game';
+                        davetButton.style.display = 'none';
+                    } else {
+                        statusDiv.textContent = 'Aktif';
+                        statusDiv.className = 'friend-status status-online';
+                        davetButton.style.display = 'inline-block';
+                    }
+                });
+            } else {
+                statusDiv.textContent = 'Aktif Değil';
+                statusDiv.className = 'friend-status status-offline';
+                davetButton.style.display = 'none';
+            }
+        });
+
+        card.appendChild(statusDiv);
+        card.appendChild(davetButton);
+
+        // Durumu sürekli dinle
+        const cleanup = listenToFriendStatus(student.friendId, statusDiv, davetButton);
+        // Kart DOM'dan çıkarıldığında dinlemeyi temizle
+        card.addEventListener('remove', cleanup);
+    }
+
+    return card;
+}
+
+async function addFriend(student) {
+    try {
+        // Önce mevcut arkadaş sayısını kontrol et
+        const currentFriendsRef = database.ref(`friendships/${selectedStudent.studentId}`);
+        const snapshot = await currentFriendsRef.once('value');
+        const currentFriendsCount = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+
+        if (currentFriendsCount >= 10) {
+            showAlert('En fazla 10 arkadaş ekleyebilirsiniz!');
+            return;
+        }
+
+        // Arkadaş zaten ekli mi kontrol et
+        const existingFriendRef = database.ref(`friendships/${selectedStudent.studentId}/${student.id}`);
+        const existingFriend = await existingFriendRef.once('value');
+        
+        if (existingFriend.exists()) {
+            showAlert('Bu kişi zaten arkadaş listenizde!');
+            return;
+        }
+
+        const friendshipRef = database.ref(`friendships/${selectedStudent.studentId}/${student.id}`);
+        await friendshipRef.set({
+            friendId: student.id,
+            friendName: student.name,
+            friendClassId: student.classId,
+            friendClassName: classNameMap[student.classId] || student.classId,
+            friendPhoto: student.photo || null,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        showAlert('Arkadaş başarıyla eklendi!');
+        loadFriendsList(); // Listeyi yenile
+
+    } catch (error) {
+        console.error('Arkadaş ekleme hatası:', error);
+        showAlert('Arkadaş eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+    }
+}
+
+async function loadFriendsList() {
+    try {
+        friendsList.innerHTML = '<div class="loading">Yükleniyor...</div>';
+        
+        if (!selectedStudent || !selectedStudent.studentId) {
+            throw new Error('Öğrenci bilgisi bulunamadı');
+        }
+
+        const snapshot = await database.ref(`friendships/${selectedStudent.studentId}`).once('value');
+        friendsList.innerHTML = '';
+        
+        if (!snapshot.exists()) {
+            friendsList.innerHTML = '<div class="no-friends">Henüz arkadaşınız yok</div>';
+            return;
+        }
+
+        const friends = [];
+        snapshot.forEach(childSnapshot => {
+            const friendData = childSnapshot.val();
+            if (friendData) {
+                friends.push({
+                    friendId: friendData.friendId,
+                    friendName: friendData.friendName,
+                    friendClassName: friendData.friendClassName,
+                    friendPhoto: friendData.friendPhoto,
+                    friendClassId: friendData.friendClassId
+                });
+            }
+        });
+
+        friends.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        if (friends.length === 0) {
+            friendsList.innerHTML = '<div class="no-friends">Henüz arkadaşınız yok</div>';
+            return;
+        }
+
+        friends.forEach(friend => {
+            const card = createFriendCard({
+                friendId: friend.friendId,
+                name: friend.friendName,
+                className: friend.friendClassName,
+                photo: friend.friendPhoto,
+                classId: friend.friendClassId
+            }, false);
+            friendsList.appendChild(card);
+        });
+
+        console.log('Yüklenen arkadaşlar:', friends); // Debug için
+
+    } catch (error) {
+        console.error('Arkadaş listesi yükleme hatası:', error);
+        friendsList.innerHTML = '<div class="error">Liste yüklenirken bir hata oluştu. Hata: ' + error.message + '</div>';
+    }
+}
+
+function updateFriendStatus(friendId, statusDiv) {
+    database.ref(`loggedinPlayers`).orderByChild('studentId').equalTo(friendId).once('value', snapshot => {
+        if (snapshot.exists()) {
+            // Arkadaş online
+            database.ref(`classes/${selectedStudent.classId}/students/${friendId}/inDuel`).once('value', duelSnapshot => {
+                if (duelSnapshot.exists() && duelSnapshot.val() === true) {
+                    statusDiv.textContent = 'Oyunda';
+                    statusDiv.className = 'friend-status status-in-game';
+                } else {
+                    statusDiv.textContent = 'Aktif';
+                    statusDiv.className = 'friend-status status-online';
+                }
+            });
+        } else {
+            // Arkadaş offline
+            statusDiv.textContent = 'Aktif Değil';
+            statusDiv.className = 'friend-status status-offline';
+        }
+    });
+}
+
+function listenToFriendStatus(friendId, statusDiv, inviteButton) {
+    const loggedInRef = database.ref('loggedinPlayers').orderByChild('studentId').equalTo(friendId);
+    const inDuelRef = database.ref(`classes/${selectedStudent.classId}/students/${friendId}/inDuel`);
+
+    loggedInRef.on('value', snapshot => {
+        const isOnline = snapshot.exists();
+        
+        if (isOnline) {
+            inDuelRef.on('value', duelSnapshot => {
+                const isInDuel = duelSnapshot.exists() && duelSnapshot.val() === true;
+                
+                if (isInDuel) {
+                    statusDiv.textContent = 'Oyunda';
+                    statusDiv.className = 'friend-status status-in-game';
+                    inviteButton.style.display = 'none';
+                } else {
+                    statusDiv.textContent = 'Aktif';
+                    statusDiv.className = 'friend-status status-online';
+                    inviteButton.style.display = 'block';
+                }
+            });
+        } else {
+            statusDiv.textContent = 'Aktif Değil';
+            statusDiv.className = 'friend-status status-offline';
+            inviteButton.style.display = 'none';
+        }
+    });
+
+    // Temizlik işlevi
+    return () => {
+        loggedInRef.off();
+        inDuelRef.off();
+    };
+}
+
+// Sayfa yüklendiğinde arkadaş listesini yükle
+window.addEventListener('load', () => {
+    if (selectedStudent && selectedStudent.studentId) {
+        loadFriendsList();
+    }
+});
 
         backButtons.forEach(backButton => {
             backButton.addEventListener('click', () => {
@@ -2984,11 +3449,32 @@ async function createDuelSession(inviterId, inviterClassId, inviterName, inviter
 }
 
 function switchToDuelScreen(duelKey) {
+    // Tüm ekranları gizle
     mainScreen.style.display = 'none';
     singlePlayerScreen.style.display = 'none';
     singlePlayerGameScreen.style.display = 'none';
-    duelSelectionScreen.style.display = 'flex';
+    friendsScreen.style.display = 'none';
     rankingPanel.classList.remove('open');
+    playersOverlay.style.display = 'none';
+    
+    // Düello ekranının container'ını düzenle
+    document.body.style.display = 'flex';
+    document.body.style.justifyContent = 'center';
+    document.body.style.alignItems = 'center';
+    document.body.style.minHeight = '100vh';
+    
+    // Düello ekranını göster
+    duelSelectionScreen.style.display = 'flex';
+    duelSelectionScreen.style.flexDirection = 'column';
+    duelSelectionScreen.style.width = '100%';
+    duelSelectionScreen.style.maxWidth = '900px';
+    duelSelectionScreen.style.background = 'white';
+    duelSelectionScreen.style.padding = '30px 40px';
+    duelSelectionScreen.style.borderRadius = '20px';
+    duelSelectionScreen.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.2)';
+
+    // Container sınıfının özelliklerini ekle
+    duelSelectionScreen.classList.add('container');
 
     // Düello referansını al
     const duelRef = database.ref(`duels/${duelKey}`);
@@ -3026,8 +3512,6 @@ function switchToDuelScreen(duelKey) {
         console.error("Sınıf verileri yüklenirken hata:", error);
         showAlert('Sınıf verileri yüklenirken bir hata oluştu.');
     });
-
-    playersOverlay.style.display = 'none';
 
     duelRef.on('value', async (snap) => {
         if (snap.exists()) {
@@ -3090,29 +3574,26 @@ function switchToDuelScreen(duelKey) {
         }
     });
 
-            // Müzik çalma işlevini her iki oyuncu için garanti altına almak adına ek kullanıcı etkileşimi
-            // Düello ekranına geçiş yapıldığında küçük bir etkileşim sağlamak için gizli bir buton ekleyebiliriz
-            // Bu sayede tarayıcıların autoplay politikalarına uyum sağlanır
-            const hiddenPlayButton = document.createElement('button');
-            hiddenPlayButton.style.display = 'none';
-            hiddenPlayButton.id = 'hiddenPlayButton';
-            duelSelectionScreen.appendChild(hiddenPlayButton);
+    // Müzik başlatma
+    const hiddenPlayButton = document.createElement('button');
+    hiddenPlayButton.style.display = 'none';
+    hiddenPlayButton.id = 'hiddenPlayButton';
+    duelSelectionScreen.appendChild(hiddenPlayButton);
 
-            hiddenPlayButton.addEventListener('click', () => {
-                duelMusic.play().then(() => {
-                    duelMusic.loop = true;
-                }).catch(error => {
-                    console.error("Müzik çalınamadı:", error);
-                });
-            });
+    hiddenPlayButton.addEventListener('click', () => {
+        duelMusic.play().then(() => {
+            duelMusic.loop = true;
+        }).catch(error => {
+            console.error("Müzik çalınamadı:", error);
+        });
+    });
 
-            // Gizli butonu otomatik olarak tetiklemek
-            setTimeout(() => {
-                hiddenPlayButton.click();
-            }, 1000);
-        }
+    setTimeout(() => {
+        hiddenPlayButton.click();
+    }, 1000);
+}  
 
-        function resetDuelGameState() {
+      function resetDuelGameState() {
             duelQuestionNumber.textContent = 'Soru 1/10';
             duelProgressBarInner.style.width = '0%';
             duelTimerElement.textContent = '45';
