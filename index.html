@@ -34,7 +34,7 @@
             }
         }
 
-        .container, .game-container, .student-selection-container, .admin-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
+        .container, .game-container, .student-selection-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
             background: white;
             padding: 30px 40px;
             border-radius: 20px;
@@ -348,32 +348,7 @@ option {
             }
         }
 
-        .admin-button {
-            background-color: #88b04b;
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s, transform 0.2s;
-            margin: 25px auto 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .admin-button img {
-            width: 28px;
-            height: 28px;
-        }
-
-        .admin-button:hover {
-            background-color: #6aa844;
-            transform: scale(1.1);
-        }
-
-        .game-container, .student-selection-container, .admin-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
+        .game-container, .student-selection-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
             display: none;
             flex-direction: column;
             gap: 25px;
@@ -420,7 +395,7 @@ option {
             outline: none;
         }
 
-        .back-button, .start-game-button, .login-button, .admin-back-button, .duel-start-button, .ranking-back-button, .close-ranking-button {
+        .back-button, .start-game-button, .login-button, .duel-start-button, .ranking-back-button, .close-ranking-button {
             padding: 14px 30px;
             border: none;
             border-radius: 10px;
@@ -432,14 +407,14 @@ option {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .back-button, .admin-back-button, .ranking-back-button, .close-ranking-button {
+        .back-button, .ranking-back-button, .close-ranking-button {
             background-color: #555;
             color: white;
             width: 100%;
             max-width: 220px;
         }
 
-        .back-button:hover, .admin-back-button:hover, .ranking-back-button:hover, .close-ranking-button:hover {
+        .back-button:hover, .ranking-back-button:hover, .close-ranking-button:hover {
             background-color: #333;
             transform: scale(1.05);
         }
@@ -479,41 +454,6 @@ option {
 
         .login-button:hover.active {
             transform: scale(1.05);
-        }
-
-        .admin-student-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .admin-student-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            margin-bottom: 12px;
-            background-color: #e0f7fa;
-            border-radius: 8px;
-            transition: background-color 0.3s;
-        }
-
-        .admin-student-list li:hover {
-            background-color: #b2ebf2;
-        }
-
-        .admin-student-list li button {
-            padding: 10px 16px;
-            background-color: #17a2b8;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1em;
-        }
-
-        .admin-student-list li button:hover {
-            background-color: #138496;
         }
 
         .error {
@@ -1604,9 +1544,8 @@ option {
             <input type="password" id="student-password-input" placeholder="Şifre" disabled>
         </div>
         <button class="login-button" id="login-button" disabled>Giriş</button>
-        <button class="admin-button" id="admin-button">
-            <img src="https://cdn.pixabay.com/photo/2019/10/06/11/40/lock-4529981_1280.png" alt="Admin">
-        </button>
+        
+            </button>
         <div class="error" id="student-selection-error"></div>
     </div>
 
@@ -1675,28 +1614,6 @@ option {
         </div>
         <button class="start-game-button" id="start-game-button" disabled>Oyuna Başla</button>
         <button class="back-button">Geri Dön</button>
-    </div>
-
-    <!-- Admin Ekranı -->
-    <div class="container admin-container" id="admin-screen">
-        <h2>Admin Paneli</h2>
-        <div class="table-section">
-            <h3>Sınıf Seçimi ve PIN Doğrulama</h3>
-            <label for="admin-class-select">Sınıf Seç:</label>
-            <select id="admin-class-select">
-                <option value="">Seçiniz</option>
-            </select>
-
-            <label for="admin-pin-input">Sınıf PIN'i Gir:</label>
-            <input type="password" id="admin-pin-input" placeholder="PIN">
-
-            <button class="login-button" id="admin-login-button" disabled>PIN Doğrula</button>
-        </div>
-        <div class="table-section" id="admin-student-section" style="display: none;">
-            <h3>Öğrenciler</h3>
-            <ul class="admin-student-list" id="admin-student-list"></ul>
-        </div>
-        <button class="admin-back-button">Geri Dön</button>
     </div>
 
     <!-- Tek Kişilik Oyun Sorular Ekranı -->
@@ -2039,25 +1956,16 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
         const studentSelectionScreen = document.getElementById('student-selection-screen');
         const mainScreen = document.getElementById('main-screen');
         const singlePlayerScreen = document.getElementById('single-player-screen');
-        const adminScreen = document.getElementById('admin-screen');
         const singlePlayerGameScreen = document.getElementById('single-player-game-screen');
         const duelSelectionScreen = document.getElementById('duel-selection-screen');
         const duelGameScreen = document.getElementById('duel-game-screen');
         const rankingPanel = document.getElementById('rankingPanel'); // Ranking Panel ID
 
         const loginButton = document.getElementById('login-button');
-        const adminButton = document.getElementById('admin-button');
         const singlePlayerButton = document.querySelector('.single-player');
         const backButtons = document.querySelectorAll('.back-button');
-        const adminBackButton = document.querySelector('.admin-back-button');
         const startGameButton = document.getElementById('start-game-button');
         const finalBackButton = document.getElementById('final-back-button');
-
-        const adminClassSelect = document.getElementById('admin-class-select');
-        const adminPinInput = document.getElementById('admin-pin-input');
-        const adminLoginButton = document.getElementById('admin-login-button');
-        const adminStudentSection = document.getElementById('admin-student-section');
-        const adminStudentList = document.getElementById('admin-student-list');
 
         const selectionClassSelect = document.getElementById('selection-class-select');
         const selectionNameSelect = document.getElementById('selection-name-select');
@@ -2162,7 +2070,6 @@ window.onload = () => {
         studentSelectionScreen.style.display = 'flex';
     }
     fetchClassesForSelection();
-    fetchAdminClasses();
     fetchChampionData();
 };
 
@@ -2243,12 +2150,6 @@ loginButton.addEventListener('click', async () => {
 });
 
 
-        adminButton.addEventListener('click', () => {
-            studentSelectionScreen.style.display = 'none';
-            mainScreen.style.display = 'none';
-            adminScreen.style.display = 'flex';
-        });
-
         backButtons.forEach(backButton => {
             backButton.addEventListener('click', () => {
                 const currentScreen = backButton.parentElement;
@@ -2285,12 +2186,6 @@ loginButton.addEventListener('click', async () => {
             });
         });
 
-        adminBackButton.addEventListener('click', () => {
-            adminScreen.style.display = 'none';
-            studentSelectionScreen.style.display = 'flex';
-            resetAdminScreens();
-        });
-
         singlePlayerButton.addEventListener('click', () => {
             mainScreen.style.display = 'none';
             singlePlayerScreen.style.display = 'flex';
@@ -2308,33 +2203,6 @@ loginButton.addEventListener('click', async () => {
             }
         });
 
-        adminLoginButton.addEventListener('click', () => {
-            const selectedClass = adminClassSelect.value;
-            const enteredPin = adminPinInput.value;
-
-            if (selectedClass === "" || enteredPin === "") {
-                showAlert('Lütfen sınıf ve PIN girin.');
-                return;
-            }
-
-            database.ref(`classes/${selectedClass}/pin`).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    const correctPin = snapshot.val();
-                    if (enteredPin === correctPin) {
-                        fetchAdminStudents(selectedClass);
-                        adminStudentSection.style.display = 'block';
-                        studentSelectionError.textContent = '';
-                    } else {
-                        showAlert('Yanlış PIN.');
-                    }
-                } else {
-                    showAlert('Bu sınıf için PIN yok.');
-                }
-            }).catch(error => {
-                console.error("PIN kontrol hata:", error);
-                showAlert('PIN kontrol edilirken hata oluştu.');
-            });
-        });
 
         async function handlePasswordUpdate(classId, studentId) {
             const newPassword = await showPrompt('Yeni şifreyi giriniz:');
@@ -2350,35 +2218,6 @@ loginButton.addEventListener('click', async () => {
                     showAlert('Şifre boş olamaz.');
                 }
             }
-        }
-
-        function fetchAdminStudents(classId) {
-            adminStudentList.innerHTML = '';
-            database.ref(`classes/${classId}/students`).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const studentId = childSnapshot.key;
-                        const studentName = childSnapshot.val().name;
-
-                        const listItem = document.createElement('li');
-                        listItem.textContent = studentName;
-
-                        const passwordButton = document.createElement('button');
-                        passwordButton.textContent = 'Şifre Oluştur/Güncelle';
-                        passwordButton.addEventListener('click', () => {
-                            handlePasswordUpdate(classId, studentId);
-                        });
-
-                        listItem.appendChild(passwordButton);
-                        adminStudentList.appendChild(listItem);
-                    });
-                } else {
-                    adminStudentList.innerHTML = '<li>Bu sınıfa ait öğrenci yok.</li>';
-                }
-            }).catch(error => {
-                console.error("Öğrenciler çekilirken hata:", error);
-                showAlert('Öğrenciler çekilirken hata oluştu.');
-            });
         }
 
         function fetchStudents(classId, studentNameSelectElement) {
@@ -2490,16 +2329,6 @@ loginButton.addEventListener('click', async () => {
             select.addEventListener('change', checkSinglePlayerSelections);
         });
 
-        adminPinInput.addEventListener('input', () => {
-            if (adminClassSelect.value !== "" && adminPinInput.value !== "") {
-                adminLoginButton.classList.add('active');
-                adminLoginButton.disabled = false;
-            } else {
-                adminLoginButton.classList.remove('active');
-                adminLoginButton.disabled = true;
-            }
-        });
-
         function checkSinglePlayerSelections() {
             let allSelected = true;
             singlePlayerSelects.forEach(select => {
@@ -2591,37 +2420,39 @@ loginButton.addEventListener('click', async () => {
             duelMusic.currentTime = 0;
         }
 
-        function resetAdminScreens() {
-            adminClassSelect.value = "";
-            adminPinInput.value = "";
-            adminLoginButton.disabled = true;
-            adminLoginButton.classList.remove('active');
-            adminStudentSection.style.display = 'none';
-            adminStudentList.innerHTML = '';
-            studentSelectionError.textContent = '';
-        }
-
 // "Çıkış Yap" Butonunu Seçme
 const logoutButton = document.getElementById('logout-button');
 
 // "Çıkış Yap" Butonuna Event Listener Ekleme
-logoutButton.addEventListener('click', () => {
-    // 1. Oturum Bilgilerini localStorage'dan Temizleme
-    localStorage.removeItem('selectedStudent');
+logoutButton.addEventListener('click', async () => {
+    try {
+        // Önce seçili öğrencinin inDuel durumunu false yap
+        if (selectedStudent && selectedStudent.classId && selectedStudent.studentId) {
+            await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).set(false);
+        }
 
-    // 2. Firebase'deki loggedinPlayers Listesinden Kullanıcıyı Kaldırma
-    if (loggedinPlayerRef) {
-        loggedinPlayerRef.remove().then(() => {
+        // Düello referansını temizle
+        if (currentDuelRef) {
+            await currentDuelRef.remove();
+            currentDuelRef = null;
+        }
+
+        // localStorage'ı temizle
+        localStorage.removeItem('selectedStudent');
+
+        // Loggedin player'ı kaldır
+        if (loggedinPlayerRef) {
+            await loggedinPlayerRef.remove();
             console.log("Kullanıcı Firebase'den başarıyla kaldırıldı.");
-        }).catch(error => {
-            console.error("Firebase'den kullanıcı kaldırılırken hata oluştu:", error);
-            showAlert('Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.');
-            return; // Hata durumunda sayfa yenilenmesin
-        });
-    }
+        }
 
-    // 3. Sayfayı Yenileme
-    window.location.reload();
+        // Sayfayı yenile
+        window.location.reload();
+
+    } catch (error) {
+        console.error("Çıkış yaparken hata oluştu:", error);
+        showAlert('Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.');
+    }
 });
 
 
@@ -3074,105 +2905,157 @@ logoutButton.addEventListener('click', () => {
             }
         });
 
-        async function createDuelSession(inviterId, inviterClassId, inviterName, inviterPhoto) {
-            const duelRef = database.ref('duels').push();
-            await duelRef.set({
-                inviter: {
-                    classId: inviterClassId,
-                    studentId: inviterId,
-                    name: inviterName,
-                    photo: inviterPhoto
-                },
-                invited: {
-                    classId: selectedStudent.classId,
-                    studentId: selectedStudent.studentId,
-                    name: selectedStudent.studentName,
-                    photo: (studentPhoto.src && studentPhoto.src !== "") ? studentPhoto.src : ""
-                },
-                selections: {
-                    class: "",
-                    subject: "",
-                    topic: ""
-                },
-                gameStarted: false,
-                questions: [] // Soru listesi eklendi
-            });
+async function createDuelSession(inviterId, inviterClassId, inviterName, inviterPhoto) {
+    const duelRef = database.ref('duels').push();
+    
+    // Her iki oyuncunun inDuel durumunu izleyen referansları oluştur
+    const inviterInDuelRef = database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`);
+    const invitedInDuelRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`);
+    
+    // Bağlantı kesildiğinde inDuel durumlarını false yap
+    inviterInDuelRef.onDisconnect().set(false);
+    invitedInDuelRef.onDisconnect().set(false);
 
-            // Düello başladıktan sonra inDuel bayraklarını ayarla
-            await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(true);
-            await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).set(true);
+    await duelRef.set({
+        inviter: {
+            classId: inviterClassId,
+            studentId: inviterId,
+            name: inviterName,
+            photo: inviterPhoto
+        },
+        invited: {
+            classId: selectedStudent.classId,
+            studentId: selectedStudent.studentId,
+            name: selectedStudent.studentName,
+            photo: (studentPhoto.src && studentPhoto.src !== "") ? studentPhoto.src : ""
+        },
+        selections: {
+            class: "",
+            subject: "",
+            topic: ""
+        },
+        gameStarted: false,
+        questions: []
+    });
 
-            duelRef.onDisconnect().remove();
+    // İki oyuncunun da inDuel durumunu true yap
+    await inviterInDuelRef.set(true);
+    await invitedInDuelRef.set(true);
 
-            currentDuelRef = duelRef;
-            isInviter = true; // Başlatan taraf inviter olur
-            switchToDuelScreen(duelRef.key);
+    // Bağlantı kesildiğinde düelloyu sil
+    duelRef.onDisconnect().remove();
+
+    currentDuelRef = duelRef;
+    isInviter = true;
+    switchToDuelScreen(duelRef.key);
+}
+
+function switchToDuelScreen(duelKey) {
+    mainScreen.style.display = 'none';
+    singlePlayerScreen.style.display = 'none';
+    singlePlayerGameScreen.style.display = 'none';
+    duelSelectionScreen.style.display = 'flex';
+    rankingPanel.classList.remove('open');
+
+    // Düello referansını al
+    const duelRef = database.ref(`duels/${duelKey}`);
+    
+    // Düello verilerini tutacak değişkenler
+    let inviterId, inviterClassId, invitedId, invitedClassId;
+    
+    // İlk veriyi bir kez çek ve değişkenleri sakla
+    duelRef.once('value').then(initialSnap => {
+        if (initialSnap.exists()) {
+            const initialData = initialSnap.val();
+            inviterId = initialData.inviter.studentId;
+            inviterClassId = initialData.inviter.classId;
+            invitedId = initialData.invited.studentId;
+            invitedClassId = initialData.invited.classId;
         }
+    });
 
-        function switchToDuelScreen(duelKey) {
-            mainScreen.style.display = 'none';
-            singlePlayerScreen.style.display = 'none';
-            singlePlayerGameScreen.style.display = 'none';
+    duelRef.onDisconnect().remove();
 
-            duelSelectionScreen.style.display = 'flex';
-
-            // Ranking panel kapat
-            rankingPanel.classList.remove('open');
-
-            database.ref('championData/headings').once('value').then(snapshot => {
-                duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const cid = childSnapshot.key;
-                        const cname = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
-                        const option = document.createElement('option');
-                        option.value = cid;
-                        option.textContent = cname;
-                        duelClassSelect.appendChild(option);
-                    });
-                }
+    // Sınıfları yükle
+    database.ref('championData/headings').once('value').then(snapshot => {
+        duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const classId = childSnapshot.key;
+                const className = childSnapshot.val().name || 'No name';
+                const option = document.createElement('option');
+                option.value = classId;
+                option.textContent = className;
+                duelClassSelect.appendChild(option);
             });
+        }
+    }).catch(error => {
+        console.error("Sınıf verileri yüklenirken hata:", error);
+        showAlert('Sınıf verileri yüklenirken bir hata oluştu.');
+    });
 
-            // Yeni: Oyundakiler overlay'ini kapat
-            playersOverlay.style.display = 'none';
+    playersOverlay.style.display = 'none';
 
-            currentDuelRef.on('value', snap => {
-                if (snap.exists()) {
-                    const data = snap.val();
-                    duelInviterPhoto.src = data.inviter.photo ? data.inviter.photo : "https://via.placeholder.com/80";
-                    duelInviterName.textContent = data.inviter.name;
+    duelRef.on('value', async (snap) => {
+        if (snap.exists()) {
+            const data = snap.val();
+            duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
+            duelInviterName.textContent = data.inviter.name;
+            duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
+            duelInvitedName.textContent = data.invited.name;
 
-                    duelInvitedPhoto.src = data.invited.photo ? data.invited.photo : "https://via.placeholder.com/80";
-                    duelInvitedName.textContent = data.invited.name;
+            // Düello ayarlarını güncelle
+            duelClassSelect.value = data.selections.class || "";
+            duelSubjectSelect.value = data.selections.subject || "";
+            duelTopicSelect.value = data.selections.topic || "";
 
-                    duelClassSelect.value = data.selections.class || "";
-                    duelSubjectSelect.value = data.selections.subject || "";
-                    duelTopicSelect.value = data.selections.topic || "";
+            if (data.gameStarted && !duelGameStarted) {
+                duelGameStarted = true;
+                duelEnded = false;
+                startDuelGame(data);
+            }
 
-                    if (data.gameStarted && !duelGameStarted) {
-                        duelGameStarted = true; 
-                        duelEnded = false; // Duel başladığında bayrağı sıfırla
-                        startDuelGame(data);
-                    }
-
-                    if (!isInviter) {
-                        duelClassSelect.disabled = true;
-                        duelSubjectSelect.disabled = true;
-                        duelTopicSelect.disabled = true;
-                        duelStartButton.disabled = true;
+            if (!isInviter) {
+                duelClassSelect.disabled = true;
+                duelSubjectSelect.disabled = true;
+                duelTopicSelect.disabled = true;
+                duelStartButton.disabled = true;
+            } else {
+                checkDuelSelections();
+            }
+        } else {
+            if (!duelEnded) {
+                try {
+                    const currentPlayerId = selectedStudent.studentId;
+                    
+                    // Bağlantısı kopan oyuncuyu tespit et ve puanları güncelle
+                    if (currentPlayerId === inviterId) {
+                        // Davet eden çıktıysa misafir kazanır
+                        await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
+                        await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
+                        await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
                     } else {
-                        checkDuelSelections();
+                        // Misafir çıktıysa davet eden kazanır
+                        await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 3);
+                        await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
+                        await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
                     }
-                } else {
-                    // Duel reference removed (diğer oyuncu çıkmış olabilir)
-                    if (!duelEnded) { // duelEnded kontrolü eklenerek sadece düello bitmemişse uyarı göster
-                        showAlert('Rakibin bağlantısı kesildi. Tekrar giriş yapınız.')
-                            .then(() => {
-                                window.location.reload();
-                            });
-                    }
+
+                    // inDuel durumlarını güncelle
+                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false);
+                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false);
+
+                    // Sayfayı yenile
+                    window.location.reload();
+
+                } catch (error) {
+                    console.error("Oyun sonlandırma hatası:", error);
+                    await showAlert('Oyun sonlandırılırken bir hata oluştu');
+                    window.location.reload();
                 }
-            });
+            }
+        }
+    });
 
             // Müzik çalma işlevini her iki oyuncu için garanti altına almak adına ek kullanıcı etkileşimi
             // Düello ekranına geçiş yapıldığında küçük bir etkileşim sağlamak için gizli bir buton ekleyebiliriz
@@ -3514,111 +3397,74 @@ logoutButton.addEventListener('click', () => {
             });
         }
 
-        function endDuelGame() {
-            currentDuelRef.off('value');
-            currentDuelRef.child('responses').off('value');
+function endDuelGame() {
+    currentDuelRef.off('value');
+    currentDuelRef.child('responses').off('value');
 
-            let message = '';
-            let winnerId = null;
-            let loserId = null;
-            let classId = null;
+    let message = '';
+    let winnerId = null;
+    let loserId = null;
+    let winnerClassId = null;
+    let loserClassId = null;
 
-            currentDuelRef.once('value').then(dSnap => {
-                const ddata = dSnap.val();
+    currentDuelRef.once('value').then(async (dSnap) => {
+        const ddata = dSnap.val();
 
-                if (duelInviterScore > duelInvitedScore) {
-                    message = `Kazanan: ${ddata.inviter.name}`;
-                    winnerId = ddata.inviter.studentId;
-                    loserId = ddata.invited.studentId;
-                    classId = ddata.inviter.classId;
-                } else if (duelInvitedScore > duelInviterScore) {
-                    message = `Kazanan: ${ddata.invited.name}`;
-                    winnerId = ddata.invited.studentId;
-                    loserId = ddata.inviter.studentId;
-                    classId = ddata.invited.classId;
-                } else {
-                    message = "Berabere Kaldınız!";
-                }
+        if (duelInviterScore > duelInvitedScore) {
+            message = `Kazanan: ${ddata.inviter.name}`;
+            winnerId = ddata.inviter.studentId;
+            winnerClassId = ddata.inviter.classId;
+            loserId = ddata.invited.studentId;
+            loserClassId = ddata.invited.classId;
+        } else if (duelInvitedScore > duelInviterScore) {
+            message = `Kazanan: ${ddata.invited.name}`;
+            winnerId = ddata.invited.studentId;
+            winnerClassId = ddata.invited.classId;
+            loserId = ddata.inviter.studentId;
+            loserClassId = ddata.inviter.classId;
+        } else {
+            message = "Berabere Kaldınız!";
+        }
 
-                if (winnerId && loserId && classId) {
-                    // Kazananın puanını +3, kaybedenin puanını -1 (en az 0)
-                    const winnerRef = database.ref(`classes/${classId}/students/${winnerId}/gameCup`);
-                    winnerRef.transaction(current => {
-                        return (current || 0) + 3;
-                    });
+        if (winnerId && loserId) {
+            // Kazananın puanını +6, kaybedenin puanını -2
+            const winnerRef = database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`);
+            await winnerRef.transaction(current => {
+                return (current || 0) + 6;
+            });
 
-                    const loserRef = database.ref(`classes/${classId}/students/${loserId}/gameCup`);
-                    loserRef.transaction(current => {
-                        return Math.max((current || 0) - 1, 0);
-                    });
+            const loserRef = database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`);
+            await loserRef.transaction(current => {
+                return Math.max((current || 0) - 2, 0);
+            });
 
-                    // Refresh gameCup display for logged-in player if they are the winner or loser
-                    if (winnerId === selectedStudent.studentId || loserId === selectedStudent.studentId) {
-                        fetchAndDisplayGameCup();
-                    }
-                }
+            if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
+                fetchAndDisplayGameCup();
+            }
+        }
 
-                // Display winner message
-                duelQuestionNumber.style.display = 'none';
-                document.querySelector('#duel-game-screen .progress-container').style.display = 'none';
-                document.querySelector('#duel-game-screen .timer-container').style.display = 'none';
-                document.querySelector('#duel-game-screen .question-container').style.display = 'none';
-                duelOptionsContainer.style.display = 'none';
+        duelQuestionNumber.style.display = 'none';
+        document.querySelector('#duel-game-screen .progress-container').style.display = 'none';
+        document.querySelector('#duel-game-screen .timer-container').style.display = 'none';
+        document.querySelector('#duel-game-screen .question-container').style.display = 'none';
+        duelOptionsContainer.style.display = 'none';
 
-                winnerMessage.textContent = message;
-                duelFinalContainer.style.display = 'flex';
+        winnerMessage.textContent = message;
+        duelFinalContainer.style.display = 'flex';
 
-                // Kazanan ekranında müziği çal
-                if (message.startsWith('Kazanan') || message === "Berabere Kaldınız!") {
-                    winnerMusic.currentTime = 0;
-                    winnerMusic.play().catch(error => {
-                        console.error("Kazanan müziği çalınamadı:", error);
-                    });
-                }
-
-                // Kazanan ekranına geldiğinde arka plan müziğini durdur
-                duelMusic.pause();
-                duelMusic.currentTime = 0;
-
-                // Duelin bittiğini belirt
-                duelEnded = true;
+        if (message.startsWith('Kazanan') || message === "Berabere Kaldınız!") {
+            winnerMusic.currentTime = 0;
+            winnerMusic.play().catch(error => {
+                console.error("Kazanan müziği çalınamadı:", error);
             });
         }
 
-        function fetchAdminClasses() {
-            database.ref('classes').once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    adminClassSelect.innerHTML = '<option value="">Seçiniz</option>';
-                    snapshot.forEach(childSnapshot => {
-                        const classId = childSnapshot.key;
-                        const classData = childSnapshot.val();
-                        const className = classData.name ? classData.name : classId; // Sınıf adını alıyoruz
+        duelMusic.pause();
+        duelMusic.currentTime = 0;
 
-                        console.log(`Admin Panel - Class ID: ${classId}, Class Name: ${className}`);
-
-                        // Sınıf adı mevcut olduğu için doğrudan ekleyebiliriz
-                        const option = document.createElement('option');
-                        option.value = classId;
-                        option.textContent = className;
-                        adminClassSelect.appendChild(option);
-                    });
-                } else {
-                    console.warn("Admin için sınıf bulunamadı.");
-                }
-            }).catch(error => {
-                console.error("Admin sınıf çekme hata:", error);
-            });
-
-            adminClassSelect.addEventListener('change', () => {
-                if (adminClassSelect.value !== "" && adminPinInput.value !== "") {
-                    adminLoginButton.classList.add('active');
-                    adminLoginButton.disabled = false;
-                } else {
-                    adminLoginButton.classList.remove('active');
-                    adminLoginButton.disabled = true;
-                }
-            });
-        }
+        duelEnded = true;
+    });
+}
 
         // Fetch and display gameCup for the logged-in student
         function fetchAndDisplayGameCup() {
