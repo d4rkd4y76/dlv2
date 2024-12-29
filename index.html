@@ -3430,12 +3430,12 @@ function endDuelGame() {
             // Kazananın puanını +6, kaybedenin puanını -2
             const winnerRef = database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`);
             await winnerRef.transaction(current => {
-                return (current || 0) + 6;
+                return (current || 0) + 3;
             });
 
             const loserRef = database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`);
             await loserRef.transaction(current => {
-                return Math.max((current || 0) - 2, 0);
+                return Math.max((current || 0) - 1, 0);
             });
 
             if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
