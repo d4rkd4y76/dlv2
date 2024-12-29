@@ -69,14 +69,47 @@
 
 
 select {
+    font-family: 'Comfortaa', cursive !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
     border: 2px solid #ff8a00;
     border-radius: 12px;
-    padding: 12px;
+    padding: 12px 35px 12px 12px;
     font-size: 1.1em;
     color: #333;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+select option {
+    font-family: 'Comfortaa', cursive !important;
+    background-color: white;
+    color: #333;
+    padding: 12px;
+    font-size: 1em;
+}
+
+/* Firefox için özel stil */
+@-moz-document url-prefix() {
+    select {
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        text-indent: 0.01px;
+        text-overflow: '';
+        padding-right: 35px;
+    }
+}
+
+/* Edge ve IE için özel stil */
+select::-ms-expand {
+    display: none;
 }
 
 /* Hover ve odaklanma efekti */
