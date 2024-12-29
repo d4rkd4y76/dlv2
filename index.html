@@ -3031,12 +3031,12 @@ function switchToDuelScreen(duelKey) {
                     // Bağlantısı kopan oyuncuyu tespit et ve puanları güncelle
                     if (currentPlayerId === inviterId) {
                         // Davet eden çıktıysa misafir kazanır
-                        await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
+                        await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 6);
                         await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
                         await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
                     } else {
                         // Misafir çıktıysa davet eden kazanır
-                        await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 3);
+                        await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 6);
                         await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
                         await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
                     }
