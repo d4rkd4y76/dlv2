@@ -153,6 +153,63 @@ select {
     gap: 15px;
 }
 
+.player-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.player-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ff8a00;
+}
+
+.player-name {
+    flex: 1;
+    font-size: 1em;
+    font-weight: bold;
+    color: #333;
+}
+
+.davet-et-button, .oyunda-button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9em;
+}
+
+.davet-et-button {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.davet-et-button:hover {
+    background-color: #138496;
+}
+
+.oyunda-button {
+    background-color: #f59e0b;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.oyunda-button:hover {
+    background-color: #d97706;
+    opacity: 0.7;
+}
+
+
 .friend-photo {
     width: 50px;
     height: 50px;
@@ -441,6 +498,33 @@ option {
 
 .oyundakiler-button {
     background-color: #6b5b95;
+}
+
+.friend-added-button {
+    background-color: #808080;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: not-allowed;
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+.add-friend-button {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9em;
+}
+
+.add-friend-button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
 }
 
 .oyundakiler-button:hover {
@@ -1729,13 +1813,14 @@ option {
     <!-- Arkadaş Listesi -->
     <div class="friends-list-section">
         <h3>Arkadaş Listem</h3>
-        <div class="friends-list" id="friends-list">
+        <ul class="players-list" id="friends-list">
             <!-- Arkadaş listesi buraya gelecek -->
-        </div>
+        </ul>
     </div>
 
     <button class="back-button">Geri Dön</button>
 </div>
+
 
     <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
     <div class="ranking-panel" id="rankingPanel" style="display: none;">
@@ -2027,97 +2112,65 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
             loggedinPlayerRef = newRef;
         }
 
-        async function showLoggedInPlayers() {
-            playersList.innerHTML = '';
-            const snapshot = await database.ref('loggedinPlayers').once('value');
-            let playersArr = [];
+ async function showLoggedInPlayers() {
+    playersList.innerHTML = '';
+    const snapshot = await database.ref('loggedinPlayers').once('value');
+    let playersArr = [];
 
-            if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                    const player = child.val();
-                    playersArr.push({ ...player, key: child.key });
-                });
+    if (snapshot.exists()) {
+        snapshot.forEach(child => {
+            const player = child.val();
+            playersArr.push({ ...player, key: child.key });
+        });
 
-                // Sınıf adına göre sırala (aynı sınıftakiler önce)
-                const sameClassPlayers = playersArr.filter(p => p.classId === selectedStudent.classId && p.studentId !== selectedStudent.studentId);
-                const otherClassPlayers = playersArr.filter(p => p.classId !== selectedStudent.classId);
-                playersArr = [...sameClassPlayers, ...otherClassPlayers];
+        // Sınıf adına göre sırala (aynı sınıftakiler önce)
+        const sameClassPlayers = playersArr.filter(p => p.classId === selectedStudent.classId && p.studentId !== selectedStudent.studentId);
+        const otherClassPlayers = playersArr.filter(p => p.classId !== selectedStudent.classId);
+        playersArr = [...sameClassPlayers, ...otherClassPlayers];
 
-                for (const player of playersArr) {
-                    let photoURL = "https://via.placeholder.com/50";
-                    try {
-                        const photoSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/photo`).once('value');
-                        if (photoSnapshot.exists()) {
-                            photoURL = photoSnapshot.val();
-                        }
-                    } catch (e) {
-                        console.error('Fotoğraf alınamadı:', e);
-                    }
-
-                    // "Oyunda" butonu için inDuel kontrolü
-                    let inDuel = false;
-                    try {
-                        const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
-                        if (inDuelSnapshot.exists()) {
-                            inDuel = inDuelSnapshot.val();
-                        }
-                    } catch (e) {
-                        console.error('inDuel durumu alınamadı:', e);
-                    }
-
-                    const li = document.createElement('li');
-                    const img = document.createElement('img');
-                    img.src = photoURL;
-
-                    const span = document.createElement('span');
-                    span.className = 'player-name';
-                    let clsName = classNameMap[player.classId] ? classNameMap[player.classId] : player.classId;
-                    span.textContent = `${player.name} / (${clsName})`;
-
-                    if (inDuel) {
-                        // "Oyunda" Butonu
-                        const oyundaButton = document.createElement('button');
-                        oyundaButton.textContent = 'Oyunda';
-                        oyundaButton.className = 'oyunda-button'; // Yeni sınıf kullanıldı
-                        oyundaButton.disabled = true; // Tıklanamaz
-                        li.appendChild(img);
-                        li.appendChild(span);
-                        li.appendChild(oyundaButton);
-                    } else {
-                        // "Davet Et" Butonu
-                        const davetButton = document.createElement('button');
-                        davetButton.textContent = 'Davet Et';
-                        davetButton.className = 'davet-et-button';
-                        davetButton.style.backgroundColor = '#17a2b8';
-                        davetButton.style.color = 'white';
-                        davetButton.style.border = 'none';
-                        davetButton.style.borderRadius = '6px';
-                        davetButton.style.padding = '8px 14px';
-                        davetButton.style.cursor = 'pointer';
-                        davetButton.style.transition = 'background-color 0.3s';
-                        davetButton.addEventListener('mouseover', () => {
-                            davetButton.style.backgroundColor = '#138496';
-                        });
-                        davetButton.addEventListener('mouseout', () => {
-                            davetButton.style.backgroundColor = '#17a2b8';
-                        });
-                        davetButton.addEventListener('click', () => {
-                            sendInvitation(player);
-                        });
-                        li.appendChild(img);
-                        li.appendChild(span);
-                        li.appendChild(davetButton);
-                    }
-
-                    playersList.appendChild(li);
+        for (const player of playersArr) {
+            let photoURL = "https://via.placeholder.com/50";
+            try {
+                const photoSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/photo`).once('value');
+                if (photoSnapshot.exists()) {
+                    photoURL = photoSnapshot.val();
                 }
-            } else {
-                const li = document.createElement('li');
-                li.textContent = "Şu an oyunda kimse yok.";
-                playersList.appendChild(li);
+            } catch (e) {
+                console.error('Fotoğraf alınamadı:', e);
             }
-            playersOverlay.style.display = 'flex';
+
+            // "inDuel" durumu
+            let inDuel = false;
+            try {
+                const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
+                if (inDuelSnapshot.exists()) {
+                    inDuel = inDuelSnapshot.val();
+                }
+            } catch (e) {
+                console.error('inDuel durumu alınamadı:', e);
+            }
+
+            const playerData = {
+                name: player.name,
+                classId: player.classId,
+                className: classNameMap[player.classId] ? classNameMap[player.classId] : player.classId,
+                photo: photoURL,
+                inDuel: inDuel,
+                studentId: player.studentId
+            };
+
+            const li = createFriendCard(playerData);
+            playersList.appendChild(li);
         }
+    } else {
+        const li = document.createElement('li');
+        li.textContent = "Şu an oyunda kimse yok.";
+        playersList.appendChild(li);
+    }
+    playersOverlay.style.display = 'flex';
+}
+
+
         oyundakilerButton.addEventListener('click', showLoggedInPlayers);
 
         const studentSelectionScreen = document.getElementById('student-selection-screen');
@@ -2347,147 +2400,130 @@ friendSearchInput.addEventListener('keypress', (e) => {
 
 async function searchFriends() {
     const searchTerm = friendSearchInput.value.toLowerCase().trim();
-    if (searchTerm === '') return;
-
+    if (!searchTerm) return;
+    
     searchResults.innerHTML = '<div class="loading">Aranıyor...</div>';
     
     try {
         const snapshot = await database.ref('classes').once('value');
         const results = [];
         
-        if (snapshot.exists()) {
-            snapshot.forEach(classSnapshot => {
-                const className = classSnapshot.val().name;
-                const students = classSnapshot.child('students').val();
-                
-                if (students) {
-                    Object.entries(students).forEach(([studentId, studentData]) => {
-                        if (studentData.name && 
-                            studentData.name.toLowerCase().includes(searchTerm) &&
-                            studentId !== selectedStudent.studentId) { // Kendisi hariç
-                            results.push({
-                                id: studentId,
-                                classId: classSnapshot.key,
-                                className: className,
-                                ...studentData
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
+        snapshot.forEach(classSnapshot => {
+            const className = classSnapshot.val().name;
+            const students = classSnapshot.child('students').val();
+            
+            if (students) {
+                Object.entries(students).forEach(([studentId, studentData]) => {
+                    if (studentData.name?.toLowerCase().includes(searchTerm) && 
+                        studentId !== selectedStudent.studentId) {
+                        results.push({
+                            studentId,
+                            classId: classSnapshot.key,
+                            className,
+                            ...studentData
+                        });
+                    }
+                });
+            }
+        });
+        
         displaySearchResults(results);
     } catch (error) {
-        console.error('Arama hatası:', error);
-        searchResults.innerHTML = '<div class="error">Arama sırasında bir hata oluştu.</div>';
+        searchResults.innerHTML = '<div class="error">Arama hatası oluştu</div>';
     }
 }
 
-function displaySearchResults(results) {
+async function displaySearchResults(results) {
     searchResults.innerHTML = '';
-    
-    if (results.length === 0) {
+    if (!results.length) {
         searchResults.innerHTML = '<div class="no-results">Sonuç bulunamadı</div>';
         return;
     }
 
-    results.forEach(student => {
-        // Öğrencinin sınıf adını düzgün şekilde al
-        student.className = classNameMap[student.classId] || student.classId;
-        const card = createFriendCard(student, true);
-        searchResults.appendChild(card);
-    });
+    for (const student of results) {
+        const friendshipRef = database.ref(`friendships/${selectedStudent.studentId}/${student.studentId}`);
+        const isFriend = (await friendshipRef.once('value')).exists();
+        
+        const inDuelRef = database.ref(`classes/${student.classId}/students/${student.studentId}/inDuel`);
+        const inDuel = (await inDuelRef.once('value')).val();
+
+        const li = document.createElement('li');
+        li.className = 'player-item';
+
+        const photo = student.photo || 'https://via.placeholder.com/50';
+        const className = classNameMap[student.classId] || student.classId;
+
+        li.innerHTML = `
+            <img src="${photo}" alt="${student.name}" class="player-photo">
+            <span class="player-name">${student.name} / (${className})</span>
+            ${inDuel ? 
+                '<button class="oyunda-button" disabled>Oyunda</button>' :
+                isFriend ? 
+                    '<button class="davet-et-button">Davet Et</button>' : 
+                    '<button class="add-friend-button">+ Arkadaş Ekle</button>'
+            }
+        `;
+
+        const button = li.querySelector('button');
+        if (!inDuel) {
+            if (isFriend) {
+                button.onclick = () => sendInvitation({...student, classId: student.classId});
+            } else {
+                button.onclick = () => addFriend({
+                    id: student.studentId,
+                    name: student.name,
+                    classId: student.classId,
+                    className,
+                    photo: student.photo
+                });
+            }
+        }
+
+        searchResults.appendChild(li);
+    }
 }
 
-function createFriendCard(student, isSearchResult = false) {
-    const card = document.createElement('div');
-    card.className = 'friend-card';
-    
-    const photo = document.createElement('img');
-    photo.src = student.photo || 'https://via.placeholder.com/50';
-    photo.className = 'friend-photo';
-    
-    const info = document.createElement('div');
-    info.className = 'friend-info';
-    info.innerHTML = `
-        <div class="friend-name">${student.name}</div>
-        <div class="friend-class">${classNameMap[student.classId] || student.classId}</div>
-    `;
-    
-    card.appendChild(photo);
-    card.appendChild(info);
+async function addFriend(student) {
+    try {
+        const currentFriendsRef = database.ref(`friendships/${selectedStudent.studentId}`);
+        const snapshot = await currentFriendsRef.once('value');
+        if (snapshot.numChildren() >= 10) {
+            showAlert('En fazla 10 arkadaş ekleyebilirsiniz!');
+            return;
+        }
 
-    if (isSearchResult) {
-        const addButton = document.createElement('button');
-        addButton.className = 'add-friend-button';
-        addButton.innerHTML = '+';
-        addButton.onclick = () => addFriend(student);
-        card.appendChild(addButton);
-    } else {
-        // Arkadaş listesindeki kartlar için durum göstergesi
-        const statusDiv = document.createElement('div');
-        statusDiv.className = 'friend-status';
-        
-        // Davet butonu
-        const davetButton = document.createElement('button');
-        davetButton.className = 'davet-et-button';
-        davetButton.textContent = 'Davet Et';
-        davetButton.style.backgroundColor = '#17a2b8';
-        davetButton.style.color = 'white';
-        davetButton.style.border = 'none';
-        davetButton.style.borderRadius = '6px';
-        davetButton.style.padding = '8px 14px';
-        davetButton.style.cursor = 'pointer';
-        davetButton.style.transition = 'background-color 0.3s';
+        const friendshipData = {
+            friendId: student.id,
+            friendName: student.name,
+            friendClassId: student.classId,
+            friendClassName: student.className,
+            friendPhoto: student.photo || null,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
 
-        davetButton.addEventListener('mouseover', () => {
-            davetButton.style.backgroundColor = '#138496';
-        });
-        davetButton.addEventListener('mouseout', () => {
-            davetButton.style.backgroundColor = '#17a2b8';
-        });
+        await Promise.all([
+            database.ref(`friendships/${selectedStudent.studentId}/${student.id}`).set(friendshipData),
+            database.ref(`friendships/${student.id}/${selectedStudent.studentId}`).set({
+                friendId: selectedStudent.studentId,
+                friendName: selectedStudent.studentName,
+                friendClassId: selectedStudent.classId,
+                friendClassName: classNameMap[selectedStudent.classId],
+                friendPhoto: studentPhoto.src || null,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            })
+        ]);
 
-        davetButton.addEventListener('click', () => {
-            const playerData = {
-                studentId: student.friendId,
-                classId: student.friendClassId,
-                name: student.friendName
-            };
-            sendInvitation(playerData);
-        });
-
-        // Oyunda değilse ve aktifse davet butonunu göster
-        database.ref(`loggedinPlayers`).orderByChild('studentId').equalTo(student.friendId).once('value', snapshot => {
-            if (snapshot.exists()) {
-                database.ref(`classes/${student.friendClassId}/students/${student.friendId}/inDuel`).once('value', duelSnapshot => {
-                    if (duelSnapshot.exists() && duelSnapshot.val() === true) {
-                        statusDiv.textContent = 'Oyunda';
-                        statusDiv.className = 'friend-status status-in-game';
-                        davetButton.style.display = 'none';
-                    } else {
-                        statusDiv.textContent = 'Aktif';
-                        statusDiv.className = 'friend-status status-online';
-                        davetButton.style.display = 'inline-block';
-                    }
-                });
-            } else {
-                statusDiv.textContent = 'Aktif Değil';
-                statusDiv.className = 'friend-status status-offline';
-                davetButton.style.display = 'none';
-            }
-        });
-
-        card.appendChild(statusDiv);
-        card.appendChild(davetButton);
-
-        // Durumu sürekli dinle
-        const cleanup = listenToFriendStatus(student.friendId, statusDiv, davetButton);
-        // Kart DOM'dan çıkarıldığında dinlemeyi temizle
-        card.addEventListener('remove', cleanup);
+        showAlert('Arkadaş başarıyla eklendi!');
+        loadFriendsList();
+        searchFriends();
+    } catch (error) {
+        showAlert('Arkadaş eklenirken hata oluştu');
     }
+}
 
-    return card;
+async function checkIfFriend(friendId) {
+    const snapshot = await database.ref(`friendships/${selectedStudent.studentId}/${friendId}`).once('value');
+    return snapshot.exists();
 }
 
 async function addFriend(student) {
@@ -2533,56 +2569,60 @@ async function addFriend(student) {
 async function loadFriendsList() {
     try {
         friendsList.innerHTML = '<div class="loading">Yükleniyor...</div>';
-        
-        if (!selectedStudent || !selectedStudent.studentId) {
-            throw new Error('Öğrenci bilgisi bulunamadı');
-        }
 
-        const snapshot = await database.ref(`friendships/${selectedStudent.studentId}`).once('value');
-        friendsList.innerHTML = '';
-        
+        const friendshipsRef = database.ref(`friendships/${selectedStudent.studentId}`);
+        const snapshot = await friendshipsRef.once('value');
+
         if (!snapshot.exists()) {
             friendsList.innerHTML = '<div class="no-friends">Henüz arkadaşınız yok</div>';
             return;
         }
 
+        friendsList.innerHTML = '';
         const friends = [];
+
         snapshot.forEach(childSnapshot => {
             const friendData = childSnapshot.val();
-            if (friendData) {
-                friends.push({
-                    friendId: friendData.friendId,
-                    friendName: friendData.friendName,
-                    friendClassName: friendData.friendClassName,
-                    friendPhoto: friendData.friendPhoto,
-                    friendClassId: friendData.friendClassId
-                });
+            friends.push({
+                studentId: friendData.friendId,
+                name: friendData.friendName,
+                classId: friendData.friendClassId,
+                className: friendData.friendClassName,
+                photo: friendData.friendPhoto,
+                inDuel: false // varsayılan değer
+            });
+        });
+
+        for (const friend of friends) {
+            // inDuel durumunu kontrol et
+            const inDuelRef = database.ref(`classes/${friend.classId}/students/${friend.studentId}/inDuel`);
+            const inDuelSnapshot = await inDuelRef.once('value');
+            friend.inDuel = inDuelSnapshot.val() || false;
+
+            // Arkadaş kartını oluştur
+            const li = document.createElement('li');
+            li.className = 'player-item';
+
+            li.innerHTML = `
+                <img src="${friend.photo || 'https://via.placeholder.com/50'}" alt="${friend.name}" class="player-photo">
+                <span class="player-name">${friend.name} / (${friend.className})</span>
+                ${friend.inDuel ? 
+                    '<button class="oyunda-button" disabled>Oyunda</button>' : 
+                    '<button class="davet-et-button">Davet Et</button>'
+                }
+            `;
+
+            if (!friend.inDuel) {
+                const davetButton = li.querySelector('.davet-et-button');
+                davetButton.onclick = () => sendInvitation(friend);
             }
-        });
 
-        friends.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-        if (friends.length === 0) {
-            friendsList.innerHTML = '<div class="no-friends">Henüz arkadaşınız yok</div>';
-            return;
+            friendsList.appendChild(li);
         }
-
-        friends.forEach(friend => {
-            const card = createFriendCard({
-                friendId: friend.friendId,
-                name: friend.friendName,
-                className: friend.friendClassName,
-                photo: friend.friendPhoto,
-                classId: friend.friendClassId
-            }, false);
-            friendsList.appendChild(card);
-        });
-
-        console.log('Yüklenen arkadaşlar:', friends); // Debug için
 
     } catch (error) {
         console.error('Arkadaş listesi yükleme hatası:', error);
-        friendsList.innerHTML = '<div class="error">Liste yüklenirken bir hata oluştu. Hata: ' + error.message + '</div>';
+        friendsList.innerHTML = '<div class="error">Liste yüklenirken bir hata oluştu</div>';
     }
 }
 
