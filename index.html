@@ -468,6 +468,17 @@ option {
     overflow: hidden;
 }
 
+.offline-button {
+    background-color: #808080;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: not-allowed;
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
 .buttons button::before {
     content: '';
     position: absolute;
@@ -2589,7 +2600,8 @@ async function loadFriendsList() {
                 classId: friendData.friendClassId,
                 className: friendData.friendClassName,
                 photo: friendData.friendPhoto,
-                inDuel: false // varsayılan değer
+                inDuel: false,
+                isOnline: false
             });
         });
 
@@ -2599,20 +2611,35 @@ async function loadFriendsList() {
             const inDuelSnapshot = await inDuelRef.once('value');
             friend.inDuel = inDuelSnapshot.val() || false;
 
-            // Arkadaş kartını oluştur
+            // Online durumunu kontrol et
+            const loggedInRef = database.ref('loggedinPlayers').orderByChild('studentId').equalTo(friend.studentId);
+            const loggedInSnapshot = await loggedInRef.once('value');
+            friend.isOnline = loggedInSnapshot.exists();
+
             const li = document.createElement('li');
             li.className = 'player-item';
+
+            let buttonClass = 'davet-et-button';
+            let buttonText = 'Davet Et';
+            let isDisabled = false;
+
+            if (friend.inDuel) {
+                buttonClass = 'oyunda-button';
+                buttonText = 'Oyunda';
+                isDisabled = true;
+            } else if (!friend.isOnline) {
+                buttonClass = 'offline-button';
+                buttonText = 'Çevrimdışı';
+                isDisabled = true;
+            }
 
             li.innerHTML = `
                 <img src="${friend.photo || 'https://via.placeholder.com/50'}" alt="${friend.name}" class="player-photo">
                 <span class="player-name">${friend.name} / (${friend.className})</span>
-                ${friend.inDuel ? 
-                    '<button class="oyunda-button" disabled>Oyunda</button>' : 
-                    '<button class="davet-et-button">Davet Et</button>'
-                }
+                <button class="${buttonClass}" ${isDisabled ? 'disabled' : ''}>${buttonText}</button>
             `;
 
-            if (!friend.inDuel) {
+            if (!isDisabled) {
                 const davetButton = li.querySelector('.davet-et-button');
                 davetButton.onclick = () => sendInvitation(friend);
             }
