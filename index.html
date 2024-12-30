@@ -262,6 +262,8 @@ select {
     color: #166534;
 }
 
+
+
 .status-in-game {
     background: #fee2e2;
     color: #991b1b;
@@ -401,24 +403,64 @@ option {
             to { transform: scale(1); opacity: 1; }
         }
 
-        .game-cup-image {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 10px;
-            animation: none;
-        }
+.game-cup-image {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 5px;
+    transform-origin: center;
+    animation: trophyBounce 2s infinite;
+}
+
+@keyframes trophyGlow {
+    from {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+}
+
+@keyframes trophyBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.trophy-container {
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    border-radius: 15px;
+    padding: 5px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    margin: 15px 0;
+    animation: trophyGlow 2s infinite alternate;
+}
+
+.trophy-inner {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
 
         @keyframes rotateCup {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
-        .game-cup-score {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ff8a00;
-            animation: fadeIn 1s ease;
-        }
+.game-cup-score {
+    font-size: 2em;
+    font-weight: bold;
+    background: linear-gradient(45deg, #ffd700, #ff8c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
 
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.8); }
@@ -479,6 +521,40 @@ option {
     font-size: 0.9em;
 }
 
+.student-diamond {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    animation: diamondGlow 2s infinite alternate;
+}
+
+.diamond-count {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #1e90ff;
+    text-shadow: 0 0 3px #1e90ff;
+    animation: diamondPulse 2.5s infinite alternate;
+}
+
+@keyframes diamondGlow {
+    from {
+        filter: drop-shadow(0 0 2px #1e90ff);
+    }
+    to {
+        filter: drop-shadow(0 0 8px #1e90ff);
+    }
+}
+
+@keyframes diamondPulse {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.1);
+    }
+}
+
 .buttons button::before {
     content: '';
     position: absolute;
@@ -507,9 +583,6 @@ option {
     background-color: #ff6f61;
 }
 
-.oyundakiler-button {
-    background-color: #6b5b95;
-}
 
 .friend-added-button {
     background-color: #808080;
@@ -536,11 +609,6 @@ option {
 .add-friend-button:hover {
     background-color: #218838;
     transform: scale(1.05);
-}
-
-.oyundakiler-button:hover {
-    transform: scale(1.07);
-    opacity: 0.9;
 }
 
 .kupa-siralama-button {
@@ -1786,20 +1854,26 @@ option {
         <div class="student-info">
             <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
             <div class="student-name" id="student-name"></div>
-            <div class="student-cup">
-                <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk0M3A2MWR2aTJxenhoMjJ2dmRybXFzNjRlam9oNGlpM3p2eW0zayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/wX7I4l8SfFyG8rqhsd/giphy.webp" alt="Game Cup" class="game-cup-image">
-                <span class="game-cup-score" id="game-cup-score">0</span>
-            </div>
+<div class="student-cup">
+    <div class="trophy-container">
+        <div class="trophy-inner">
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk0M3A2MWR2aTJxenhoMjJ2dmRybXFzNjRlam9oNGlpM3p2eW0zayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/wX7I4l8SfFyG8rqhsd/giphy.webp" alt="Game Cup" class="game-cup-image">
+            <span class="game-cup-score" id="game-cup-score">0</span>
+        </div>
+    </div>
+</div>
+<div class="student-diamond">
+    <span class="diamond-count">💎 = <span id="diamond-value">0</span></span>
+</div>
         </div>
         <div class="buttons">
             <button class="single-player">Tek Kişilik Oyun</button>
-            <button class="oyundakiler-button" id="oyundakiler-button">Oyundakiler</button>
+	    <button class="friends-button" id="friends-button">
+               👥 Arkadaşlar
+            </button>
             <!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
             <button class="kupa-siralama-button" id="kupa-siralama-button">
                 🏆 Kupa Sıralaması
-            </button>
-	    <button class="friends-button" id="friends-button">
-               👥 Arkadaşlar
             </button>
 	    <button class="logout-button" id="logout-button">Çıkış Yap</button>
 
@@ -2074,13 +2148,14 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
 
         // Lütfen kendi firebaseConfig değerlerinizi girin
         const firebaseConfig = {
-  apiKey: "AIzaSyCETl3W4_EblmlP3Ejq03JfgBIGLTLK7kM",
-  authDomain: "sampiyonlar-ligi.firebaseapp.com",
-  databaseURL: "https://sampiyonlar-ligi-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "sampiyonlar-ligi",
-  storageBucket: "sampiyonlar-ligi.firebasestorage.app",
-  messagingSenderId: "248285384149",
-  appId: "1:248285384149:web:39116a8e31ef61d16f815c"
+  apiKey: "AIzaSyAV8LLng3Cx6-116U6WcEFVn7XqOq2l3Sc",
+  authDomain: "duellomatik.firebaseapp.com",
+  databaseURL: "https://duellomatik-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "duellomatik",
+  storageBucket: "duellomatik.firebasestorage.app",
+  messagingSenderId: "274662566652",
+  appId: "1:274662566652:web:c097e7052aba00a6b04579",
+  measurementId: "G-4HXFJJ0WLR"
 };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -2093,7 +2168,6 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
         const playersOverlay = document.getElementById('playersOverlay');
         const playersCloseButton = document.getElementById('playersCloseButton');
         const playersList = document.getElementById('playersList');
-        const oyundakilerButton = document.getElementById('oyundakiler-button');
         const invitationOverlay = document.getElementById('invitationOverlay');
         const invitationMessage = document.getElementById('invitationMessage');
 
@@ -2181,8 +2255,6 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
     playersOverlay.style.display = 'flex';
 }
 
-
-        oyundakilerButton.addEventListener('click', showLoggedInPlayers);
 
         const studentSelectionScreen = document.getElementById('student-selection-screen');
         const mainScreen = document.getElementById('main-screen');
@@ -2297,13 +2369,13 @@ window.onload = () => {
         addLoggedInPlayer(selectedStudent);
         startInvitationListener(selectedStudent.studentId);
         fetchAndDisplayGameCup();
+        onMainScreenLoad(); // Elmas sistemini başlat
     } else {
         studentSelectionScreen.style.display = 'flex';
     }
     fetchClassesForSelection();
     fetchChampionData();
 };
-
 
 
         async function fetchAllClasses() {
@@ -2363,9 +2435,9 @@ loginButton.addEventListener('click', async () => {
                     studentName.textContent = selectedStudent.studentName;
                     await addLoggedInPlayer(selectedStudent);
                     startInvitationListener(selectedStudent.studentId);
-                    fetchAndDisplayGameCup(); // gameCup puanını çek ve göster
+                    fetchAndDisplayGameCup();
+                    onMainScreenLoad(); // Elmas sistemini başlat
 
-                    // **Oturum Bilgilerini localStorage'a Kaydet**
                     localStorage.setItem('selectedStudent', JSON.stringify(selectedStudent));
                 } else {
                     studentSelectionError.textContent = 'Yanlış şifre. Lütfen tekrar deneyiniz.';
@@ -2379,6 +2451,52 @@ loginButton.addEventListener('click', async () => {
         });
     }
 });
+
+
+const studentsRef = database.ref('classes/2-D/students');
+studentsRef.once('value').then(snapshot => {
+  if (snapshot.exists()) {
+    snapshot.forEach(childSnapshot => {
+      const studentRef = childSnapshot.ref;
+      studentRef.child('diamond').set(0);
+      studentRef.child('lastDiamondUpdate').set(firebase.database.ServerValue.TIMESTAMP);
+    });
+  }
+});
+
+// Elmas sayısını güncelleme fonksiyonu
+async function updateDiamondCount() {
+    if (!selectedStudent?.studentId) return;
+    
+    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    const snapshot = await studentRef.once('value');
+    const userData = snapshot.val();
+    
+    const currentTime = Date.now();
+    const lastUpdate = userData.lastDiamondUpdate || currentTime;
+    const hoursPassed = Math.floor((currentTime - lastUpdate) / (1000 * 60 * 60));
+    
+    if (hoursPassed > 0) {
+        let newDiamonds = (userData.diamond || 0) + hoursPassed;
+        if (newDiamonds > 30) newDiamonds = 30;
+        
+        await studentRef.update({
+            diamond: newDiamonds,
+            lastDiamondUpdate: currentTime
+        });
+        
+        document.getElementById('diamond-value').textContent = newDiamonds;
+    } else {
+        document.getElementById('diamond-value').textContent = userData.diamond || 0;
+    }
+}
+
+// Ana ekrana gelindiğinde elmas sayısını güncelle
+function onMainScreenLoad() {
+    updateDiamondCount();
+    // Her saat başı kontrol et
+    setInterval(updateDiamondCount, 1000 * 60 * 60);
+}
 
 // Ana değişkenler
 const friendsButton = document.querySelector('.friends-button');
