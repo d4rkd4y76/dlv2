@@ -94,6 +94,179 @@ select {
     gap: 10px;
 }
 
+.student-stats-container {
+    position: relative;
+    margin-top: 20px;
+    padding: 5px;
+    perspective: 1000px;
+}
+
+.student-stats {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transform-style: preserve-3d;
+    animation: floatStats 6s ease-in-out infinite;
+}
+
+.stats-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stats-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.trophy-glow {
+    background: radial-gradient(circle at center,
+        rgba(255, 215, 0, 0.3) 0%,
+        transparent 70%);
+    animation: pulseGold 2s ease-in-out infinite;
+}
+
+.diamond-glow {
+    background: radial-gradient(circle at center,
+        rgba(30, 144, 255, 0.3) 0%,
+        transparent 70%);
+    animation: pulseBlue 2s ease-in-out infinite;
+}
+
+.stats-icon {
+    position: relative;
+    font-size: 2em;
+    z-index: 2;
+}
+
+.trophy-stats .stats-icon {
+    animation: shakeRotate 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+}
+
+.diamond-stats .stats-icon {
+    animation: floatShine 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(30, 144, 255, 0.5));
+}
+
+.stats-value {
+    position: relative;
+    font-size: 1.6em;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.trophy-stats .stats-value {
+    background: linear-gradient(45deg, #ffd700, #ffa500, #ff8c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerGold 3s linear infinite;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.diamond-stats .stats-value {
+    background: linear-gradient(45deg, #00bfff, #1e90ff, #4169e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerBlue 3s linear infinite;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stats-item:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes floatStats {
+    0%, 100% { transform: translateY(0) rotateX(0); }
+    50% { transform: translateY(-10px) rotateX(5deg); }
+}
+
+@keyframes pulseGold {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes pulseBlue {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes shakeRotate {
+    0%, 100% { transform: rotate(-5deg); }
+    25% { transform: rotate(0deg) scale(1.1); }
+    50% { transform: rotate(5deg); }
+    75% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes floatShine {
+    0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+    50% { transform: translateY(-5px) scale(1.1); filter: brightness(1.3); }
+}
+
+@keyframes shimmerGold {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+@keyframes shimmerBlue {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+.trophy-stats:hover .trophy-glow {
+    animation: pulseGold 1s ease-in-out infinite;
+}
+
+.diamond-stats:hover .diamond-glow {
+    animation: pulseBlue 1s ease-in-out infinite;
+}
+
+/* Hover efektleri için ek parıltılar */
+.stats-item::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.2) 0%,
+        transparent 50%);
+    transform: rotate(45deg);
+    transition: 0.5s;
+    opacity: 0;
+}
+
+.stats-item:hover::before {
+    opacity: 1;
+    animation: rotateSweep 1s linear infinite;
+}
+
+@keyframes rotateSweep {
+    0% { transform: rotate(45deg) translateY(0%); }
+    100% { transform: rotate(45deg) translateY(100%); }
+}
+
 .friends-button:hover {
     transform: scale(1.05);
     background: linear-gradient(135deg, #4f46e5, #4338ca);
@@ -1852,20 +2025,23 @@ option {
     <!-- Ana Ekran -->
     <div class="container" id="main-screen" style="display: none;">
         <div class="student-info">
-            <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
-            <div class="student-name" id="student-name"></div>
-<div class="student-cup">
-    <div class="trophy-container">
-        <div class="trophy-inner">
-            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk0M3A2MWR2aTJxenhoMjJ2dmRybXFzNjRlam9oNGlpM3p2eW0zayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/wX7I4l8SfFyG8rqhsd/giphy.webp" alt="Game Cup" class="game-cup-image">
-            <span class="game-cup-score" id="game-cup-score">0</span>
+    <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
+    <div class="student-name" id="student-name"></div>
+    <div class="student-stats-container">
+        <div class="student-stats">
+            <div class="stats-item trophy-stats">
+                <div class="stats-glow trophy-glow"></div>
+                <span class="stats-icon">🏆</span>
+                <span class="stats-value trophy-value" id="game-cup-score">0</span>
+            </div>
+            <div class="stats-item diamond-stats">
+                <div class="stats-glow diamond-glow"></div>
+                <span class="stats-icon">💎</span>
+                <span class="stats-value diamond-value" id="diamond-value">0</span>
+            </div>
         </div>
     </div>
 </div>
-<div class="student-diamond">
-    <span class="diamond-count">💎 = <span id="diamond-value">0</span></span>
-</div>
-        </div>
         <div class="buttons">
             <button class="single-player">Tek Kişilik Oyun</button>
 	    <button class="friends-button" id="friends-button">
