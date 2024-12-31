@@ -2343,7 +2343,7 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
         let duelQuestionLocked = false;
         let duelGameStarted = false;
 
-window.onload = () => {
+window.onload = async () => {
     const storedStudent = localStorage.getItem('selectedStudent');
     if (storedStudent) {
         selectedStudent = JSON.parse(storedStudent);
@@ -2376,7 +2376,6 @@ window.onload = () => {
     fetchClassesForSelection();
     fetchChampionData();
 };
-
 
         async function fetchAllClasses() {
             const snapshot = await database.ref('classes').once('value');
@@ -2414,6 +2413,17 @@ loginButton.addEventListener('click', async () => {
             if (snapshot.exists()) {
                 const correctPassword = snapshot.val();
                 if (enteredPassword === correctPassword) {
+                    // Kullanıcının diamond değerini kontrol et
+        const diamondRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`);
+const lastUpdateRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/lastDiamondUpdate`);
+
+const diamondSnapshot = await diamondRef.once('value');
+if (!diamondSnapshot.exists()) {
+    // Yeni kullanıcı için 60 elmas tanımla
+    await diamondRef.set(60);
+    await lastUpdateRef.set(firebase.database.ServerValue.TIMESTAMP);
+}
+
                     studentSelectionScreen.style.display = 'none';
                     mainScreen.style.display = 'flex';
                     studentSelectionError.textContent = '';
@@ -2452,42 +2462,39 @@ loginButton.addEventListener('click', async () => {
     }
 });
 
-
-const studentsRef = database.ref('classes/2-D/students');
-studentsRef.once('value').then(snapshot => {
-  if (snapshot.exists()) {
-    snapshot.forEach(childSnapshot => {
-      const studentRef = childSnapshot.ref;
-      studentRef.child('diamond').set(0);
-      studentRef.child('lastDiamondUpdate').set(firebase.database.ServerValue.TIMESTAMP);
-    });
-  }
-});
-
+// Elmas sayısını güncelleme fonksiyonu
 // Elmas sayısını güncelleme fonksiyonu
 async function updateDiamondCount() {
     if (!selectedStudent?.studentId) return;
     
-    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-    const snapshot = await studentRef.once('value');
-    const userData = snapshot.val();
-    
-    const currentTime = Date.now();
-    const lastUpdate = userData.lastDiamondUpdate || currentTime;
-    const hoursPassed = Math.floor((currentTime - lastUpdate) / (1000 * 60 * 60));
-    
-    if (hoursPassed > 0) {
-        let newDiamonds = (userData.diamond || 0) + hoursPassed;
-        if (newDiamonds > 30) newDiamonds = 30;
+    try {
+        const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+        const snapshot = await studentRef.once('value');
+        const userData = snapshot.val();
         
-        await studentRef.update({
-            diamond: newDiamonds,
-            lastDiamondUpdate: currentTime
-        });
+        const currentTime = Date.now();
+        const lastUpdate = userData.lastDiamondUpdate || currentTime;
+        const hoursPassed = Math.floor((currentTime - lastUpdate) / (1000 * 60 * 60));
         
-        document.getElementById('diamond-value').textContent = newDiamonds;
-    } else {
-        document.getElementById('diamond-value').textContent = userData.diamond || 0;
+        if (hoursPassed > 0) {
+            // Mevcut elmas sayısı
+            let currentDiamonds = userData.diamond || 0;
+            // Eklenecek elmas sayısı (saatte 1)
+            let diamondsToAdd = hoursPassed;
+            // Yeni toplam elmas sayısı (maksimum 30)
+            let newDiamonds = Math.min(currentDiamonds + diamondsToAdd, 30);
+            
+            await studentRef.update({
+                diamond: newDiamonds,
+                lastDiamondUpdate: currentTime
+            });
+            
+            document.getElementById('diamond-value').textContent = newDiamonds;
+        } else {
+            document.getElementById('diamond-value').textContent = userData.diamond || 0;
+        }
+    } catch (error) {
+        console.error("Elmas güncelleme hatası:", error);
     }
 }
 
