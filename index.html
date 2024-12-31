@@ -96,20 +96,20 @@ select {
 
 .student-stats-container {
     position: relative;
-    margin-top: 20px;
-    padding: 5px;
+    margin-top: 15px; /* Azaltıldı: 20px -> 15px */
+    padding: 3px; /* Azaltıldı: 5px -> 3px */
     perspective: 1000px;
 }
 
 .student-stats {
     display: flex;
     justify-content: center;
-    gap: 25px;
-    padding: 15px;
+    gap: 15px; /* Azaltıldı: 25px -> 15px */
+    padding: 10px; /* Azaltıldı: 15px -> 10px */
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    border-radius: 15px; /* Azaltıldı: 20px -> 15px */
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 6px 24px 0 rgba(31, 38, 135, 0.37); /* Azaltıldı shadow */
     border: 1px solid rgba(255, 255, 255, 0.18);
     transform-style: preserve-3d;
     animation: floatStats 6s ease-in-out infinite;
@@ -119,9 +119,9 @@ select {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    border-radius: 16px;
+    gap: 8px; /* Azaltıldı: 12px -> 8px */
+    padding: 8px 15px; /* Azaltıldı: 12px 20px -> 8px 15px */
+    border-radius: 12px; /* Azaltıldı: 16px -> 12px */
     background: rgba(255, 255, 255, 0.05);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -154,7 +154,7 @@ select {
 
 .stats-icon {
     position: relative;
-    font-size: 2em;
+    font-size: 1.3em; /* Azaltıldı: 2em -> 1.3em */
     z-index: 2;
 }
 
@@ -170,7 +170,7 @@ select {
 
 .stats-value {
     position: relative;
-    font-size: 1.6em;
+    font-size: 1.2em; /* Azaltıldı: 1.6em -> 1.2em */
     font-weight: bold;
     z-index: 2;
 }
@@ -192,35 +192,35 @@ select {
 }
 
 .stats-item:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px) scale(1.03); /* Azaltıldı: -5px -> -3px, 1.05 -> 1.03 */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Azaltıldı: 10px 20px -> 8px 16px */
 }
 
 @keyframes floatStats {
     0%, 100% { transform: translateY(0) rotateX(0); }
-    50% { transform: translateY(-10px) rotateX(5deg); }
+    50% { transform: translateY(-5px) rotateX(3deg); } /* Azaltıldı: -10px -> -5px, 5deg -> 3deg */
 }
 
 @keyframes pulseGold {
     0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); } /* Azaltıldı: 1.2 -> 1.1 */
 }
 
 @keyframes pulseBlue {
     0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); } /* Azaltıldı: 1.2 -> 1.1 */
 }
 
 @keyframes shakeRotate {
-    0%, 100% { transform: rotate(-5deg); }
-    25% { transform: rotate(0deg) scale(1.1); }
-    50% { transform: rotate(5deg); }
+    0%, 100% { transform: rotate(-3deg); } /* Azaltıldı: -5deg -> -3deg */
+    25% { transform: rotate(0deg) scale(1.05); } /* Azaltıldı: 1.1 -> 1.05 */
+    50% { transform: rotate(3deg); } /* Azaltıldı: 5deg -> 3deg */
     75% { transform: rotate(0deg) scale(1); }
 }
 
 @keyframes floatShine {
     0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
-    50% { transform: translateY(-5px) scale(1.1); filter: brightness(1.3); }
+    50% { transform: translateY(-3px) scale(1.05); filter: brightness(1.2); } /* Azaltıldı: -5px -> -3px, 1.1 -> 1.05, 1.3 -> 1.2 */
 }
 
 @keyframes shimmerGold {
