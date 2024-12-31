@@ -2479,17 +2479,27 @@ async function updateDiamondCount() {
         if (hoursPassed > 0) {
             // Mevcut elmas sayısı
             let currentDiamonds = userData.diamond || 0;
-            // Eklenecek elmas sayısı (saatte 1)
-            let diamondsToAdd = hoursPassed;
-            // Yeni toplam elmas sayısı (maksimum 30)
-            let newDiamonds = Math.min(currentDiamonds + diamondsToAdd, 30);
             
-            await studentRef.update({
-                diamond: newDiamonds,
-                lastDiamondUpdate: currentTime
-            });
-            
-            document.getElementById('diamond-value').textContent = newDiamonds;
+            // Eğer mevcut elmas sayısı 30'dan küçükse saatlik artış uygula
+            if (currentDiamonds < 30) {
+                // Eklenecek elmas sayısı (saatte 1)
+                let diamondsToAdd = hoursPassed * 10;
+                // Yeni toplam elmas sayısı (maksimum 30)
+                let newDiamonds = Math.min(currentDiamonds + diamondsToAdd, 30);
+                
+                await studentRef.update({
+                    diamond: newDiamonds,
+                    lastDiamondUpdate: currentTime
+                });
+                
+                document.getElementById('diamond-value').textContent = newDiamonds;
+            } else {
+                // Elmas sayısı zaten 30 veya üzerindeyse mevcut değeri koru
+                document.getElementById('diamond-value').textContent = currentDiamonds;
+                await studentRef.update({
+                    lastDiamondUpdate: currentTime
+                });
+            }
         } else {
             document.getElementById('diamond-value').textContent = userData.diamond || 0;
         }
