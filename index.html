@@ -2000,7 +2000,7 @@ option {
 
     <!-- Öğrenci Seçimi Ekranı -->
     <div class="container student-selection-container" id="student-selection-screen">
-        <h2>Öğrenci Seçimi</h2>
+        <h2>🏆 Düellomatik 🏆</h2>
         <div class="table-section">
             <h3>Öğrenci Seçme</h3>
             <label for="selection-class-select">Sınıfı Seç:</label>
@@ -3669,33 +3669,60 @@ logoutButton.addEventListener('click', async () => {
         }
 
         // Davet Etme ve Dinleme
-        async function sendInvitation(player) {
-            try {
-                const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
-                const isInDuel = inDuelSnapshot.exists() ? inDuelSnapshot.val() : false;
+async function sendInvitation(player) {
+    try {
+        // Reddedilen davet kontrolü
+        const rejectedInviteRef = database.ref('rejectedInvites')
+            .orderByChild('inviterId')
+            .equalTo(selectedStudent.studentId);
+            
+        const snapshot = await rejectedInviteRef.once('value');
+        let canSendInvite = true;
+        let remainingTime = 0;
 
-                if (isInDuel) {
-                    showAlert(`${player.name} zaten bir düelloda!`);
-                    return;
+        if (snapshot.exists()) {
+            snapshot.forEach(child => {
+                const invite = child.val();
+                if (invite.invitedId === player.studentId) {
+                    const timeDiff = Date.now() - invite.timestamp;
+                    if (timeDiff < 30000) { // 30 saniye
+                        canSendInvite = false;
+                        remainingTime = Math.ceil((30000 - timeDiff) / 1000);
+                    }
                 }
-
-                const invitationRef = database.ref(`invitations/${player.studentId}`);
-                invitationRef.set({
-                    invitedByName: selectedStudent.studentName,
-                    invitedByClassId: selectedStudent.classId,
-                    invitedByStudentId: selectedStudent.studentId,
-                    invitedByPhoto: studentPhoto.src ? studentPhoto.src : ""
-                }).then(() => {
-                    showAlert(`${player.name} davet edildi!`);
-                }).catch(error => {
-                    console.error("Davet gönderme hatası:", error);
-                    showAlert('Davet gönderilirken bir hata oluştu.');
-                });
-            } catch (error) {
-                console.error("Düello kontrolü hata:", error);
-                showAlert('Düello durumu kontrol edilirken hata oluştu.');
-            }
+            });
         }
+
+        if (!canSendInvite) {
+            showAlert(`Bu kişi davetinizi reddetti. ${remainingTime} sn sonra tekrar deneyiniz.`);
+            return;
+        }
+
+        // Düello kontrolü
+        const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
+        const isInDuel = inDuelSnapshot.exists() ? inDuelSnapshot.val() : false;
+        
+        if (isInDuel) {
+            showAlert(`${player.name} zaten bir düelloda!`);
+            return;
+        }
+
+        // Davet gönderme
+        const invitationRef = database.ref(`invitations/${player.studentId}`);
+        await invitationRef.set({
+            invitedByName: selectedStudent.studentName,
+            invitedByClassId: selectedStudent.classId,
+            invitedByStudentId: selectedStudent.studentId,
+            invitedByPhoto: studentPhoto.src ? studentPhoto.src : ""
+        });
+        
+        showAlert(`${player.name} davet edildi!`);
+        
+    } catch (error) {
+        console.error("Davet gönderme hatası:", error);
+        showAlert('Davet gönderilirken bir hata oluştu.');
+    }
+}
 
         function startInvitationListener(studentId) {
             // Davetleri dinle
@@ -3748,13 +3775,53 @@ logoutButton.addEventListener('click', async () => {
         const invitationDeclineButton = document.getElementById('invitationDeclineButton');
         const invitationAcceptButton = document.getElementById('invitationAcceptButton');
 
-        invitationDeclineButton.addEventListener('click', () => {
-            if (currentInvitation && selectedStudent.studentId) {
-                database.ref(`invitations/${selectedStudent.studentId}`).remove();
-                invitationOverlay.style.display = 'none';
-                currentInvitation = null;
-            }
+invitationDeclineButton.addEventListener('click', async () => {
+    if (currentInvitation && selectedStudent.studentId) {
+        try {
+            // Reddedilen daveti kaydet
+            const rejectedInviteRef = database.ref('rejectedInvites').push();
+            await rejectedInviteRef.set({
+                inviterId: currentInvitation.invitedByStudentId,
+                invitedId: selectedStudent.studentId,
+                timestamp: Date.now()
+            });
+
+            // 30 saniye sonra reddedilen daveti sil
+            setTimeout(async () => {
+                await rejectedInviteRef.remove();
+            }, 30000);
+
+            // Mevcut daveti kaldır
+            await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+            invitationOverlay.style.display = 'none';
+            currentInvitation = null;
+
+        } catch (error) {
+            console.error("Davet reddetme hatası:", error);
+            showAlert('Davet reddedilirken bir hata oluştu.');
+        }
+    }
+});
+
+async function cleanupRejectedInvites() {
+    const thirtySecondsAgo = Date.now() - 30000;
+    const rejectedInvitesRef = database.ref('rejectedInvites');
+    const oldInvitesSnapshot = await rejectedInvitesRef
+        .orderByChild('timestamp')
+        .endAt(thirtySecondsAgo)
+        .once('value');
+
+    if (oldInvitesSnapshot.exists()) {
+        const updates = {};
+        oldInvitesSnapshot.forEach(child => {
+            updates[child.key] = null;
         });
+        await rejectedInvitesRef.update(updates);
+    }
+}
+
+// Her 30 saniyede bir temizlik yap
+setInterval(cleanupRejectedInvites, 30000);
 
         invitationAcceptButton.addEventListener('click', async () => {
             if (currentInvitation && selectedStudent.studentId) {
