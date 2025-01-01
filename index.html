@@ -2072,6 +2072,29 @@ option {
     100% { transform: rotate(360deg); }
 }
 
+.selecting-student-banner {
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0;
+    box-shadow: 0 4px 15px rgba(255, 78, 80, 0.4);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px #ff6b6b;
+    }
+    to {
+        box-shadow: 0 0 20px #ffd93d;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -2252,6 +2275,7 @@ option {
     <!-- Düello Seçim Ekranı -->
     <div class="duel-selection-container" id="duel-selection-screen">
         <h2>Ortak Seçim Ekranı</h2>
+<div id="selecting-student-banner" class="selecting-student-banner"></div>
         <div class="table-section">
             <h3>Konu Belirleme</h3>
             <label for="duel-class-select">Sınıf Seç:</label>
@@ -3990,7 +4014,6 @@ async function createDuelSession(inviterId, inviterClassId, inviterName, inviter
 }
 
 function switchToDuelScreen(duelKey) {
-    // Tüm ekranları gizle
     mainScreen.style.display = 'none';
     singlePlayerScreen.style.display = 'none';
     singlePlayerGameScreen.style.display = 'none';
@@ -3998,13 +4021,11 @@ function switchToDuelScreen(duelKey) {
     rankingPanel.classList.remove('open');
     playersOverlay.style.display = 'none';
     
-    // Düello ekranının container'ını düzenle
     document.body.style.display = 'flex';
     document.body.style.justifyContent = 'center';
     document.body.style.alignItems = 'center';
     document.body.style.minHeight = '100vh';
     
-    // Düello ekranını göster
     duelSelectionScreen.style.display = 'flex';
     duelSelectionScreen.style.flexDirection = 'column';
     duelSelectionScreen.style.width = '100%';
@@ -4013,30 +4034,28 @@ function switchToDuelScreen(duelKey) {
     duelSelectionScreen.style.padding = '30px 40px';
     duelSelectionScreen.style.borderRadius = '20px';
     duelSelectionScreen.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.2)';
-
-    // Container sınıfının özelliklerini ekle
     duelSelectionScreen.classList.add('container');
 
-    // Düello referansını al
     const duelRef = database.ref(`duels/${duelKey}`);
-    
-    // Düello verilerini tutacak değişkenler
     let inviterId, inviterClassId, invitedId, invitedClassId;
     
-    // İlk veriyi bir kez çek ve değişkenleri sakla
-    duelRef.once('value').then(initialSnap => {
-        if (initialSnap.exists()) {
-            const initialData = initialSnap.val();
-            inviterId = initialData.inviter.studentId;
-            inviterClassId = initialData.inviter.classId;
-            invitedId = initialData.invited.studentId;
-            invitedClassId = initialData.invited.classId;
-        }
-    });
+duelRef.once('value').then(initialSnap => {
+    if (initialSnap.exists()) {
+        const initialData = initialSnap.val();
+        inviterId = initialData.inviter.studentId;
+        inviterClassId = initialData.inviter.classId;
+        invitedId = initialData.invited.studentId;
+        invitedClassId = initialData.invited.classId;
+        
+        // Sadece davet eden kişinin ismini göster
+        const selectingStudentBanner = document.getElementById('selecting-student-banner');
+        selectingStudentBanner.textContent = `${initialData.inviter.name} konuyu belirliyor.`;
+        selectingStudentBanner.style.display = 'block';
+    }
+});
 
     duelRef.onDisconnect().remove();
 
-    // Sınıfları yükle
     database.ref('championData/headings').once('value').then(snapshot => {
         duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
         if (snapshot.exists()) {
@@ -4055,67 +4074,83 @@ function switchToDuelScreen(duelKey) {
     });
 
     duelRef.on('value', async (snap) => {
-        if (snap.exists()) {
-            const data = snap.val();
-            duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
-            duelInviterName.textContent = data.inviter.name;
-            duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
-            duelInvitedName.textContent = data.invited.name;
+    if (snap.exists()) {
+        const data = snap.val();
+        duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
+        duelInviterName.textContent = data.inviter.name;
+        duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
+        duelInvitedName.textContent = data.invited.name;
 
-            // Düello ayarlarını güncelle
-            duelClassSelect.value = data.selections.class || "";
-            duelSubjectSelect.value = data.selections.subject || "";
-            duelTopicSelect.value = data.selections.topic || "";
-
-            if (data.gameStarted && !duelGameStarted) {
-                duelGameStarted = true;
-                duelEnded = false;
-                startDuelGame(data);
-            }
-
-            if (!isInviter) {
-                duelClassSelect.disabled = true;
-                duelSubjectSelect.disabled = true;
-                duelTopicSelect.disabled = true;
-                duelStartButton.disabled = true;
-            } else {
-                checkDuelSelections();
-            }
-        } else {
-            if (!duelEnded) {
-                try {
-                    const currentPlayerId = selectedStudent.studentId;
-                    
-                    // Bağlantısı kopan oyuncuyu tespit et ve puanları güncelle
-                    if (currentPlayerId === inviterId) {
-                        // Davet eden çıktıysa misafir kazanır
-                        await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 6);
-                        await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
-                        await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
-                    } else {
-                        // Misafir çıktıysa davet eden kazanır
-                        await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
-                        await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
-                        await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
-                    }
-
-                    // inDuel durumlarını güncelle
-                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false);
-                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false);
-
-                    // Sayfayı yenile
-                    window.location.reload();
-
-                } catch (error) {
-                    console.error("Oyun sonlandırma hatası:", error);
-                    await showAlert('Oyun sonlandırılırken bir hata oluştu');
-                    window.location.reload();
-                }
+        // Sınıf seçimi yapıldığında dersleri yükle
+        if (data.selections.class && data.selections.class !== duelClassSelect.value) {
+            duelClassSelect.value = data.selections.class;
+            try {
+                await fetchLessons(data.selections.class, duelSubjectSelect);
+            } catch (error) {
+                console.error("Dersler yüklenirken hata:", error);
             }
         }
-    });
 
-    // Müzik başlatma
+        // Ders seçimi yapıldığında konuları yükle
+        if (data.selections.subject && data.selections.subject !== duelSubjectSelect.value) {
+            duelSubjectSelect.value = data.selections.subject;
+            try {
+                if (data.selections.class) {
+                    await fetchTopics(data.selections.class, data.selections.subject, duelTopicSelect);
+                }
+            } catch (error) {
+                console.error("Konular yüklenirken hata:", error);
+            }
+        }
+
+        // Konu seçimini güncelle
+        if (data.selections.topic) {
+            duelTopicSelect.value = data.selections.topic;
+        }
+
+        if (data.gameStarted && !duelGameStarted) {
+            duelGameStarted = true;
+            duelEnded = false;
+            startDuelGame(data);
+        }
+
+        if (!isInviter) {
+            duelClassSelect.disabled = true;
+            duelSubjectSelect.disabled = true;
+            duelTopicSelect.disabled = true;
+            duelStartButton.disabled = true;
+        } else {
+            checkDuelSelections();
+        }
+    } else {
+        if (!duelEnded) {
+            try {
+                const currentPlayerId = selectedStudent.studentId;
+                
+                if (currentPlayerId === inviterId) {
+                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 6);
+                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
+                    await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
+                } else {
+                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
+                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
+                    await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
+                }
+
+                await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false);
+                await database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false);
+
+                window.location.reload();
+
+            } catch (error) {
+                console.error("Oyun sonlandırma hatası:", error);
+                await showAlert('Oyun sonlandırılırken bir hata oluştu');
+                window.location.reload();
+            }
+        }
+    }
+});
+
     const hiddenPlayButton = document.createElement('button');
     hiddenPlayButton.style.display = 'none';
     hiddenPlayButton.id = 'hiddenPlayButton';
@@ -4132,7 +4167,7 @@ function switchToDuelScreen(duelKey) {
     setTimeout(() => {
         hiddenPlayButton.click();
     }, 1000);
-}  
+}
 
       function resetDuelGameState() {
             duelQuestionNumber.textContent = 'Soru 1/10';
