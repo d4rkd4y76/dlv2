@@ -127,6 +127,57 @@ select {
     transition: all 0.3s ease;
 }
 
+.search-random-duel {
+    width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #ff4e50, #f9d423);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.search-random-duel:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(255, 78, 80, 0.4);
+}
+
+.fire-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(45deg, transparent 65%, rgba(255, 78, 80, 0.4) 100%);
+    animation: fireEffect 2s infinite;
+    z-index: 1;
+}
+
+@keyframes fireEffect {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
+        opacity: 0;
+    }
+}
+
 .stats-glow {
     position: absolute;
     top: 50%;
@@ -1822,6 +1873,147 @@ option {
     animation: float 3s ease-in-out infinite;
 }
 
+.random-duel-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #ff8a00;
+    object-fit: cover;
+    animation: profileGlow 2s infinite alternate;
+}
+
+.profile-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.profile-trophy {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #ffd700, #ff8a00);
+    padding: 12px 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.trophy-icon {
+    font-size: 1.5em;
+    animation: trophyBounce 1s infinite alternate;
+}
+
+.trophy-count {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.search-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.start-search-button {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.5em;
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.search-fire-effect {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.2), transparent);
+    animation: fireWave 2s infinite;
+}
+
+.searching-indicator {
+    text-align: center;
+}
+
+.loading-text {
+    font-size: 1.3em;
+    color: #ff416c;
+    margin-bottom: 15px;
+    font-weight: bold;
+    animation: textPulse 1.5s infinite;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #ff416c;
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+}
+
+@keyframes profileGlow {
+    from { box-shadow: 0 0 10px #ff8a00; }
+    to { box-shadow: 0 0 20px #ff8a00; }
+}
+
+@keyframes trophyBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+@keyframes fireWave {
+    0% { transform: translateY(100%) scale(1); }
+    50% { transform: translateY(-20%) scale(1.2); }
+    100% { transform: translateY(100%) scale(1); }
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 @keyframes float {
     0%, 100% {
         transform: translateY(0);
@@ -2044,6 +2236,10 @@ option {
 </div>
         <div class="buttons">
             <button class="single-player">Tek Kişilik Oyun</button>
+<button class="search-random-duel">
+    🔥 Düello Ara
+    <div class="fire-animation"></div>
+</button>
 	    <button class="friends-button" id="friends-button">
                👥 Arkadaşlar
             </button>
@@ -2129,6 +2325,8 @@ option {
         <button class="back-button">Geri Dön</button>
     </div>
 
+
+
     <!-- Tek Kişilik Oyun Sorular Ekranı -->
     <div class="single-player-game-container" id="single-player-game-screen">
         <div class="progress-container">
@@ -2153,6 +2351,31 @@ option {
             <button class="end-game-button" id="final-back-button">Geri Dön</button>
         </div>
     </div>
+
+<div class="random-duel-container" id="random-duel-screen" style="display: none;">
+    <div class="profile-section">
+        <img src="" alt="Profil Fotoğrafı" class="profile-photo" id="random-duel-profile-photo">
+        <div class="profile-name" id="random-duel-profile-name"></div>
+        <div class="profile-trophy">
+            <span class="trophy-icon">🏆</span>
+            <span class="trophy-count" id="random-duel-trophy-count">0</span>
+        </div>
+    </div>
+    
+    <div class="search-section">
+        <button class="start-search-button" id="start-search-button">
+            🔥 DÜELLO ARA 🔥
+            <div class="search-fire-effect"></div>
+        </button>
+        
+        <div class="searching-indicator" id="searching-indicator" style="display: none;">
+            <div class="loading-text">Rakip Aranıyor...</div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <button class="back-button" id="random-duel-back">Geri Dön</button>
+</div>
 
     <!-- Düello Seçim Ekranı -->
     <div class="duel-selection-container" id="duel-selection-screen">
@@ -2804,6 +3027,166 @@ async function displaySearchResults(results) {
         searchResults.appendChild(li);
     }
 }
+
+// Düello Ara butonuna tıklama olayı
+document.querySelector('.search-random-duel').addEventListener('click', () => {
+    mainScreen.style.display = 'none';
+    const randomDuelScreen = document.getElementById('random-duel-screen');
+    randomDuelScreen.style.display = 'flex';
+    
+    // Profil bilgilerini yükle
+    document.getElementById('random-duel-profile-photo').src = studentPhoto.src;
+    document.getElementById('random-duel-profile-name').textContent = selectedStudent.studentName;
+    document.getElementById('random-duel-trophy-count').textContent = 
+        document.getElementById('game-cup-score').textContent;
+});
+
+let randomMatchRef = null;
+let isSearchingForMatch = false;
+
+// Düello aramayı başlat
+document.getElementById('start-search-button').addEventListener('click', async () => {
+    if (isSearchingForMatch) return;
+    
+    const searchButton = document.getElementById('start-search-button');
+    const searchingIndicator = document.getElementById('searching-indicator');
+    
+    searchButton.style.display = 'none';
+    searchingIndicator.style.display = 'block';
+    isSearchingForMatch = true;
+
+    // Eşleşme kaydı oluştur
+    randomMatchRef = database.ref('randomMatches').push();
+    await randomMatchRef.set({
+        studentId: selectedStudent.studentId,
+        classId: selectedStudent.classId,
+        status: 'searching',
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    });
+
+    // Eşleşme aramayı başlat
+    searchForMatch();
+});
+
+// Eşleşme arama fonksiyonu
+function searchForMatch() {
+    const matchQuery = database.ref('randomMatches')
+        .orderByChild('classId')
+        .equalTo(selectedStudent.classId);
+
+    matchQuery.on('value', async (snapshot) => {
+        if (!snapshot.exists() || !isSearchingForMatch) return;
+
+        const availableMatches = [];
+        snapshot.forEach(child => {
+            const match = child.val();
+            if (match.studentId !== selectedStudent.studentId && 
+                match.status === 'searching' &&
+                match.classId === selectedStudent.classId) {
+                availableMatches.push({
+                    id: child.key,
+                    ...match
+                });
+            }
+        });
+
+        if (availableMatches.length > 0) {
+            // Rastgele bir eşleşme seç
+            const match = availableMatches[Math.floor(Math.random() * availableMatches.length)];
+            
+            // Eşleşme bulundu, düello başlat
+            await createRandomDuel(match);
+            
+            // Temizlik
+            await randomMatchRef.remove();
+            matchQuery.off();
+            isSearchingForMatch = false;
+        }
+    });
+}
+
+// Düello oluşturma
+async function createRandomDuel(match) {
+    const duelRef = database.ref('duels').push();
+    
+    // Rastgele seçim hakkı belirle
+    const hasSelectionRight = Math.random() < 0.5;
+    
+    await duelRef.set({
+        inviter: {
+            classId: selectedStudent.classId,
+            studentId: hasSelectionRight ? selectedStudent.studentId : match.studentId,
+            name: hasSelectionRight ? selectedStudent.studentName : match.studentName,
+            photo: hasSelectionRight ? studentPhoto.src : "",
+            hasSelectionRight: hasSelectionRight
+        },
+        invited: {
+            classId: selectedStudent.classId,
+            studentId: hasSelectionRight ? match.studentId : selectedStudent.studentId,
+            name: hasSelectionRight ? match.studentName : selectedStudent.studentName,
+            photo: hasSelectionRight ? "" : studentPhoto.src,
+            hasSelectionRight: !hasSelectionRight
+        },
+        selections: {
+            class: selectedStudent.classId,
+            subject: "",
+            topic: ""
+        },
+        gameStarted: false
+    });
+
+    // Düello ekranına geç
+    currentDuelRef = duelRef;
+    isInviter = hasSelectionRight;
+    switchToDuelScreen(duelRef.key);
+}
+
+// Geri Dön butonu
+document.getElementById('random-duel-back').addEventListener('click', () => {
+    if (randomMatchRef) {
+        randomMatchRef.remove();
+        randomMatchRef = null;
+    }
+    isSearchingForMatch = false;
+    document.getElementById('random-duel-screen').style.display = 'none';
+    document.getElementById('searching-indicator').style.display = 'none';
+    document.getElementById('start-search-button').style.display = 'block';
+    mainScreen.style.display = 'flex';
+});
+
+// switchToDuelScreen fonksiyonunda yapılacak değişiklik
+const originalSwitchToDuelScreen = switchToDuelScreen;
+switchToDuelScreen = function(duelKey) {
+    originalSwitchToDuelScreen(duelKey);
+    
+    const duelRef = database.ref(`duels/${duelKey}`);
+    duelRef.once('value', snap => {
+        if (snap.exists()) {
+            const data = snap.val();
+            
+            // Sınıf seçimini kilitle
+            duelClassSelect.value = selectedStudent.classId;
+            duelClassSelect.disabled = true;
+
+            // Seçim hakkı kontrolü
+            const hasRight = isInviter ? data.inviter.hasSelectionRight : data.invited.hasSelectionRight;
+            
+            if (hasRight) {
+                // Seçim hakkı yazısı ekle
+                const rightLabel = document.createElement('div');
+                rightLabel.className = 'selection-right';
+                rightLabel.textContent = 'SEÇİM HAKKI';
+                duelSelectionScreen.insertBefore(rightLabel, duelSelectionScreen.firstChild);
+                
+                duelSubjectSelect.disabled = false;
+                duelTopicSelect.disabled = false;
+            } else {
+                duelSubjectSelect.disabled = true;
+                duelTopicSelect.disabled = true;
+            }
+        }
+    });
+};
 
 async function addFriend(student) {
     try {
