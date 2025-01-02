@@ -2095,6 +2095,229 @@ option {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Matchmaking Ekranı Stilleri */
+.matchmaking-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.active-games-container {
+    background: linear-gradient(135deg, #f6f7f8, #e2e2e2);
+    border-radius: 15px;
+    padding: 20px;
+    min-height: 300px;
+}
+
+.active-games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.game-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+}
+
+.create-game-button {
+    background: linear-gradient(45deg, #ff4e50, #f9d423);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.2em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(255,78,80,0.4);
+    align-self: center;
+}
+
+.create-game-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(255,78,80,0.6);
+}
+
+.join-game-button {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.join-game-button:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+.join-game-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Oyun Kurma Ekranı Stilleri */
+.game-setup-container {
+    display: none;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.setup-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000000;
+}
+
+.confirm-content {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.confirm-ok-button, .confirm-cancel-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s;
+}
+
+.confirm-ok-button {
+    background: #4CAF50;
+    color: white;
+}
+
+.confirm-cancel-button {
+    background: #f44336;
+    color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
 </head>
 <body>
@@ -2308,6 +2531,102 @@ option {
             </div>
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-content">
+        <div class="confirm-message" id="confirmMessage"></div>
+        <div class="confirm-buttons">
+            <button class="confirm-cancel-button" id="confirmCancelButton">Reddet</button>
+            <button class="confirm-ok-button" id="confirmOkButton">Kabul Et</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Oyun Eşleştirme Ekranı -->
+<div class="matchmaking-container" id="matchmaking-screen" style="display: none;">
+    <h2>Düello Eşleştirme</h2>
+    
+    <!-- Aktif Oyunlar Listesi -->
+    <div class="active-games-container">
+        <h3>Aktif Oyunlar</h3>
+        <div class="active-games-list" id="active-games-list">
+            <!-- Oyunlar buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+    
+    <!-- Oyun Kurma Butonu -->
+    <button class="create-game-button" id="create-game-button">
+        <span class="button-content">
+            <i class="game-icon">🎮</i>
+            <span>Oyun Kur</span>
+        </span>
+        <div class="button-glow"></div>
+    </button>
+</div>
+
+<!-- Oyun Kurma Ekranı -->
+<div class="game-setup-container" id="game-setup-screen" style="display: none;">
+    <h2>Oyun Kurma</h2>
+    <div class="setup-section">
+        <label for="setup-class-select">Sınıf Seç:</label>
+        <select id="setup-class-select"></select>
+
+        <label for="setup-subject-select">Ders Seç:</label>
+        <select id="setup-subject-select"></select>
+
+        <label for="setup-topic-select">Konu Seç:</label>
+        <select id="setup-topic-select"></select>
+    </div>
+    <button class="setup-game-button" id="setup-game-button" disabled>Oyunu Kur</button>
+    <button class="back-button">Geri Dön</button>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- Düello Oyun Ekranı -->
     <div class="duel-game-container" id="duel-game-screen">
@@ -3450,6 +3769,539 @@ logoutButton.addEventListener('click', async () => {
         showAlert('Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.');
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Global değişkenler
+let currentSetupGame = null;
+
+// "Düello Ara" butonuna click event listener ekle
+document.getElementById('findDuelButton').addEventListener('click', () => {
+    mainScreen.style.display = 'none';
+    document.getElementById('matchmaking-screen').style.display = 'flex';
+    loadActiveGames();
+});
+
+// Aktif oyunları yükleme fonksiyonu
+function loadActiveGames() {
+    const activeGamesList = document.getElementById('active-games-list');
+    activeGamesList.innerHTML = '<div class="loading">Oyunlar Yükleniyor...</div>';
+
+    database.ref('activeGames').orderByChild('status').equalTo('waiting').on('value', snapshot => {
+        activeGamesList.innerHTML = '';
+        
+        if (!snapshot.exists()) {
+            activeGamesList.innerHTML = '<div class="no-games">Aktif oyun bulunmuyor</div>';
+            return;
+        }
+
+        snapshot.forEach(childSnapshot => {
+            const game = childSnapshot.val();
+            const gameCard = createGameCard(childSnapshot.key, game);
+            activeGamesList.appendChild(gameCard);
+        });
+    });
+}
+
+// Oyun kartı oluşturma fonksiyonu
+function createGameCard(gameId, game) {
+    const div = document.createElement('div');
+    div.className = 'game-card';
+    
+    div.innerHTML = `
+        <div class="game-info">
+            <div class="creator-info">${game.creatorName} (${game.creatorClass})</div>
+            <div class="game-details">
+                ${game.className} > ${game.subjectName} > ${game.topicName}
+            </div>
+        </div>
+        <button class="join-game-button" ${game.creatorId === selectedStudent.studentId ? 'disabled' : ''}>
+            ${game.creatorId === selectedStudent.studentId ? 'Sizin Oyununuz' : 'Katıl'}
+        </button>
+    `;
+
+    if (game.creatorId !== selectedStudent.studentId) {
+        div.querySelector('.join-game-button').addEventListener('click', () => joinGame(gameId, game));
+    }
+
+    return div;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Oyun kurma butonu event listener
+document.getElementById('create-game-button').addEventListener('click', () => {
+   document.getElementById('matchmaking-screen').style.display = 'none';
+   document.getElementById('game-setup-screen').style.display = 'flex';
+   loadSetupSelections();
+});
+
+// Setup seçimlerini yükleme 
+function loadSetupSelections() {
+   const setupClassSelect = document.getElementById('setup-class-select');
+   const setupSubjectSelect = document.getElementById('setup-subject-select');
+   const setupTopicSelect = document.getElementById('setup-topic-select');
+
+   // Sınıfları yükle
+   database.ref('championData/headings').once('value', snapshot => {
+       setupClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+       if (snapshot.exists()) {
+           snapshot.forEach(child => {
+               const option = document.createElement('option');
+               option.value = child.key;
+               option.textContent = child.val().name;
+               setupClassSelect.appendChild(option);
+           });
+       }
+   });
+
+   // Sınıf seçildiğinde dersleri yükle
+   setupClassSelect.addEventListener('change', () => {
+       const selectedClass = setupClassSelect.value;
+       if (selectedClass === "") return;
+
+       // Dersleri yükle
+       database.ref(`championData/headings/${selectedClass}/lessons`).once('value').then(snapshot => {
+           setupSubjectSelect.innerHTML = '<option value="">Seçiniz</option>';
+           setupTopicSelect.innerHTML = '<option value="">Seçiniz</option>';
+
+           if (snapshot.exists()) {
+               snapshot.forEach(childSnapshot => {
+                   const option = document.createElement('option');
+                   option.value = childSnapshot.key;
+                   option.textContent = childSnapshot.val().name;
+                   setupSubjectSelect.appendChild(option);
+               });
+           }
+       });
+   });
+
+   // Ders seçildiğinde konuları yükle
+   setupSubjectSelect.addEventListener('change', () => {
+       const selectedClass = setupClassSelect.value;
+       const selectedSubject = setupSubjectSelect.value;
+       if (!selectedClass || !selectedSubject) return;
+
+       // Konuları yükle
+       database.ref(`championData/headings/${selectedClass}/lessons/${selectedSubject}/topics`).once('value').then(snapshot => {
+           setupTopicSelect.innerHTML = '<option value="">Seçiniz</option>';
+           if (snapshot.exists()) {
+               snapshot.forEach(childSnapshot => {
+                   const option = document.createElement('option');
+                   option.value = childSnapshot.key;
+                   option.textContent = childSnapshot.val().name;
+                   setupTopicSelect.appendChild(option);
+               });
+           }
+       });
+   });
+
+   // Topic seçildiğinde butonu aktifleştir
+   setupTopicSelect.addEventListener('change', () => {
+       const setupGameButton = document.getElementById('setup-game-button');
+       if (setupClassSelect.value && setupSubjectSelect.value && setupTopicSelect.value) {
+           setupGameButton.disabled = false;
+           setupGameButton.classList.add('active');
+       } else {
+           setupGameButton.disabled = true;
+           setupGameButton.classList.remove('active');
+       }
+   });
+}
+
+// Oyunu kurma
+document.getElementById('setup-game-button').addEventListener('click', async () => {
+   const gameData = {
+       creatorId: selectedStudent.studentId,
+       creatorName: selectedStudent.studentName,
+       creatorClass: classNameMap[selectedStudent.classId],
+       classId: document.getElementById('setup-class-select').value,
+       subjectId: document.getElementById('setup-subject-select').value,
+       topicId: document.getElementById('setup-topic-select').value,
+       className: document.getElementById('setup-class-select').options[document.getElementById('setup-class-select').selectedIndex].text,
+       subjectName: document.getElementById('setup-subject-select').options[document.getElementById('setup-subject-select').selectedIndex].text,
+       topicName: document.getElementById('setup-topic-select').options[document.getElementById('setup-topic-select').selectedIndex].text,
+       status: 'waiting',
+       createdAt: firebase.database.ServerValue.TIMESTAMP
+   };
+
+   try {
+       const newGameRef = database.ref('activeGames').push();
+       await newGameRef.set(gameData);
+       currentSetupGame = newGameRef.key;
+       
+       document.getElementById('game-setup-screen').style.display = 'none';
+       document.getElementById('matchmaking-screen').style.display = 'flex';
+       
+       const createButton = document.getElementById('create-game-button');
+       createButton.textContent = 'Oyunu İptal Et';
+       createButton.style.background = 'linear-gradient(45deg, #ff0000, #cc0000)';
+   } catch (error) {
+       console.error("Oyun kurma hatası:", error);
+       await showAlert('Oyun kurulurken bir hata oluştu');
+   }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function loadSetupSubjects(classId) {
+    console.log("loadSetupSubjects çağrıldı:", classId);
+    const setupSubjectSelect = document.getElementById('setup-subject-select');
+    setupSubjectSelect.innerHTML = '<option value="">Seçiniz</option>';
+    setupTopicSelect.innerHTML = '<option value="">Seçiniz</option>';
+
+    if (!classId) return;
+
+    database.ref(`championData/headings/${classId}/lessons`).once('value')
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const option = document.createElement('option');
+                    option.value = childSnapshot.key;
+                    option.textContent = childSnapshot.val().name;
+                    setupSubjectSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Ders yükleme hatası:", error);
+            showAlert('Dersler yüklenirken bir hata oluştu');
+        });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function joinGame(gameId, game) {
+   try {
+       const inDuelSnapshot = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
+       const isInDuel = inDuelSnapshot.exists() ? inDuelSnapshot.val() : false;
+       
+       if (isInDuel) {
+           showAlert(`Zaten bir düellodasın!`);
+           return;
+       }
+
+       const creatorInDuelSnapshot = await database.ref(`classes/${game.classId}/students/${game.creatorId}/inDuel`).once('value');
+       const creatorIsInDuel = creatorInDuelSnapshot.exists() ? creatorInDuelSnapshot.val() : false;
+       
+       if (creatorIsInDuel) {
+           showAlert(`${game.creatorName} zaten bir düelloda!`);
+           return;
+       }
+
+       const gameMessageRef = database.ref(`activeGames/${gameId}/messages`).push();
+       await gameMessageRef.set({
+           senderId: selectedStudent.studentId,
+           senderName: selectedStudent.studentName,
+           senderClass: classNameMap[selectedStudent.classId],
+           type: 'join_request',
+           timestamp: firebase.database.ServerValue.TIMESTAMP
+       });
+
+       showAlert(`${game.creatorName} kullanıcısına katılma isteği gönderildi`);
+
+   } catch (error) {
+       console.error("Katılma isteği hatası:", error);
+       showAlert('Katılma isteği gönderilirken hata oluştu');
+   }
+}
+
+function listenToGameMessages() {
+   if (!selectedStudent?.studentId) return;
+
+   database.ref('activeGames').on('child_added', async (gameSnapshot) => {
+       const game = gameSnapshot.val();
+       
+       if (game.creatorId === selectedStudent.studentId) {
+           database.ref(`activeGames/${gameSnapshot.key}/messages`).on('child_added', async (messageSnapshot) => {
+               const message = messageSnapshot.val();
+               
+               if (message.type === 'join_request') {
+                   const result = await showConfirm(
+                       `${message.senderName} (${message.senderClass}) düelloya katılmak istiyor.`
+                   );
+
+                   if (result) {
+                       const duelRef = database.ref('duels').push();
+                       await duelRef.set({
+                           inviter: {
+                               studentId: selectedStudent.studentId,
+                               name: selectedStudent.studentName,
+                               classId: selectedStudent.classId,
+                               photo: studentPhoto.src
+                           },
+                           invited: {
+                               studentId: message.senderId,
+                               name: message.senderName,
+                               classId: getClassIdByClassName(message.senderClass),
+                               photo: null
+                           },
+                           selections: {
+                               class: game.classId,
+                               subject: game.subjectId,
+                               topic: game.topicId
+                           },
+                           locked: true,
+                           gameStarted: false
+                       });
+
+                       await database.ref(`activeGames/${gameSnapshot.key}`).remove();
+                   }
+
+                   await messageSnapshot.ref.remove();
+               }
+           });
+       }
+   });
+}
+
+// Oyun kurulduğunda dinleyiciyi başlat
+window.addEventListener('load', () => {
+   if (selectedStudent?.studentId) {
+       listenToGameMessages();
+   }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Konfirmasyon fonksiyonu
+function showConfirm(message) {
+    return new Promise(resolve => {
+        const overlay = document.getElementById('confirmOverlay');
+        const msgElement = document.getElementById('confirmMessage');
+        msgElement.textContent = message;
+        overlay.style.display = 'flex';
+
+        document.getElementById('confirmOkButton').onclick = () => {
+            overlay.style.display = 'none';
+            resolve(true);
+        };
+
+        document.getElementById('confirmCancelButton').onclick = () => {
+            overlay.style.display = 'none';
+            resolve(false);
+        };
+    });
+}
+
+// Oyun iptal fonksiyonu
+async function cancelGame() {
+    if (currentSetupGame) {
+        try {
+            await database.ref(`activeGames/${currentSetupGame}`).remove();
+            currentSetupGame = null;
+            const createButton = document.getElementById('create-game-button');
+            createButton.textContent = 'Oyun Kur';
+            createButton.style.background = 'linear-gradient(45deg, #ff4e50, #f9d423)';
+            showAlert('Oyun iptal edildi.');
+        } catch (error) {
+            console.error("Oyun iptal hatası:", error);
+            showAlert('Oyun iptal edilirken bir hata oluştu');
+        }
+    }
+}
+
+// Create/Cancel Game butonuna tıklanınca
+document.getElementById('create-game-button').addEventListener('click', function() {
+    if (currentSetupGame) {
+        cancelGame();
+    } else {
+        document.getElementById('matchmaking-screen').style.display = 'none';
+        document.getElementById('game-setup-screen').style.display = 'flex';
+        loadSetupSelections();
+    }
+});
+
+// Sayfa yüklendiğinde davet dinleyicisini başlat
+window.addEventListener('load', () => {
+    if (selectedStudent && selectedStudent.studentId) {
+        listenToGameInvitations();
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         function fetchQuestions(classId, subjectId, topicId) {
