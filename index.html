@@ -4928,11 +4928,50 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
 
                         /*****************************************
                          * "matched" => 3. kişi bu ikiliye ulaşamaz
+                         * Burada transaction ile güncelleme
                          *****************************************/
-                        await Promise.all([
-                            matchmakingRef.child(matchId).update({ status: 'matched' }),
-                            newMatchEntry.update({ status: 'matched' })
-                        ]);
+                        try {
+                            await new Promise((resolve, reject) => {
+                                matchmakingRef.runTransaction((currentData) => {
+                                    if (!currentData) return currentData;
+
+                                    // Kendi kaydımın anahtarı
+                                    const myKey = newMatchEntry.key;
+
+                                    // Kayıtlar var mı?
+                                    if (!currentData[myKey] || !currentData[matchId]) {
+                                        return; // iptal
+                                    }
+
+                                    // İkisi de hâlâ "searching" mi?
+                                    if (
+                                        currentData[myKey].status !== 'searching' ||
+                                        currentData[matchId].status !== 'searching'
+                                    ) {
+                                        return; // iptal
+                                    }
+
+                                    // İkisini de matched yap
+                                    currentData[myKey].status = 'matched';
+                                    currentData[matchId].status = 'matched';
+
+                                    return currentData; // transaction güncellemeleri
+                                }, (error, committed, snapshot2) => {
+                                    if (error) {
+                                        reject(error);
+                                    } else if (!committed) {
+                                        reject(new Error('Transaction not committed, eşleşme iptal.'));
+                                    } else {
+                                        resolve(snapshot2.val());
+                                    }
+                                });
+                            });
+                        } catch (txError) {
+                            console.error('Transaction hata:', txError);
+                            // Eşleşme iptal
+                            await cleanup();
+                            return;
+                        }
 
                         // Kim önce "searching" açtıysa o "inviter"
                         const newMatchSnapshot = await newMatchEntry.once('value');
