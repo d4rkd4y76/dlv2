@@ -4699,13 +4699,11 @@ function endDuelGame() {
 
 
 
-// Mevcut script etiketlerinizin içine, en sona ekleyin
+// Ana eşleştirme ekranı
 const matchmakingScreen = document.createElement('div');
 matchmakingScreen.id = 'matchmaking-screen';
 document.body.appendChild(matchmakingScreen);
 
-// MatchmakingScreen React bileşeni
-// Düello Ara butonuna tıklama olayı
 document.getElementById('findDuelButton').addEventListener('click', async () => {
     try {
         const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
@@ -4716,81 +4714,31 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
             return;
         }
 
-        // Arama ekranını göster - HTML kısmı aynı kalacak, değişiklik yok
         const matchmakingDiv = document.createElement('div');
         matchmakingDiv.id = 'matchmaking-screen';
         matchmakingDiv.innerHTML = `
-            <div style="
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(0, 0, 0, 0.9);
-                z-index: 9999;
-            ">
-                <div style="
-                    position: relative;
-                    width: 400px;
-                    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-                    padding: 2rem;
-                    border-radius: 1rem;
-                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                ">
-                    <div style="
-                        position: absolute;
-                        top: -3rem;
-                        left: 50%;
-                        transform: translateX(-50%);
-                    ">
-                        <div style="
-                            width: 6rem;
-                            height: 6rem;
-                            border-radius: 50%;
-                            background: linear-gradient(135deg, #fbbf24, #ef4444);
-                            animation: pulse 2s infinite;
-                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                        "></div>
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.9); z-index: 9999;">
+                <div style="position: relative; width: 400px; background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 2rem; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+                    <div style="position: absolute; top: -3rem; left: 50%; transform: translateX(-50%);">
+                        <div style="width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, #fbbf24, #ef4444); animation: pulse 2s infinite; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);"></div>
                     </div>
                     <div style="margin-top: 4rem; text-align: center;">
-                        <h2 style="font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 1rem;">
-                            Düello Aranıyor...
-                        </h2>
-                        <div style="
-                            width: 4rem;
-                            height: 4rem;
-                            border: 4px solid white;
-                            border-top-color: transparent;
-                            border-radius: 50%;
-                            animation: spin 1s linear infinite;
-                            margin: 0 auto 1rem;
-                        "></div>
-                        <p style="color: rgba(255, 255, 255, 0.8);">
-                            Rakip oyuncu bekleniyor...
-                        </p>
+                        <h2 style="font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 1rem;">Düello Aranıyor...</h2>
+                        <div style="width: 4rem; height: 4rem; border: 4px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                        <p style="color: rgba(255, 255, 255, 0.8);">Rakip oyuncu bekleniyor...</p>
                     </div>
                 </div>
             </div>
             <style>
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); opacity: 1; }
-                    50% { transform: scale(1.05); opacity: 0.8; }
-                }
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
+                @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
             </style>
         `;
         document.body.appendChild(matchmakingDiv);
 
-        // Garanti 5 saniye bekle
         await new Promise(resolve => setTimeout(resolve, 5000));
 
-        // Oyuncuyu arama havuzuna ekle
         const matchmakingRef = database.ref('matchmaking');
         const newMatchEntry = await matchmakingRef.push({
             classId: selectedStudent.classId,
@@ -4801,134 +4749,126 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
             status: 'searching'
         });
 
+        newMatchEntry.onDisconnect().remove();
+
         let timeoutId;
         let matchFound = false;
 
-        // Eşleşme dinleyicisi
-        const matchListener = matchmakingRef.orderByChild('classId').equalTo(selectedStudent.classId).on('value', async (snapshot) => {
-            if (!snapshot.exists() || matchFound) return;
+        const matchListener = matchmakingRef
+            .orderByChild('classId')
+            .equalTo(selectedStudent.classId)
+            .on('value', async (snapshot) => {
+                if (!snapshot.exists() || matchFound) return;
 
-            const matches = snapshot.val();
-            const availableMatch = Object.entries(matches).find(([matchId, match]) => 
-                match.studentId !== selectedStudent.studentId && 
-                match.status === 'searching' &&
-                match.classId === selectedStudent.classId
-            );
+                const matches = snapshot.val();
+                const availableMatch = Object.entries(matches).find(([id, match]) => 
+                    match.studentId !== selectedStudent.studentId && 
+                    match.status === 'searching' &&
+                    match.classId === selectedStudent.classId
+                );
 
-            if (availableMatch) {
-                matchFound = true;
-                clearTimeout(timeoutId);
+                if (availableMatch) {
+                    try {
+                        matchFound = true;
+                        clearTimeout(timeoutId);
 
-                const [matchId, match] = availableMatch;
-                matchmakingRef.off('value', matchListener);
+                        const [matchId, match] = availableMatch;
+                        matchmakingRef.off('value', matchListener);
 
-                // Eşleşme bulundu ekranını göster - HTML aynı
-                matchmakingDiv.innerHTML = `
-                    <div style="
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background: rgba(0, 0, 0, 0.9);
-                        z-index: 9999;
-                    ">
-                        <div style="
-                            position: relative;
-                            width: 400px;
-                            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-                            padding: 2rem;
-                            border-radius: 1rem;
-                            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                            text-align: center;
-                        ">
-                            <div style="animation: bounce 1s infinite;">
-                                <div style="font-size: 2rem; font-weight: bold; color: white; margin-bottom: 1rem;">
-                                    🎮 Düello Bulundu!
-                                </div>
-                                <div style="font-size: 1.25rem; color: #fde047; animation: pulse 2s infinite;">
-                                    Hazır Olun!
+                        matchmakingDiv.innerHTML = `
+                            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.9); z-index: 9999;">
+                                <div style="position: relative; width: 400px; background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 2rem; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center;">
+                                    <div style="animation: bounce 1s infinite;">
+                                        <div style="font-size: 2rem; font-weight: bold; color: white; margin-bottom: 1rem;">🎮 Düello Bulundu!</div>
+                                        <div style="font-size: 1.25rem; color: #fde047; animation: pulse 2s infinite;">Hazır Olun!</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <style>
-                        @keyframes bounce {
-                            0%, 100% { transform: translateY(0); }
-                            50% { transform: translateY(-10px); }
-                        }
-                    </style>
-                `;
+                        `;
 
-                // Davet eden oyuncuyu belirle (timestamp'i daha eski olan davet eden olacak)
-                const isInviter = newMatchEntry.val().timestamp < match.timestamp;
-
-                // Her iki oyuncunun da eşleşme durumunu güncelle
-                await Promise.all([
-                    matchmakingRef.child(matchId).update({ status: 'matched' }),
-                    matchmakingRef.child(newMatchEntry.key).update({ status: 'matched' })
-                ]);
-
-                // 2 saniye sonra düello başlat
-                setTimeout(async () => {
-                    try {
-                        if (isInviter) {
-                            // Bu oyuncu davet eden olacak
-                            await createDuelSession(
-                                selectedStudent.studentId,
-                                selectedStudent.classId,
-                                selectedStudent.studentName,
-                                studentPhoto.src
-                            );
-                        } else {
-                            // Bu oyuncu davet edilen olacak
-                            await createDuelSession(
-                                match.studentId,
-                                selectedStudent.classId,
-                                match.studentName,
-                                match.studentPhoto
-                            );
-                        }
-                    } catch (error) {
-                        console.error('Düello oluşturma hatası:', error);
-                        await showAlert('Düello oluşturulurken bir hata oluştu.');
-                    } finally {
                         await Promise.all([
-                            matchmakingRef.child(matchId).remove(),
-                            matchmakingRef.child(newMatchEntry.key).remove()
+                            matchmakingRef.child(matchId).update({ status: 'matched' }),
+                            newMatchEntry.update({ status: 'matched' })
                         ]);
-                        matchmakingDiv.remove();
-                    }
-                }, 2000);
-            }
-        });
 
-        // 30 saniye sonra eşleşme bulunamazsa iptal et
+                        // Burada timestamp kontrolü ve debug ekleniyor
+                        const newMatchSnapshot = await newMatchEntry.once('value');
+                        const isInviter = newMatchSnapshot.val().timestamp < match.timestamp;
+
+                        console.log('Eşleşme bilgileri:', {
+                            newMatch: newMatchSnapshot.val(),
+                            matchData: match,
+                            isInviter
+                        });
+
+setTimeout(async () => {
+    try {
+        if (isInviter) {
+            await createDuelSession(
+                selectedStudent.studentId,
+                selectedStudent.classId,
+                selectedStudent.studentName,
+                studentPhoto.src,
+                match.studentId,     // Karşı oyuncu bilgilerini ekle
+                match.classId,
+                match.studentName,
+                match.studentPhoto
+            );
+        } else {
+            await createDuelSession(
+                match.studentId,
+                match.classId,
+                match.studentName,
+                match.studentPhoto,
+                selectedStudent.studentId,     // Karşı oyuncu bilgilerini ekle
+                selectedStudent.classId,
+                selectedStudent.studentName,
+                studentPhoto.src
+            );
+        }
+    } catch (error) {
+        console.error('Düello oluşturma hatası:', error);
+        await showAlert('Düello oluşturulurken bir hata oluştu.');
+    } finally {
+        await Promise.all([
+            matchmakingRef.child(matchId).remove(),
+            matchmakingRef.child(newMatchEntry.key).remove()
+        ]);
+        matchmakingDiv.remove();
+    }
+}, 2000);
+                    } catch (error) {
+                        console.error('Eşleşme işleme hatası:', error);
+                        await cleanup();
+                    }
+                }
+            });
+
         timeoutId = setTimeout(async () => {
             if (!matchFound) {
                 matchmakingRef.off('value', matchListener);
-                await matchmakingRef.child(newMatchEntry.key).remove();
-                if (document.getElementById('matchmaking-screen')) {
-                    matchmakingDiv.remove();
-                    await showAlert('Eşleşme bulunamadı. Lütfen tekrar deneyin.');
-                }
+                await newMatchEntry.remove();
+                matchmakingDiv.remove();
+                await showAlert('Eşleşme bulunamadı. Lütfen tekrar deneyin.');
             }
         }, 30000);
 
+        async function cleanup() {
+            matchmakingRef.off('value', matchListener);
+            if (timeoutId) clearTimeout(timeoutId);
+            await newMatchEntry.remove();
+            matchmakingDiv.remove();
+            await showAlert('Eşleştirme sırasında bir hata oluştu.');
+        }
+
     } catch (error) {
         console.error('Eşleştirme hatası:', error);
-        const matchmakingScreen = document.getElementById('matchmaking-screen');
-        if (matchmakingScreen) {
-            matchmakingScreen.remove();
+        if (document.getElementById('matchmaking-screen')) {
+            document.getElementById('matchmaking-screen').remove();
         }
         await showAlert('Eşleştirme sırasında bir hata oluştu.');
     }
 });
-
-
 
 
 
