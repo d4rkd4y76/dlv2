@@ -4770,11 +4770,12 @@ async function createDuelSession(
   // 5) Bağlantı kesilirse düelloyu kaldıralım
   duelRef.onDisconnect().remove();
 
-  // (İsteğe bağlı) İsterseniz doğrudan "duelSelectionScreen" e geçirebilirsiniz:
-  // switchToDuelScreen(duelRef.key);
-
   console.log("createDuelSession oluşturuldu => ", duelRef.key);
+
+  // İsterseniz burada doğrudan switchToDuelScreen(duelRef.key) de çağırabilirsiniz.
+  // Normalde 'startInvitationListener' gibi bir dinleyici bu kaydı yakalayıp yönlendirir.
 }
+
 
 // ---------------- "Düello Ara" Butonu Kodunun Güncel Hali ----------------
 const matchmakingScreen = document.createElement('div');
@@ -4861,10 +4862,8 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
         let timeoutId;
         let matchFound = false;
 
-        // =========================================
-        // **EKLENDİ**: Kendi matchmaking kaydımız "child_changed" ile "matched" olur ise
-        // "Düello Aranıyor..." ekranını kapatabiliriz (diğer taraf bulduğunda da tetiklenir).
-        // =========================================
+        // A) Kendi matchmaking kaydımın 'status' değerini izleyerek 
+        //    'matched' olursa "Düello Aranıyor" ekranını kapatır.
         const ownMatchListener = matchmakingRef.child(newMatchEntry.key)
           .on('child_changed', snapshot => {
               if (snapshot.key === 'status' && snapshot.val() === 'matched') {
@@ -4876,7 +4875,7 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
               }
           });
 
-        // 5) Aynı sınıftaki "searching" durumundaki kayıtları dinleyip eşleşme arıyoruz
+        // 5) Aynı sınıftaki "searching" durumunda olan kayıtları dinleyip eşleşme arıyoruz
         const matchListener = matchmakingRef
             .orderByChild('classId')
             .equalTo(selectedStudent.classId)
@@ -4885,7 +4884,7 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
 
                 const matches = snapshot.val();
 
-                // Farklı bir studentId ve "searching" durumunda olan ilkini yakala
+                // Farklı bir studentId ve "searching" durumunda olan ilkini bul
                 const availableMatch = Object.entries(matches).find(([id, match]) => 
                     match.studentId !== selectedStudent.studentId && 
                     match.status === 'searching' &&
@@ -4897,11 +4896,11 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                         matchFound = true;
                         clearTimeout(timeoutId);
 
-                        const [matchId, match] = availableMatch;
+                        const [matchId, matchData] = availableMatch;
                         // Artık dinlemeyi kes
                         matchmakingRef.off('value', matchListener);
 
-                        // UI'da "Düello Bulundu" mesajı
+                        // UI'da "Düello Bulundu" mesajı göster
                         matchmakingDiv.innerHTML = `
                             <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
                                         display: flex; align-items: center; justify-content: center; 
@@ -4929,13 +4928,13 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                             newMatchEntry.update({ status: 'matched' })
                         ]);
 
-                        // Timestamp karşılaştırması: kim önce "searching"e girdiyse o "inviter"
+                        // Timestamp karşılaştırması: kim önce "searching"e girmiş, o "inviter"
                         const newMatchSnapshot = await newMatchEntry.once('value');
-                        const isInviter = newMatchSnapshot.val().timestamp < match.timestamp;
+                        const isInviter = newMatchSnapshot.val().timestamp < matchData.timestamp;
 
                         console.log('Eşleşme bilgileri:', {
                             newMatch: newMatchSnapshot.val(),
-                            matchData: match,
+                            matchData: matchData,
                             isInviter
                         });
 
@@ -4949,19 +4948,19 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                                       selectedStudent.classId,
                                       selectedStudent.studentName,
                                       studentPhoto.src,
-                                      match.studentId,
-                                      match.classId,
-                                      match.studentName,
-                                      match.studentPhoto
+                                      matchData.studentId,
+                                      matchData.classId,
+                                      matchData.studentName,
+                                      matchData.studentPhoto
                                     );
                                     console.log("Ben davet edenim, createDuelSession çağırdım.");
                                 } else {
                                     // Ben davet edilen isem, createDuelSession ters parametreyle
                                     await createDuelSession(
-                                      match.studentId,
-                                      match.classId,
-                                      match.studentName,
-                                      match.studentPhoto,
+                                      matchData.studentId,
+                                      matchData.classId,
+                                      matchData.studentName,
+                                      matchData.studentPhoto,
                                       selectedStudent.studentId,
                                       selectedStudent.classId,
                                       selectedStudent.studentName,
@@ -4974,15 +4973,24 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                                 console.error('Düello oluşturma hatası:', error);
                                 await showAlert('Düello oluşturulurken bir hata oluştu.');
                             } finally {
-                                // Eşleşme kayıtlarını matchmaking'den kaldır
-                                await Promise.all([
-                                    matchmakingRef.child(matchId).remove(),
-                                    matchmakingRef.child(newMatchEntry.key).remove()
-                                ]);
-                                matchmakingDiv.remove();
+                                // B) Kayıtları silmek için 2-3 sn bekleyelim
+                                //    (karşı taraf 'matched' olayını göremeden silinmesin)
+                                setTimeout(async () => {
+                                    try {
+                                        await Promise.all([
+                                          matchmakingRef.child(matchId).remove(),
+                                          matchmakingRef.child(newMatchEntry.key).remove()
+                                        ]);
+                                    } catch (remErr) {
+                                        console.error("matchmaking kaydı silinirken hata:", remErr);
+                                    }
 
-                                // ownMatchListener'ı kapatalım ki bellek sızıntısı olmasın
-                                matchmakingRef.child(newMatchEntry.key).off('child_changed', ownMatchListener);
+                                    // "Düello Bulundu" mesajını kapat
+                                    matchmakingDiv.remove();
+
+                                    // ownMatchListener'ı iptal
+                                    matchmakingRef.child(newMatchEntry.key).off('child_changed', ownMatchListener);
+                                }, 3000);
                             }
                         }, 2000);
 
@@ -5016,12 +5024,15 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
 
     } catch (error) {
         console.error('Eşleştirme hatası:', error);
-        if (document.getElementById('matchmaking-screen')) {
-            document.getElementById('matchmaking-screen').remove();
+        const mmScreen = document.getElementById('matchmaking-screen');
+        if (mmScreen) {
+            mmScreen.remove();
         }
         await showAlert('Eşleştirme sırasında bir hata oluştu.');
     }
 });
+
+
 
 
 
