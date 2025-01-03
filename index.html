@@ -4716,7 +4716,76 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
             return;
         }
 
-        // [Diğer kod aynı - Arama ekranı HTML'i değişmeyecek]
+        // Arama ekranını göster - HTML kısmı aynı kalacak, değişiklik yok
+        const matchmakingDiv = document.createElement('div');
+        matchmakingDiv.id = 'matchmaking-screen';
+        matchmakingDiv.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 9999;
+            ">
+                <div style="
+                    position: relative;
+                    width: 400px;
+                    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                    padding: 2rem;
+                    border-radius: 1rem;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                ">
+                    <div style="
+                        position: absolute;
+                        top: -3rem;
+                        left: 50%;
+                        transform: translateX(-50%);
+                    ">
+                        <div style="
+                            width: 6rem;
+                            height: 6rem;
+                            border-radius: 50%;
+                            background: linear-gradient(135deg, #fbbf24, #ef4444);
+                            animation: pulse 2s infinite;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                        "></div>
+                    </div>
+                    <div style="margin-top: 4rem; text-align: center;">
+                        <h2 style="font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 1rem;">
+                            Düello Aranıyor...
+                        </h2>
+                        <div style="
+                            width: 4rem;
+                            height: 4rem;
+                            border: 4px solid white;
+                            border-top-color: transparent;
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                            margin: 0 auto 1rem;
+                        "></div>
+                        <p style="color: rgba(255, 255, 255, 0.8);">
+                            Rakip oyuncu bekleniyor...
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.05); opacity: 0.8; }
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        `;
+        document.body.appendChild(matchmakingDiv);
 
         // Garanti 5 saniye bekle
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -4753,7 +4822,49 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                 const [matchId, match] = availableMatch;
                 matchmakingRef.off('value', matchListener);
 
-                // [Eşleşme bulundu HTML'i aynı kalacak]
+                // Eşleşme bulundu ekranını göster - HTML aynı
+                matchmakingDiv.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(0, 0, 0, 0.9);
+                        z-index: 9999;
+                    ">
+                        <div style="
+                            position: relative;
+                            width: 400px;
+                            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                            padding: 2rem;
+                            border-radius: 1rem;
+                            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                            text-align: center;
+                        ">
+                            <div style="animation: bounce 1s infinite;">
+                                <div style="font-size: 2rem; font-weight: bold; color: white; margin-bottom: 1rem;">
+                                    🎮 Düello Bulundu!
+                                </div>
+                                <div style="font-size: 1.25rem; color: #fde047; animation: pulse 2s infinite;">
+                                    Hazır Olun!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes bounce {
+                            0%, 100% { transform: translateY(0); }
+                            50% { transform: translateY(-10px); }
+                        }
+                    </style>
+                `;
+
+                // Davet eden oyuncuyu belirle (timestamp'i daha eski olan davet eden olacak)
+                const isInviter = newMatchEntry.val().timestamp < match.timestamp;
 
                 // Her iki oyuncunun da eşleşme durumunu güncelle
                 await Promise.all([
@@ -4761,67 +4872,37 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                     matchmakingRef.child(newMatchEntry.key).update({ status: 'matched' })
                 ]);
 
-                // 3 saniye bekle ve düello başlat
+                // 2 saniye sonra düello başlat
                 setTimeout(async () => {
                     try {
-                        const duelRef = database.ref('duels').push();
-                        
-                        // Kim davet eden olacak kontrolü
-                        const isInviter = newMatchEntry.val().timestamp < match.timestamp;
-
-                        // Düello verilerini hazırla
-                        const duelData = {
-                            inviter: isInviter ? {
-                                classId: selectedStudent.classId,
-                                studentId: selectedStudent.studentId,
-                                name: selectedStudent.studentName,
-                                photo: studentPhoto.src
-                            } : {
-                                classId: match.classId,
-                                studentId: match.studentId,
-                                name: match.studentName,
-                                photo: match.studentPhoto
-                            },
-                            invited: isInviter ? {
-                                classId: match.classId,
-                                studentId: match.studentId,
-                                name: match.studentName,
-                                photo: match.studentPhoto
-                            } : {
-                                classId: selectedStudent.classId,
-                                studentId: selectedStudent.studentId,
-                                name: selectedStudent.studentName,
-                                photo: studentPhoto.src
-                            },
-                            selections: {
-                                class: "",
-                                subject: "",
-                                topic: ""
-                            },
-                            gameStarted: false,
-                            questions: []
-                        };
-
-                        // Düello oluştur ve ortak seçim ekranına yönlendir
-                        await duelRef.set(duelData);
-                        currentDuelRef = duelRef;
-                        isInviter = isInviter;
-                        
-                        // Temizlik işlemleri
+                        if (isInviter) {
+                            // Bu oyuncu davet eden olacak
+                            await createDuelSession(
+                                selectedStudent.studentId,
+                                selectedStudent.classId,
+                                selectedStudent.studentName,
+                                studentPhoto.src
+                            );
+                        } else {
+                            // Bu oyuncu davet edilen olacak
+                            await createDuelSession(
+                                match.studentId,
+                                selectedStudent.classId,
+                                match.studentName,
+                                match.studentPhoto
+                            );
+                        }
+                    } catch (error) {
+                        console.error('Düello oluşturma hatası:', error);
+                        await showAlert('Düello oluşturulurken bir hata oluştu.');
+                    } finally {
                         await Promise.all([
                             matchmakingRef.child(matchId).remove(),
                             matchmakingRef.child(newMatchEntry.key).remove()
                         ]);
                         matchmakingDiv.remove();
-
-                        // Ortak seçim ekranına yönlendir
-                        switchToDuelScreen(duelRef.key);
-                    } catch (error) {
-                        console.error('Düello oluşturma hatası:', error);
-                        await showAlert('Düello oluşturulurken bir hata oluştu.');
-                        matchmakingDiv.remove();
                     }
-                }, 3000);
+                }, 2000);
             }
         });
 
@@ -4846,7 +4927,6 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
         await showAlert('Eşleştirme sırasında bir hata oluştu.');
     }
 });
-
 
 
 
