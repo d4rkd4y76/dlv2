@@ -2095,6 +2095,161 @@ option {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Eşleştirme Ekranı Ana Stili */
+.matchmaking-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.matchmaking-content {
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Başlık Stili */
+.matchmaking-content h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Arama Animasyonu */
+.searching-animation {
+    width: 80px;
+    height: 80px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #ff4e50;
+    border-radius: 50%;
+    margin: 20px auto;
+    animation: spin 1s linear infinite;
+}
+
+/* Oyuncu Listesi */
+.available-players {
+    margin-top: 30px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(255,255,255,0.9);
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.player-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.duel-request-button {
+    background: linear-gradient(45deg, #ff4e50, #f9d423);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.duel-request-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(255, 78, 80, 0.4);
+}
+
+/* İptal Butonu */
+.cancel-search-button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-search-button:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
 </head>
 <body>
@@ -2308,6 +2463,85 @@ option {
             </div>
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="matchmaking-screen" id="matchmakingScreen">
+    <div class="matchmaking-content">
+        <h2>Düello Rakibi Aranıyor</h2>
+        
+        <!-- Arama Animasyonu -->
+        <div class="searching-animation"></div>
+        
+        <!-- Mevcut Oyuncular Listesi -->
+        <div class="available-players">
+            <h3>Müsait Oyuncular</h3>
+            <div class="players-list" id="availablePlayersList">
+                <!-- Oyuncular dinamik olarak buraya eklenecek -->
+            </div>
+        </div>
+        
+        <!-- İptal Butonu -->
+        <button class="cancel-search-button" id="cancelSearchButton">
+            Aramayı İptal Et
+        </button>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- Düello Oyun Ekranı -->
     <div class="duel-game-container" id="duel-game-screen">
@@ -4678,6 +4912,215 @@ function endDuelGame() {
                 });
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Düello Arama butonuna tıklandığında
+document.getElementById('findDuelButton').addEventListener('click', () => {
+    // Öğrenciyi matchmaking listesine ekle
+    database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).set({
+        name: selectedStudent.studentName,
+        classId: selectedStudent.classId,
+        studentId: selectedStudent.studentId,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        status: 'searching'
+    }).then(() => {
+        showMatchmakingScreen();
+    });
+});
+
+// Eşleştirme ekranını göster
+function showMatchmakingScreen() {
+    const matchmakingScreen = document.getElementById('matchmakingScreen');
+    matchmakingScreen.style.display = 'flex';
+    listenForAvailablePlayers();
+}
+
+// Müsait oyuncuları dinle
+function listenForAvailablePlayers() {
+    const currentClass = selectedStudent.classId;
+    
+    // Matchmaking listesindeki oyuncuları dinle
+    const matchmakingRef = database.ref(`matchmaking/${currentClass}`);
+    matchmakingRef.on('value', async (snapshot) => {
+        const availablePlayersList = document.getElementById('availablePlayersList');
+        availablePlayersList.innerHTML = '';
+        
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const player = childSnapshot.val();
+                if (player.studentId !== selectedStudent.studentId) {
+                    // Oyuncunun düelloda olup olmadığını kontrol et
+                    database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`)
+                        .once('value')
+                        .then((inDuelSnap) => {
+                            const inDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+                            if (!inDuel && player.status === 'searching') {
+                                createPlayerItem(player).then(playerItem => {
+                                    availablePlayersList.appendChild(playerItem);
+                                });
+                            }
+                        });
+                }
+            });
+        }
+    });
+}
+
+// Oyuncu öğesini oluştur (aynı kaldı)
+async function createPlayerItem(player) {
+    const div = document.createElement('div');
+    div.className = 'player-item';
+    
+    // Oyuncunun fotoğrafını database'den çek
+    const photoSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/photo`).once('value');
+    const photoUrl = photoSnapshot.exists() ? photoSnapshot.val() : 'https://via.placeholder.com/50';
+    
+    div.innerHTML = `
+        <img src="${photoUrl}" alt="${player.name}" class="player-photo">
+        <span class="player-name">${player.name} / ${classNameMap[player.classId]}</span>
+        <button class="duel-request-button">
+            <i class="duel-icon">⚔️</i>
+            Düello İste
+        </button>
+    `;
+    
+    const duelButton = div.querySelector('.duel-request-button');
+    duelButton.addEventListener('click', async () => {
+        // Düello daveti gönder
+        await sendInvitation({
+            studentId: player.studentId,
+            name: player.name,
+            classId: player.classId,
+            photo: photoUrl
+        });
+        
+        // Matchmaking ekranını kapat
+        document.getElementById('matchmakingScreen').style.display = 'none';
+        // Matchmaking listesinden kaldır
+        database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+    });
+    
+    return div;
+}
+
+// invitationAcceptButton listener'ı (aynı kaldı)
+invitationAcceptButton.addEventListener('click', async () => {
+    if (currentInvitation && selectedStudent.studentId) {
+        try {
+            const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
+            const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+
+            if (isInDuel) {
+                showAlert(`Zaten bir düellodasın!`);
+                invitationOverlay.style.display = 'none';
+                currentInvitation = null;
+                return;
+            }
+
+            // Matchmaking ekranını kapat
+            document.getElementById('matchmakingScreen').style.display = 'none';
+            
+            invitationOverlay.style.display = 'none';
+            await createDuelSession(
+                currentInvitation.invitedByStudentId,
+                currentInvitation.invitedByClassId,
+                currentInvitation.invitedByName,
+                currentInvitation.invitedByPhoto
+            );
+            await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+            
+            // Matchmaking listesinden kaldır
+            await database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+
+        } catch (error) {
+            console.error("Düello başlatılırken hata:", error);
+            showAlert('Düello başlatılırken bir hata oluştu.');
+        }
+    }
+});
+
+// Aramayı iptal et
+document.getElementById('cancelSearchButton').addEventListener('click', () => {
+    const matchmakingScreen = document.getElementById('matchmakingScreen');
+    matchmakingScreen.style.display = 'none';
+    mainScreen.style.display = 'flex';
+    
+    // Matchmaking listesinden kaldır
+    database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+    
+    // Dinleyiciyi temizle
+    database.ref(`matchmaking/${selectedStudent.classId}`).off();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
     </body>
     
