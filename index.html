@@ -4770,7 +4770,7 @@ async function createDuelSession(
   // 5) Bağlantı kesilirse düelloyu kaldıralım
   duelRef.onDisconnect().remove();
 
-  // (İsteğe bağlı) Dilerseniz hemen "duelSelectionScreen" e geçiren bir fonksiyon çağırabilirsiniz:
+  // (İsteğe bağlı) İsterseniz doğrudan "duelSelectionScreen" e geçirebilirsiniz:
   // switchToDuelScreen(duelRef.key);
 
   console.log("createDuelSession oluşturuldu => ", duelRef.key);
@@ -4860,6 +4860,21 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
 
         let timeoutId;
         let matchFound = false;
+
+        // =========================================
+        // **EKLENDİ**: Kendi matchmaking kaydımız "child_changed" ile "matched" olur ise
+        // "Düello Aranıyor..." ekranını kapatabiliriz (diğer taraf bulduğunda da tetiklenir).
+        // =========================================
+        const ownMatchListener = matchmakingRef.child(newMatchEntry.key)
+          .on('child_changed', snapshot => {
+              if (snapshot.key === 'status' && snapshot.val() === 'matched') {
+                  // Ekranda halen "Düello Aranıyor" varsa kapat
+                  const mmScreen = document.getElementById('matchmaking-screen');
+                  if (mmScreen) {
+                      mmScreen.remove();
+                  }
+              }
+          });
 
         // 5) Aynı sınıftaki "searching" durumundaki kayıtları dinleyip eşleşme arıyoruz
         const matchListener = matchmakingRef
@@ -4965,6 +4980,9 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
                                     matchmakingRef.child(newMatchEntry.key).remove()
                                 ]);
                                 matchmakingDiv.remove();
+
+                                // ownMatchListener'ı kapatalım ki bellek sızıntısı olmasın
+                                matchmakingRef.child(newMatchEntry.key).off('child_changed', ownMatchListener);
                             }
                         }, 2000);
 
@@ -4979,6 +4997,7 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
         timeoutId = setTimeout(async () => {
             if (!matchFound) {
                 matchmakingRef.off('value', matchListener);
+                matchmakingRef.child(newMatchEntry.key).off('child_changed', ownMatchListener);
                 await newMatchEntry.remove();
                 matchmakingDiv.remove();
                 await showAlert('Eşleşme bulunamadı. Lütfen tekrar deneyin.');
@@ -4988,6 +5007,7 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
         // Hata vb. durumlarda temizlik fonksiyonu
         async function cleanup() {
             matchmakingRef.off('value', matchListener);
+            matchmakingRef.child(newMatchEntry.key).off('child_changed', ownMatchListener);
             if (timeoutId) clearTimeout(timeoutId);
             await newMatchEntry.remove();
             matchmakingDiv.remove();
@@ -5002,6 +5022,7 @@ document.getElementById('findDuelButton').addEventListener('click', async () => 
         await showAlert('Eşleştirme sırasında bir hata oluştu.');
     }
 });
+
 
 
 
