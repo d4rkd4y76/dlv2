@@ -4144,6 +4144,17 @@ logoutButton.addEventListener('click', async () => {
         // Davet Etme ve Dinleme
 async function sendInvitation(player) {
     try {
+        // Önce davet gönderen kişinin hala online olup olmadığını kontrol et
+        const inviterSnapshot = await database.ref('loggedinPlayers')
+            .orderByChild('studentId')
+            .equalTo(selectedStudent.studentId)
+            .once('value');
+            
+        if (!inviterSnapshot.exists()) {
+            showAlert('Bağlantı hatası! Lütfen tekrar giriş yapın.');
+            return;
+        }
+
         // Reddedilen davet kontrolü
         const rejectedInviteRef = database.ref('rejectedInvites')
             .orderByChild('inviterId')
@@ -4158,7 +4169,7 @@ async function sendInvitation(player) {
                 const invite = child.val();
                 if (invite.invitedId === player.studentId) {
                     const timeDiff = Date.now() - invite.timestamp;
-                    if (timeDiff < 30000) { // 30 saniye
+                    if (timeDiff < 30000) {
                         canSendInvite = false;
                         remainingTime = Math.ceil((30000 - timeDiff) / 1000);
                     }
@@ -4182,11 +4193,16 @@ async function sendInvitation(player) {
 
         // Davet gönderme
         const invitationRef = database.ref(`invitations/${player.studentId}`);
+        
+        // Davet gönderenin bağlantısı koptuğunda daveti otomatik silme
+        invitationRef.onDisconnect().remove();
+        
         await invitationRef.set({
             invitedByName: selectedStudent.studentName,
             invitedByClassId: selectedStudent.classId,
             invitedByStudentId: selectedStudent.studentId,
-            invitedByPhoto: studentPhoto.src ? studentPhoto.src : ""
+            invitedByPhoto: studentPhoto.src ? studentPhoto.src : "",
+            timestamp: firebase.database.ServerValue.TIMESTAMP // Davet zamanını ekle
         });
         
         showAlert(`${player.name} davet edildi!`);
@@ -4197,48 +4213,73 @@ async function sendInvitation(player) {
     }
 }
 
+
         function startInvitationListener(studentId) {
-            // Davetleri dinle
-            database.ref(`invitations/${studentId}`).on('value', snapshot => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    currentInvitation = { ...data };
-                    showInvitationModal(data);
-                } else {
-                    if (invitationOverlay.style.display === 'flex' && !currentInvitation) {
-                        invitationOverlay.style.display = 'none';
-                    }
-                    currentInvitation = null;
+    const invitationRef = database.ref(`invitations/${studentId}`);
+    
+    // Davetleri dinle
+    invitationRef.on('value', async snapshot => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            
+            // Davet 30 saniyeden eski ise otomatik olarak sil
+            if (data.timestamp && (Date.now() - data.timestamp) > 30000) {
+                await invitationRef.remove();
+                return;
+            }
+            
+            // Davet gönderen kişinin online durumunu kontrol et
+            const inviterOnlineSnapshot = await database.ref('loggedinPlayers')
+                .orderByChild('studentId')
+                .equalTo(data.invitedByStudentId)
+                .once('value');
+                
+            if (!inviterOnlineSnapshot.exists()) {
+                await invitationRef.remove();
+                if (invitationOverlay.style.display === 'flex') {
+                    invitationOverlay.style.display = 'none';
+                    showAlert('Davet gönderen oyuncu artık çevrimiçi değil!');
                 }
-            });
-
-            // Düelloları dinle
-            database.ref('duels').orderByChild('inviter/studentId').equalTo(studentId).on('child_added', snapshot => {
-                if (currentDuelRef == null) {
-                    currentDuelRef = snapshot.ref;
-                    isInviter = true;
-                    switchToDuelScreen(snapshot.key);
-                }
-            });
-
-            database.ref('duels').orderByChild('invited/studentId').equalTo(studentId).on('child_added', snapshot => {
-                if (currentDuelRef == null) {
-                    currentDuelRef = snapshot.ref;
-                    isInviter = false;
-                    switchToDuelScreen(snapshot.key);
-                }
-            });
-
-            // Düello referansı silindiğinde (örneğin, bir oyuncu bağlantısını kestiğinde)
-            database.ref('duels').on('child_removed', snapshot => {
-                if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) { // duelEnded kontrolü eklendi
-                    showAlert('Rakibin bağlantısı kesildi. Tekrar giriş yapınız.')
-                        .then(() => {
-                            window.location.reload();
-                        });
-                }
-            });
+                return;
+            }
+            
+            currentInvitation = { ...data };
+            showInvitationModal(data);
+        } else {
+            if (invitationOverlay.style.display === 'flex' && !currentInvitation) {
+                invitationOverlay.style.display = 'none';
+            }
+            currentInvitation = null;
         }
+    });
+
+    // Düelloları dinle (mevcut kodun geri kalanı aynı kalacak)
+    database.ref('duels').orderByChild('inviter/studentId').equalTo(studentId).on('child_added', snapshot => {
+        if (currentDuelRef == null) {
+            currentDuelRef = snapshot.ref;
+            isInviter = true;
+            switchToDuelScreen(snapshot.key);
+        }
+    });
+
+    database.ref('duels').orderByChild('invited/studentId').equalTo(studentId).on('child_added', snapshot => {
+        if (currentDuelRef == null) {
+            currentDuelRef = snapshot.ref;
+            isInviter = false;
+            switchToDuelScreen(snapshot.key);
+        }
+    });
+
+    // Düello referansı silindiğinde
+    database.ref('duels').on('child_removed', snapshot => {
+        if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) {
+            showAlert('Rakibin bağlantısı kesildi. Tekrar giriş yapınız.')
+                .then(() => {
+                    window.location.reload();
+                });
+        }
+    });
+}
 
         function showInvitationModal(data) {
             invitationMessage.textContent = `${data.invitedByName} (${classNameMap[data.invitedByClassId] ? classNameMap[data.invitedByClassId] : data.invitedByClassId}) seni düelloya davet ediyor.`;
@@ -4297,30 +4338,50 @@ async function cleanupRejectedInvites() {
 setInterval(cleanupRejectedInvites, 30000);
 
         invitationAcceptButton.addEventListener('click', async () => {
-            if (currentInvitation && selectedStudent.studentId) {
-                try {
-                    const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
-                    const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
-
-                    if (isInDuel) {
-                        showAlert(`Zaten bir düellodasın!`);
-                        invitationOverlay.style.display = 'none';
-                        currentInvitation = null;
-                        return;
-                    }
-
-                    // Yeni: "Oyundakiler" ekranını kapat
-                    playersOverlay.style.display = 'none';
-
-                    invitationOverlay.style.display = 'none';
-                    await createDuelSession(currentInvitation.invitedByStudentId, currentInvitation.invitedByClassId, currentInvitation.invitedByName, currentInvitation.invitedByPhoto);
-                    await database.ref(`invitations/${selectedStudent.studentId}`).remove();
-                } catch (error) {
-                    console.error("Düello başlatılırken hata:", error);
-                    showAlert('Düello başlatılırken bir hata oluştu.');
-                }
+    if (currentInvitation && selectedStudent.studentId) {
+        try {
+            // Önce davet gönderen kişinin hala online olup olmadığını kontrol et
+            const inviterOnlineSnapshot = await database.ref('loggedinPlayers')
+                .orderByChild('studentId')
+                .equalTo(currentInvitation.invitedByStudentId)
+                .once('value');
+                
+            if (!inviterOnlineSnapshot.exists()) {
+                await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+                invitationOverlay.style.display = 'none';
+                currentInvitation = null;
+                showAlert('Davet gönderen oyuncu artık çevrimiçi değil!');
+                return;
             }
-        });
+
+            const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
+            const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+
+            if (isInDuel) {
+                showAlert(`Zaten bir düellodasın!`);
+                invitationOverlay.style.display = 'none';
+                currentInvitation = null;
+                return;
+            }
+
+            // Yeni: "Oyundakiler" ekranını kapat
+            playersOverlay.style.display = 'none';
+
+            invitationOverlay.style.display = 'none';
+            await createDuelSession(
+                currentInvitation.invitedByStudentId, 
+                currentInvitation.invitedByClassId, 
+                currentInvitation.invitedByName, 
+                currentInvitation.invitedByPhoto
+            );
+            await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+        } catch (error) {
+            console.error("Düello başlatılırken hata:", error);
+            showAlert('Düello başlatılırken bir hata oluştu.');
+        }
+    }
+});
+
 
 async function createDuelSession(inviterId, inviterClassId, inviterName, inviterPhoto) {
     const duelRef = database.ref('duels').push();
