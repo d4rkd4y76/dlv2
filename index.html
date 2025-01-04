@@ -2395,6 +2395,156 @@ option {
 
 
 
+/* Profil değiştirme overlay ve içerik stilleri */
+.profile-change-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.profile-change-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 600px; /* Panel genişliğini sınırla */
+    position: relative;
+    animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
+}
+
+/* Profil başlık stili */
+.profile-change-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.profile-change-header h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin: 0;
+}
+
+/* Profil fotoğrafları grid düzeni */
+.profile-photos-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Profil fotoğraf kartı stili */
+.profile-photo-item {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.3s ease;
+}
+
+/* Profil fotoğrafı */
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ff8a00;
+}
+
+/* Fiyat etiketi */
+.profile-photo-price {
+    background: #f8f9fa;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Buton stilleri */
+.profile-photo-button {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.buy-button {
+    background: #28a745;
+    color: white;
+}
+
+.use-button {
+    background: #007bff;
+    color: white;
+}
+
+/* Kapatma butonu */
+.profile-close-button {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Hover efektleri */
+.profile-photo-item:hover {
+    transform: translateY(-5px);
+}
+
+.profile-close-button:hover {
+    color: #ff4444;
+}
+
+.buy-button:hover {
+    background: #218838;
+}
+
+.use-button:hover {
+    background: #0056b3;
+}
+
 
 
 
@@ -2445,6 +2595,9 @@ option {
 
     <!-- Ana Ekran -->
     <div class="container" id="main-screen" style="display: none;">
+<div class="profile-icon-container">
+    <img src="" alt="Profile" id="profile-icon" class="profile-icon">
+</div>
         <div class="student-info">
     <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
     <div class="student-name" id="student-name"></div>
@@ -2686,7 +2839,20 @@ option {
 
 
 
-
+<div class="profile-change-overlay" id="profileChangeOverlay">
+    <div class="profile-change-content">
+        <div class="profile-change-header">
+            <h2>Profil Fotoğrafı Değiştir</h2>
+            <button class="profile-close-button" id="profileCloseButton">✖</button>
+        </div>
+        
+        <div class="profile-photos-container" id="profilePhotosContainer">
+            <!-- Profil fotoğrafları buraya dinamik olarak eklenecek -->
+        </div>
+        
+        <button class="profile-back-button">Geri Dön</button>
+    </div>
+</div>
 
 
 
@@ -5406,6 +5572,202 @@ window.addEventListener('beforeunload', () => {
        database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
    }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Profil fotoğrafları verisi - ID'ler eklendi
+const profilePhotos = [
+    {
+        url: 'https://cdn.pixabay.com/animation/2022/08/02/19/43/19-43-44-141_512.gif',
+        price: 500,
+        id: 'photo1'
+    },
+    {
+        url: 'https://cdn.pixabay.com/animation/2022/07/31/06/04/06-04-32-13_512.gif',
+        price: 500,
+        id: 'photo2'
+    },
+    {
+        url: 'https://cdn.pixabay.com/animation/2024/02/23/15/15/15-15-50-56_512.gif',
+        price: 500,
+        id: 'photo3'
+    }
+];
+
+function updateProfileIcon() {
+    const profileIcon = document.getElementById('profile-icon');
+    if (selectedStudent && selectedStudent.studentId) {
+        database
+            .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
+            .once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    profileIcon.src = snapshot.val();
+                }
+            });
+    }
+}
+
+document.getElementById('profile-icon').addEventListener('click', () => {
+    document.getElementById('profileChangeOverlay').style.display = 'flex';
+    loadProfilePhotos();
+});
+
+async function buyProfilePhoto(photo) {
+    try {
+        // Öğrenci referansını al
+        const studentRef = database.ref(
+            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`
+        );
+
+        // Elmas sayısını kontrol et
+        const diamondSnapshot = await studentRef.child('diamond').once('value');
+        const currentDiamonds = diamondSnapshot.val() || 0;
+
+        // Yeterli elmas var mı?
+        if (currentDiamonds >= photo.price) {
+            // Güncellenecek verileri hazırlıyoruz
+            const updates = {};
+
+            // Elmas düşür
+            updates['diamond'] = currentDiamonds - photo.price;
+
+            // AŞAĞIDAKİ SATIRLAR DÜZELTİLDİ:
+            // purchasedPhotos altında boolean 'true' yerine obje kaydediyoruz
+updates[`purchasedPhotos/${btoa(photo.url)}`] = {
+  url: photo.url,
+  purchaseDate: Date.now()
+};
+
+            // Veritabanını güncelle
+            await studentRef.update(updates);
+
+            // UI'daki elmas sayısını güncelle
+            document.getElementById('diamond-value').textContent = currentDiamonds - photo.price;
+
+            // Başarı mesajı
+            await showAlert('✨ Profil fotoğrafı başarıyla satın alındı!');
+
+            // Fotoğraf listesini yenile
+            loadProfilePhotos();
+        } else {
+            // Elmas yetersiz
+            await showAlert('💎 Yeterli elmasınız yok!');
+        }
+    } catch (error) {
+        console.error('Satın alma hatası:', error);
+        await showAlert('❌ Satın alma işlemi başarısız oldu: ' + error.message);
+    }
+}
+
+async function useProfilePhoto(photoUrl) {
+    try {
+        // Seçilen fotoğrafı aktif yap
+        await database
+            .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
+            .set(photoUrl);
+
+        // Tüm profil fotoğrafı gösterimlerini güncelle
+        const photoElements = ['student-photo', 'profile-icon'];
+        photoElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.src = photoUrl;
+        });
+
+        await showAlert('✨ Profil fotoğrafı başarıyla değiştirildi!');
+    } catch (error) {
+        console.error('Fotoğraf değiştirme hatası:', error);
+        await showAlert('❌ Fotoğraf değiştirme işlemi başarısız oldu.');
+    }
+}
+
+async function loadProfilePhotos() {
+    const container = document.getElementById('profilePhotosContainer');
+    container.innerHTML = '';
+
+    try {
+        // Satın alınmış fotoğrafları kontrol et
+        const purchasedRef = database.ref(
+            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
+        );
+        const purchasedSnapshot = await purchasedRef.once('value');
+        const purchasedPhotos = purchasedSnapshot.val() || {};
+
+        // Tüm tanımlı fotoğrafları dön
+        profilePhotos.forEach(photo => {
+            const div = document.createElement('div');
+            div.className = 'profile-photo-item';
+
+            const img = document.createElement('img');
+            img.src = photo.url;
+            img.className = 'profile-photo';
+
+            const price = document.createElement('div');
+            price.className = 'profile-photo-price';
+
+            const button = document.createElement('button');
+            button.className = 'profile-photo-button';
+
+            // Base64 kodlu URL'yi kontrol et
+            const encodedUrl = btoa(photo.url);
+
+            // Eğer bu fotoğraf zaten satın alınmışsa
+            if (purchasedPhotos[encodedUrl]) {
+                price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
+                button.textContent = 'Kullan';
+                button.className = 'profile-photo-button use-button';
+                button.onclick = () => useProfilePhoto(photo.url);
+            } else {
+                // Henüz satın alınmamış
+                price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
+                button.textContent = 'Satın Al';
+                button.className = 'profile-photo-button buy-button';
+                button.onclick = () => buyProfilePhoto(photo);
+            }
+
+            div.appendChild(img);
+            div.appendChild(price);
+            div.appendChild(button);
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Fotoğraf listesi yükleme hatası:', error);
+        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
+    }
+}
+
+document.getElementById('profileCloseButton').addEventListener('click', () => {
+    document.getElementById('profileChangeOverlay').style.display = 'none';
+});
+
+
+
+
+
 
 
 
