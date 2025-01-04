@@ -4974,15 +4974,19 @@ document.getElementById('findDuelButton').addEventListener('click', () => {
 function showMatchmakingScreen() {
     const matchmakingScreen = document.getElementById('matchmakingScreen');
     matchmakingScreen.style.display = 'flex';
+    
+    // Müsait oyuncuları dinle
     listenForAvailablePlayers();
+    
+    // Düello kaydı (child_added) oluştuğunda matchmakingScreen'i kapat
+    listenForDuelCreation();
 }
 
 // Müsait oyuncuları dinle
 function listenForAvailablePlayers() {
     const currentClass = selectedStudent.classId;
-    
-    // Matchmaking listesindeki oyuncuları dinle
     const matchmakingRef = database.ref(`matchmaking/${currentClass}`);
+    
     matchmakingRef.on('value', async (snapshot) => {
         const availablePlayersList = document.getElementById('availablePlayersList');
         availablePlayersList.innerHTML = '';
@@ -4990,12 +4994,15 @@ function listenForAvailablePlayers() {
         if (snapshot.exists()) {
             snapshot.forEach((childSnapshot) => {
                 const player = childSnapshot.val();
+                
+                // Kendimizi listelemeyelim:
                 if (player.studentId !== selectedStudent.studentId) {
-                    // Oyuncunun düelloda olup olmadığını kontrol et
                     database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`)
                         .once('value')
                         .then((inDuelSnap) => {
                             const inDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+                            
+                            // Eğer inDuel = false ve status='searching' ise listele
                             if (!inDuel && player.status === 'searching') {
                                 createPlayerItem(player).then(playerItem => {
                                     availablePlayersList.appendChild(playerItem);
@@ -5008,15 +5015,17 @@ function listenForAvailablePlayers() {
     });
 }
 
-// Oyuncu öğesini oluştur (aynı kaldı)
 async function createPlayerItem(player) {
     const div = document.createElement('div');
     div.className = 'player-item';
     
-    // Oyuncunun fotoğrafını database'den çek
-    const photoSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/photo`).once('value');
+    // Fotoğrafı çek
+    const photoSnapshot = await database
+      .ref(`classes/${player.classId}/students/${player.studentId}/photo`)
+      .once('value');
     const photoUrl = photoSnapshot.exists() ? photoSnapshot.val() : 'https://via.placeholder.com/50';
     
+    // HTML içeriğini backtick kullanarak çok satırlı yazıyoruz
     div.innerHTML = `
         <img src="${photoUrl}" alt="${player.name}" class="player-photo">
         <span class="player-name">${player.name} / ${classNameMap[player.classId]}</span>
@@ -5028,7 +5037,7 @@ async function createPlayerItem(player) {
     
     const duelButton = div.querySelector('.duel-request-button');
     duelButton.addEventListener('click', async () => {
-        // Düello daveti gönder
+        // Davet gönder
         await sendInvitation({
             studentId: player.studentId,
             name: player.name,
@@ -5036,50 +5045,13 @@ async function createPlayerItem(player) {
             photo: photoUrl
         });
         
-        // Matchmaking ekranını kapat
+        // Kendi matchmaking kaydını kaldır, ekranı kapat
         document.getElementById('matchmakingScreen').style.display = 'none';
-        // Matchmaking listesinden kaldır
         database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
     });
     
     return div;
 }
-
-// invitationAcceptButton listener'ı (aynı kaldı)
-invitationAcceptButton.addEventListener('click', async () => {
-    if (currentInvitation && selectedStudent.studentId) {
-        try {
-            const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
-            const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
-
-            if (isInDuel) {
-                showAlert(`Zaten bir düellodasın!`);
-                invitationOverlay.style.display = 'none';
-                currentInvitation = null;
-                return;
-            }
-
-            // Matchmaking ekranını kapat
-            document.getElementById('matchmakingScreen').style.display = 'none';
-            
-            invitationOverlay.style.display = 'none';
-            await createDuelSession(
-                currentInvitation.invitedByStudentId,
-                currentInvitation.invitedByClassId,
-                currentInvitation.invitedByName,
-                currentInvitation.invitedByPhoto
-            );
-            await database.ref(`invitations/${selectedStudent.studentId}`).remove();
-            
-            // Matchmaking listesinden kaldır
-            await database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
-
-        } catch (error) {
-            console.error("Düello başlatılırken hata:", error);
-            showAlert('Düello başlatılırken bir hata oluştu.');
-        }
-    }
-});
 
 // Aramayı iptal et
 document.getElementById('cancelSearchButton').addEventListener('click', () => {
@@ -5087,12 +5059,37 @@ document.getElementById('cancelSearchButton').addEventListener('click', () => {
     matchmakingScreen.style.display = 'none';
     mainScreen.style.display = 'flex';
     
-    // Matchmaking listesinden kaldır
     database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
-    
-    // Dinleyiciyi temizle
     database.ref(`matchmaking/${selectedStudent.classId}`).off();
 });
+
+/* 
+ * 'duels' altında
+ * 'inviter.studentId' == bizim studentId veya 
+ * 'invited.studentId' == bizim studentId olan bir child eklenince 
+ * => matchmakingScreen'i kapatır.
+ */
+function listenForDuelCreation() {
+    // 1) Eğer bu kişi davet EDEN tarafsa
+    database.ref('duels')
+        .orderByChild('inviter/studentId')
+        .equalTo(selectedStudent.studentId)
+        .on('child_added', snapshot => {
+            const matchmakingScreen = document.getElementById('matchmakingScreen');
+            matchmakingScreen.style.display = 'none';
+            database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+        });
+
+    // 2) Eğer bu kişi davet ALAN tarafsa
+    database.ref('duels')
+        .orderByChild('invited/studentId')
+        .equalTo(selectedStudent.studentId)
+        .on('child_added', snapshot => {
+            const matchmakingScreen = document.getElementById('matchmakingScreen');
+            matchmakingScreen.style.display = 'none';
+            database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+        });
+}
 
 
 
