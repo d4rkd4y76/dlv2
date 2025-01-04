@@ -2587,7 +2587,7 @@ option {
 <div class="countdown-container">
     <div class="countdown" id="duelCountdown">60</div>
 </div>
-        <h2>Seçim Ekranı</h2>
+        <h2>Ortak Seçim Ekranı</h2>
 <div id="selecting-student-banner" class="selecting-student-banner"></div>
         <div class="table-section">
             <h3>Konu Belirleme</h3>
@@ -4312,7 +4312,7 @@ async function sendInvitation(player) {
     // Düello referansı silindiğinde
     database.ref('duels').on('child_removed', snapshot => {
         if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) {
-            showAlert('...')
+            showAlert('Rakibin bağlantısı kesildi. Tekrar giriş yapınız.')
                 .then(() => {
                     window.location.reload();
                 });
@@ -4526,9 +4526,9 @@ const countdownEl = document.getElementById('duelCountdown');
                     if (selectedStudent.studentId === inviterId && !initialData.gameStarted) {
                         // Puanları güncelle
                         database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
-                            .transaction(current => Math.max((current || 0) - 2, 0));
+                            .transaction(current => Math.max((current || 0) - 6, 0));
                         database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
-                            .transaction(current => (current || 0) + 3);
+                            .transaction(current => (current || 0) + 0);
                             
                         // Düello referansını kaldır
                         duelRef.remove().then(() => {
