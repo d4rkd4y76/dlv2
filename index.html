@@ -4312,7 +4312,7 @@ async function sendInvitation(player) {
     // Düello referansı silindiğinde
     database.ref('duels').on('child_removed', snapshot => {
         if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) {
-            showAlert('Süre Doldu')
+            showAlert('...')
                 .then(() => {
                     window.location.reload();
                 });
