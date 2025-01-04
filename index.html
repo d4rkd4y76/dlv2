@@ -2180,8 +2180,6 @@ option {
 
 
 
-
-
 /* İptal Butonu */
 .cancel-search-button {
     margin-top: 20px;
@@ -2340,19 +2338,6 @@ option {
     border-radius: 8px;
 }
 
-
-
-.duel-request-button.disabled {
-    background-color: #808080 !important;
-    cursor: not-allowed !important;
-    opacity: 0.7 !important;
-}
-
-.duel-request-button[disabled] {
-    background-color: #808080;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
 
 
 
@@ -5092,175 +5077,177 @@ function endDuelGame() {
 
 
 // Düello Arama butonuna tıklandığında
-document.getElementById('findDuelButton').addEventListener('click', async () => {
-    // Önce kullanıcının düelloda olup olmadığını kontrol et
-    const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
-    const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
-    
-    if (isInDuel) {
-        showAlert('Şu anda bir düelloda olduğunuz için arama yapamazsınız.');
-        return;
-    }
-
-    // Öğrenciyi matchmaking listesine ekle
-    database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).set({
-        name: selectedStudent.studentName,
-        classId: selectedStudent.classId,
-        studentId: selectedStudent.studentId,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        status: 'searching'
-    }).then(() => {
-        showMatchmakingScreen();
-    });
+document.getElementById('findDuelButton').addEventListener('click', () => {
+   // Önce mevcut listeyi ve listener'ları temizle
+   const availablePlayersList = document.getElementById('availablePlayersList');
+   availablePlayersList.innerHTML = '';
+   cleanupMatchmakingListeners();
+   
+   // Öğrenciyi matchmaking listesine ekle
+   database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).set({
+       name: selectedStudent.studentName,
+       classId: selectedStudent.classId,
+       studentId: selectedStudent.studentId,
+       timestamp: firebase.database.ServerValue.TIMESTAMP,
+       status: 'searching'
+   }).then(() => {
+       showMatchmakingScreen();
+   });
 });
 
 // Eşleştirme ekranını göster
 function showMatchmakingScreen() {
-    const matchmakingScreen = document.getElementById('matchmakingScreen');
-    matchmakingScreen.style.display = 'flex';
-    
-    // Müsait oyuncuları dinle
-    listenForAvailablePlayers();
-    
-    // Düello kaydı oluştuğunda matchmakingScreen'i kapat
-    listenForDuelCreation();
+   const matchmakingScreen = document.getElementById('matchmakingScreen');
+   matchmakingScreen.style.display = 'flex';
+   
+   // Müsait oyuncuları dinle
+   listenForAvailablePlayers();
+   
+   // Düello kaydı (child_added) oluştuğunda matchmakingScreen'i kapat
+   listenForDuelCreation();
 }
 
 // Müsait oyuncuları dinle
 function listenForAvailablePlayers() {
-    const currentClass = selectedStudent.classId;
-    const matchmakingRef = database.ref(`matchmaking/${currentClass}`);
-    const availablePlayersList = document.getElementById('availablePlayersList');
-    availablePlayersList.innerHTML = ''; // Listeyi temizle
-    
-    // Her bir oyuncu için ayrı bir dinleyici oluştur
-    matchmakingRef.on('child_added', async (childSnapshot) => {
-        const player = childSnapshot.val();
-        const playerId = childSnapshot.key;
-        
-        if (player.studentId !== selectedStudent.studentId) {
-            // Oyuncunun düelloda olup olmadığını kontrol et
-            const inDuelSnap = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
-            const inDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
-            
-            if (!inDuel && player.status === 'searching') {
-                const playerElement = await createPlayerItem(player);
-                playerElement.id = `player-${playerId}`;
-                availablePlayersList.appendChild(playerElement);
-            }
-        }
-    });
-
-    // Oyuncu silindiğinde listeden kaldır
-    matchmakingRef.on('child_removed', (oldChildSnapshot) => {
-        const playerId = oldChildSnapshot.key;
-        const elementToRemove = document.getElementById(`player-${playerId}`);
-        if (elementToRemove) {
-            elementToRemove.remove();
-        }
-    });
-
-    // inDuel durumu değiştiğinde kontrol et
-    const classRef = database.ref(`classes/${currentClass}/students`);
-    classRef.on('child_changed', async (snapshot) => {
-        const studentData = snapshot.val();
-        const studentId = snapshot.key;
-        
-        if (studentData.inDuel) {
-            const elementToRemove = document.getElementById(`player-${studentId}`);
-            if (elementToRemove) {
-                elementToRemove.remove();
-            }
-            // Matchmaking'den de kaldır
-            database.ref(`matchmaking/${currentClass}/${studentId}`).remove();
-        }
-    });
+   const currentClass = selectedStudent.classId;
+   const matchmakingRef = database.ref(`matchmaking/${currentClass}`);
+   const availablePlayersList = document.getElementById('availablePlayersList');
+   
+   // Oyuncu listesini takip etmek için Set
+   const addedPlayers = new Set();
+   
+   // Yeni oyuncu eklendiğinde
+   matchmakingRef.on('child_added', async (childSnapshot) => {
+       const player = childSnapshot.val();
+       
+       // Eğer oyuncu zaten eklenmişse ekleme
+       if (addedPlayers.has(player.studentId)) return;
+       
+       // Kendimizi listelemeyelim
+       if (player.studentId !== selectedStudent.studentId) {
+           const inDuelSnap = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
+           const inDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+           
+           // Eğer inDuel = false ve status='searching' ise listele
+           if (!inDuel && player.status === 'searching') {
+               const playerItem = await createPlayerItem(player);
+               playerItem.setAttribute('data-player-id', player.studentId);
+               availablePlayersList.appendChild(playerItem);
+               addedPlayers.add(player.studentId);
+           }
+       }
+   });
+   
+   // Oyuncu kaldırıldığında
+   matchmakingRef.on('child_removed', (oldChildSnapshot) => {
+       const removedPlayerId = oldChildSnapshot.val().studentId;
+       const playerElement = availablePlayersList.querySelector(`[data-player-id="${removedPlayerId}"]`);
+       if (playerElement) {
+           playerElement.remove();
+           addedPlayers.delete(removedPlayerId);
+       }
+   });
+   
+   // Oyuncu durumu değiştiğinde
+   matchmakingRef.on('child_changed', async (changedChildSnapshot) => {
+       const changedPlayer = changedChildSnapshot.val();
+       const playerElement = availablePlayersList.querySelector(`[data-player-id="${changedPlayer.studentId}"]`);
+       
+       if (changedPlayer.studentId !== selectedStudent.studentId) {
+           const inDuelSnap = await database.ref(`classes/${changedPlayer.classId}/students/${changedPlayer.studentId}/inDuel`).once('value');
+           const inDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+           
+           if (inDuel || changedPlayer.status !== 'searching') {
+               // Oyuncu artık müsait değilse listeden kaldır
+               if (playerElement) {
+                   playerElement.remove();
+                   addedPlayers.delete(changedPlayer.studentId);
+               }
+           }
+       }
+   });
 }
 
 async function createPlayerItem(player) {
-    const div = document.createElement('div');
-    div.className = 'player-item';
-    
-    const photoSnapshot = await database
-        .ref(`classes/${player.classId}/students/${player.studentId}/photo`)
-        .once('value');
-    const photoUrl = photoSnapshot.exists() ? photoSnapshot.val() : 'https://via.placeholder.com/50';
-    
-    div.innerHTML = `
-        <img src="${photoUrl}" alt="${player.name}" class="player-photo">
-        <span class="player-name">${player.name} / ${classNameMap[player.classId]}</span>
-        <button class="duel-request-button">
-            <i class="duel-icon">⚔️</i>
-        </button>
-    `;
-    
-    const duelButton = div.querySelector('.duel-request-button');
-    duelButton.addEventListener('click', async () => {
-        duelButton.disabled = true;
-        duelButton.style.backgroundColor = '#808080';
-        duelButton.style.cursor = 'not-allowed';
-        
-        // Daveti gönder
-        await sendInvitation({
-            studentId: player.studentId,
-            name: player.name,
-            classId: player.classId,
-            photo: photoUrl
-        });
-        
-        // Kendi matchmaking kaydını kaldır ve ekranı kapat
-        document.getElementById('matchmakingScreen').style.display = 'none';
-        database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
-    });
-    
-    return div;
+   const div = document.createElement('div');
+   div.className = 'player-item';
+   
+   // Fotoğrafı çek
+   const photoSnapshot = await database
+     .ref(`classes/${player.classId}/students/${player.studentId}/photo`)
+     .once('value');
+   const photoUrl = photoSnapshot.exists() ? photoSnapshot.val() : 'https://via.placeholder.com/50';
+   
+   div.innerHTML = `
+       <img src="${photoUrl}" alt="${player.name}" class="player-photo">
+       <span class="player-name">${player.name} / ${classNameMap[player.classId]}</span>
+       <button class="duel-request-button">
+           <i class="duel-icon">⚔️</i>
+       </button>
+   `;
+   
+   const duelButton = div.querySelector('.duel-request-button');
+   duelButton.addEventListener('click', async () => {
+       // Davet gönder
+       await sendInvitation({
+           studentId: player.studentId,
+           name: player.name,
+           classId: player.classId,
+           photo: photoUrl
+       });
+       
+       // Sadece matchmaking kaydını kaldır ve ekranı kapat
+       document.getElementById('matchmakingScreen').style.display = 'none';
+       database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+       // cleanupMatchmakingListeners buradan kaldırıldı
+   });
+   
+   return div;
 }
 
-// Aramayı iptal et ya da ekrandan çıkıldığında
+// Matchmaking dinleyicilerini temizle
+function cleanupMatchmakingListeners() {
+   const currentClass = selectedStudent.classId;
+   const matchmakingRef = database.ref(`matchmaking/${currentClass}`);
+   matchmakingRef.off();  // Tüm listener'ları temizle
+   
+   // Düello listener'larını temizlemeyi kaldırdık
+}
+
+// Aramayı iptal et
 document.getElementById('cancelSearchButton').addEventListener('click', () => {
-    closeMatchmaking();
+   const matchmakingScreen = document.getElementById('matchmakingScreen');
+   matchmakingScreen.style.display = 'none';
+   mainScreen.style.display = 'flex';
+   
+   database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+   cleanupMatchmakingListeners();
 });
 
-// Matchmaking ekranını kapatma fonksiyonu
-function closeMatchmaking() {
-    const matchmakingScreen = document.getElementById('matchmakingScreen');
-    matchmakingScreen.style.display = 'none';
-    mainScreen.style.display = 'flex';
-    
-    // Matchmaking kaydını kaldır
-    database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
-    
-    // Tüm dinleyicileri temizle
-    database.ref(`matchmaking/${selectedStudent.classId}`).off();
-    database.ref(`classes/${selectedStudent.classId}/students`).off();
-}
-
-// Düello oluşumunu dinle
 function listenForDuelCreation() {
-    // Davet eden taraf için
-    database.ref('duels')
-        .orderByChild('inviter/studentId')
-        .equalTo(selectedStudent.studentId)
-        .on('child_added', snapshot => {
-            closeMatchmaking();
-        });
+   // 1) Eğer bu kişi davet EDEN tarafsa
+   database.ref('duels')
+       .orderByChild('inviter/studentId')
+       .equalTo(selectedStudent.studentId)
+       .on('child_added', snapshot => {
+           const matchmakingScreen = document.getElementById('matchmakingScreen');
+           matchmakingScreen.style.display = 'none';
+           database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+           cleanupMatchmakingListeners();
+       });
 
-    // Davet alan taraf için
-    database.ref('duels')
-        .orderByChild('invited/studentId')
-        .equalTo(selectedStudent.studentId)
-        .on('child_added', snapshot => {
-            closeMatchmaking();
-        });
+   // 2) Eğer bu kişi davet ALAN tarafsa
+   database.ref('duels')
+       .orderByChild('invited/studentId')
+       .equalTo(selectedStudent.studentId)
+       .on('child_added', snapshot => {
+           const matchmakingScreen = document.getElementById('matchmakingScreen');
+           matchmakingScreen.style.display = 'none';
+           database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+           cleanupMatchmakingListeners();
+       });
 }
 
-// Sayfa yüklendiğinde veya yenilendiğinde
-window.addEventListener('beforeunload', () => {
-    // Matchmaking kaydını temizle
-    if (selectedStudent?.studentId) {
-        database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
-    }
-});
 
 
 
@@ -5271,32 +5258,6 @@ window.addEventListener('beforeunload', () => {
 
 
 
-
-function setupPresenceSystem() {
-    if (selectedStudent?.studentId) {
-        const userStatusRef = database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`);
-        
-        // Bağlantı kesildiğinde kullanıcıyı listeden kaldır
-        userStatusRef.onDisconnect().remove();
-
-        // İnternet bağlantısını kontrol et
-        window.addEventListener('online', () => {
-            if (document.getElementById('matchmakingScreen').style.display === 'flex') {
-                userStatusRef.set({
-                    name: selectedStudent.studentName,
-                    classId: selectedStudent.classId,
-                    studentId: selectedStudent.studentId,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    status: 'searching'
-                });
-            }
-        });
-
-        window.addEventListener('offline', () => {
-            userStatusRef.remove();
-        });
-    }
-}
 
 
 
