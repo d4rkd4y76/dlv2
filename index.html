@@ -5083,8 +5083,14 @@ document.getElementById('findDuelButton').addEventListener('click', () => {
    availablePlayersList.innerHTML = '';
    cleanupMatchmakingListeners();
    
+   // Matchmaking referansını oluştur
+   const matchmakingRef = database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`);
+   
+   // Bağlantı koptuğunda kaydı otomatik sil
+   matchmakingRef.onDisconnect().remove();
+   
    // Öğrenciyi matchmaking listesine ekle
-   database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).set({
+   matchmakingRef.set({
        name: selectedStudent.studentName,
        classId: selectedStudent.classId,
        studentId: selectedStudent.studentId,
@@ -5199,7 +5205,6 @@ async function createPlayerItem(player) {
        // Sadece matchmaking kaydını kaldır ve ekranı kapat
        document.getElementById('matchmakingScreen').style.display = 'none';
        database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
-       // cleanupMatchmakingListeners buradan kaldırıldı
    });
    
    return div;
@@ -5210,8 +5215,6 @@ function cleanupMatchmakingListeners() {
    const currentClass = selectedStudent.classId;
    const matchmakingRef = database.ref(`matchmaking/${currentClass}`);
    matchmakingRef.off();  // Tüm listener'ları temizle
-   
-   // Düello listener'larını temizlemeyi kaldırdık
 }
 
 // Aramayı iptal et
@@ -5247,6 +5250,14 @@ function listenForDuelCreation() {
            cleanupMatchmakingListeners();
        });
 }
+
+// Sayfa kapatıldığında ya da yenilendiğinde
+window.addEventListener('beforeunload', () => {
+   // Eğer matchmaking'de ise kaydı sil
+   if (selectedStudent && selectedStudent.classId && selectedStudent.studentId) {
+       database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
+   }
+});
 
 
 
