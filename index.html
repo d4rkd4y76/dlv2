@@ -2349,7 +2349,43 @@ option {
 
 
 
+.countdown-container {
+    position: absolute;
+    top: 15px; /* Küçültüldü */
+    right: 15px; /* Küçültüldü */
+    z-index: 100;
+}
 
+.countdown {
+    font-size: 1.8em; /* Font boyutu küçültüldü */
+    font-weight: bold;
+    padding: 10px 15px; /* Padding küçültüldü */
+    border-radius: 10px; /* Border-radius küçültüldü */
+    background: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Box-shadow küçültüldü */
+    animation: pulse 1s infinite;
+    transition: transform 0.3s ease; /* Transition'u sadece transform ile sınırladım */
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); } /* Scale miktarı hafifçe azaltıldı */
+}
+
+.countdown.green {
+    color: #28a745;
+    text-shadow: 0 0 8px rgba(40, 167, 69, 0.4); /* Text-shadow boyutu ve opaklığı azaltıldı */
+}
+
+.countdown.orange {
+    color: #fd7e14;
+    text-shadow: 0 0 8px rgba(253, 126, 20, 0.4);
+}
+
+.countdown.red {
+    color: #dc3545;
+    text-shadow: 0 0 8px rgba(220, 53, 69, 0.4);
+}
 
 
 
@@ -2548,6 +2584,9 @@ option {
 
     <!-- Düello Seçim Ekranı -->
     <div class="duel-selection-container" id="duel-selection-screen">
+<div class="countdown-container">
+    <div class="countdown" id="duelCountdown">60</div>
+</div>
         <h2>Ortak Seçim Ekranı</h2>
 <div id="selecting-student-banner" class="selecting-student-banner"></div>
         <div class="table-section">
@@ -4453,6 +4492,7 @@ function switchToDuelScreen(duelKey) {
 
     const duelRef = database.ref(`duels/${duelKey}`);
     let inviterId, inviterClassId, invitedId, invitedClassId;
+    let countdownInterval;
     
 duelRef.once('value').then(initialSnap => {
     if (initialSnap.exists()) {
@@ -4461,6 +4501,53 @@ duelRef.once('value').then(initialSnap => {
         inviterClassId = initialData.inviter.classId;
         invitedId = initialData.invited.studentId;
         invitedClassId = initialData.invited.classId;
+
+const countdownEl = document.getElementById('duelCountdown');
+            let timeLeft = 60;
+            
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
+                
+                // Renk değişimleri
+                if (timeLeft > 30) {
+                    countdownEl.className = 'countdown green';
+                } else if (timeLeft > 15) {
+                    countdownEl.className = 'countdown orange';
+                } else {
+                    countdownEl.className = 'countdown red';
+                }
+                
+                // Süre bittiğinde
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    
+                    // Eğer davet eden kişiysek ve oyun başlatılmamışsa
+                    if (selectedStudent.studentId === inviterId && !initialData.gameStarted) {
+                        // Puanları güncelle
+                        database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
+                            .transaction(current => Math.max((current || 0) - 2, 0));
+                        database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
+                            .transaction(current => (current || 0) + 3);
+                            
+                        // Düello referansını kaldır
+                        duelRef.remove().then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            }, 1000);
+
+duelRef.child('gameStarted').on('value', snapshot => {
+    if (snapshot.val() === true && countdownInterval) {
+        clearInterval(countdownInterval);
+        const countdownEl = document.getElementById('duelCountdown');
+        if (countdownEl) countdownEl.style.display = 'none';
+    }
+});
+
+
+
         
         // Sadece davet eden kişinin ismini göster
         const selectingStudentBanner = document.getElementById('selecting-student-banner');
