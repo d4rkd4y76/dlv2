@@ -2176,23 +2176,9 @@ option {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.duel-request-button {
-    background: linear-gradient(45deg, #ff4e50, #f9d423);
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.3s ease;
-}
 
-.duel-request-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(255, 78, 80, 0.4);
-}
+
+
 
 /* İptal Butonu */
 .cancel-search-button {
@@ -2232,6 +2218,139 @@ option {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.duel-request-button {
+    background: linear-gradient(45deg, #ff4e50, #f9d423);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-size: 16px; /* İsteğe bağlı: Buton metin boyutu */
+}
+
+/* Buton Üzerine Gelindiğinde Genel Efektler */
+.duel-request-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Duel İkonu (İçerik) */
+.duel-icon {
+    display: inline-block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    font-size: 20px; /* İsteğe bağlı: İkon boyutu */
+}
+
+
+
+/* Hover Durumunda Duel İkonu Efektleri */
+.duel-request-button:hover .duel-icon {
+    transform: rotate(360deg) scale(1.3);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+/* Hover Durumunda Buton Metni Renk Değişikliği */
+.duel-request-button:hover .button-text {
+    color: #ffe066;
+}
+
+/* Dalgalanan Metin Efekti */
+@keyframes wave {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Animasyonlu Arka Plan Parıltı Efekti */
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) skewX(-20deg);
+    }
+    50% {
+        transform: translateX(100%) skewX(-20deg);
+    }
+    100% {
+        transform: translateX(100%) skewX(-20deg);
+    }
+}
+
+/* ::before Pseudo-Elementi ile Ek Dalga Efekti */
+.duel-request-button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.5s ease;
+    pointer-events: none;
+}
+
+/* Hover Durumunda ::before Efekti */
+.duel-request-button:hover::before {
+    transform: rotate(45deg) scale(1);
+}
+
+/* ::after Pseudo-Elementi ile Shine Efekti */
+.duel-request-button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(255, 255, 255, 0.2) 100%
+    );
+    transform: translateX(-100%) skewX(-20deg);
+    animation: shine 2s infinite;
+    pointer-events: none;
+    border-radius: 8px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
