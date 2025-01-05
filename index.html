@@ -77,6 +77,18 @@ select {
     color: #333;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
+    font-family: 'Comfortaa', sans-serif; /* Comfortaa Fontunu Zorunlu Kıl */
+    /* Varsayılan ok işaretini gizler */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Özel ok işareti eklemek için */
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="%23333"><path d="M0 0l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 10px;
+    /* Cursor değişikliği */
+    cursor: pointer;
 }
 
 .friends-button {
