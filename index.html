@@ -1684,20 +1684,76 @@ option {
             to { right: 0; }
         }
 
-        .ranking-panel.open {
-            right: 0; /* Açıldığında görünür */
+                /* Açma Butonu */
+        .open-ranking-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            background-color: #4e54c8;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
+        .open-ranking-button:hover {
+            background-color: #8f94fb;
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Ranking Panel */
+        .ranking-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -2px 0 15px rgba(0, 0, 0, 0.3);
+            transition: right 0.5s ease;
+            z-index: 1000;
+            border-radius: 0 20px 20px 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .ranking-panel.open {
+            right: 0;
+        }
+
+        /* Ranking Panel Header */
         .ranking-panel h2 {
-            font-size: 2.2em;
+            font-size: 2em;
             color: #ff8a00;
             margin-bottom: 25px;
             text-align: center;
-            position: relative;
             text-shadow: 1px 1px #f7786b;
+            animation: fadeInDown 0.8s ease forwards;
         }
 
-        /* Ranking Panel İçin Geri Dön Butonu */
+        /* Geri Dön Butonu */
         .ranking-back-button {
             padding: 14px 30px;
             border: none;
@@ -1705,9 +1761,9 @@ option {
             background-color: #555;
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
             font-size: 1.1em;
-            margin-top: 30px;
+            margin-top: auto;
             align-self: center;
             width: 100%;
             max-width: 220px;
@@ -1720,270 +1776,201 @@ option {
             box-shadow: 0 7px 20px rgba(0,0,0,0.3);
         }
 
+        /* Ranking Table Container */
+        .ranking-table-container {
+            max-height: 80%;
+            overflow-y: auto;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            animation: fadeInUp 1s 0.5s forwards;
+        }
+
+        /* Ranking Table */
         .ranking-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            animation: float 3s ease-in-out infinite;
         }
 
-        .ranking-table th, .ranking-table td {
-            border: 2px solid #ff8a00;
+        /* Float Animation */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Table Header */
+        .ranking-table th {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #000;
+            font-weight: bold;
             padding: 15px;
             text-align: center;
-            font-size: 1.1em;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        /* Slide In Animation */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .ranking-table th::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0));
+            animation: shimmer 2s infinite;
+        }
+
+        /* Shimmer Animation */
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Table Data */
+        .ranking-table td {
+            padding: 15px;
+            text-align: center;
             color: #333;
+            transition: background 0.3s, color 0.3s, transform 0.3s;
+            font-weight: 500;
         }
 
-        .ranking-table th {
-            background-color: #ffe5d9;
-            color: #ff8a00;
-            font-weight: bold;
-            text-shadow: 1px 1px #f7786b;
+        /* Row Hover Effect */
+        .ranking-table tr:hover td {
+            background: #ff8a00;
+            color: white;
+            transform: scale(1.02);
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
 
-        .ranking-table tr:nth-child(even) {
-            background-color: #fff3e0;
-        }
-
-        .ranking-table tr:hover {
-            background-color: #ffe5d9;
-        }
-
+        /* Player Photo */
         .ranking-player-photo {
             width: 60px;
             height: 60px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #ff8a00;
+            transition: transform 0.3s;
         }
 
-        /* Top 3 özel stiller */
-        .ranking-table tr.top-1 {
-            background-color: #FFD700 !important; /* Altın */
-            animation: pulse 2s infinite;
+        .ranking-player-photo:hover {
+            transform: scale(1.1);
         }
 
-        .ranking-table tr.top-2 {
-            background-color: #C0C0C0 !important; /* Gümüş */
-            animation: pulse 2s infinite;
+        /* Top 3 Rows */
+        .ranking-table tr.top-1 td,
+        .ranking-table tr.top-2 td,
+        .ranking-table tr.top-3 td {
+            color: white;
+            font-weight: bold;
+            animation: glow 2s infinite alternate;
         }
 
-        .ranking-table tr.top-3 {
-            background-color: #CD7F32 !important; /* Bronz */
-            animation: pulse 2s infinite;
+        .ranking-table tr.top-1 td {
+            background: linear-gradient(135deg, #FFD700, #FFA500); /* Altın */
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        .ranking-table tr.top-2 td {
+            background: linear-gradient(135deg, #C0C0C0, #A9A9A9); /* Gümüş */
+            box-shadow: 0 0 15px rgba(192, 192, 192, 0.6);
+        }
+
+        .ranking-table tr.top-3 td {
+            background: linear-gradient(135deg, #CD7F32, #8B4513); /* Bronz */
+            box-shadow: 0 0 15px rgba(205, 127, 50, 0.6);
+        }
+
+        /* Glow Animation */
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 25px rgba(0,0,0,0.5);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            to {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 1);
             }
         }
-    
-/* Crazy Animated Ranking Table */
-.ranking-table-container {
-    max-height: 80%;
-    overflow-y: auto;
-    border-radius: 20px;
-    background: linear-gradient(145deg, #4e54c8, #8f94fb);
-    padding: 20px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    animation: pulseBackground 5s infinite alternate;
-}
 
-@keyframes pulseBackground {
-    0% {
-        background: linear-gradient(145deg, #4e54c8, #8f94fb);
-    }
-    50% {
-        background: linear-gradient(145deg, #e055fd, #8a54f5);
-    }
-    100% {
-        background: linear-gradient(145deg, #4e54c8, #8f94fb);
-    }
-}
+        /* Fade In Animasyonları */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-.ranking-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0 auto;
-    font-size: 1rem;
-    background: #ffffff;
-    border-radius: 10px;
-    overflow: hidden;
-    animation: float 3s ease-in-out infinite;
-}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .ranking-panel {
+                width: 100%;
+                border-radius: 0;
+            }
 
-.ranking-table th {
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-    color: #000;
-    font-weight: bold;
-    padding: 20px;
-    text-align: center;
-    text-transform: uppercase;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    position: relative;
-}
+            .ranking-table th, .ranking-table td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
 
-.ranking-table th::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
-    opacity: 0.7;
-    pointer-events: none;
-    transform: rotate(45deg);
-    animation: shimmer 3s infinite;
-}
+            .ranking-player-photo {
+                width: 40px;
+                height: 40px;
+            }
 
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
-}
+            .open-ranking-button, .ranking-back-button {
+                padding: 10px 20px;
+                font-size: 1rem;
+                max-width: 180px;
+            }
 
-.ranking-table td {
-    padding: 15px;
-    text-align: center;
-    background: linear-gradient(135deg, #f6f7f8, #e2e2e2);
-    color: #333;
-    border: none;
-    position: relative;
-    transition: all 0.5s ease-in-out;
-}
-
-.ranking-table tr:hover td {
-    background: linear-gradient(135deg, #f093fb, #f5576c);
-    color: #ffffff;
-    transform: scale(1.05) rotateX(10deg);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    cursor: pointer;
-}
-
-.ranking-table tr.top-1 td {
-    background: linear-gradient(135deg, #f4d03f, #16a085);
-    color: black;
-    font-weight: bold;
-    animation: rainbowShine 5s infinite alternate;
-}
-
-.ranking-table tr.top-2 td {
-    background: linear-gradient(135deg, #silver, #d1d8e0);
-    color: black;
-    font-weight: bold;
-    animation: rainbowShine 5s infinite alternate;
-}
-
-.ranking-table tr.top-3 td {
-    background: linear-gradient(135deg, #cd7f32, #8b4513);
-    color: black;
-    font-weight: bold;
-    animation: rainbowShine 5s infinite alternate;
-}
-
-@keyframes rainbowShine {
-    0% {
-        filter: brightness(1);
-    }
-    50% {
-        filter: brightness(1.5);
-    }
-    100% {
-        filter: brightness(1);
-    }
-}
-
-@media (max-width: 768px) {
-    .ranking-table {
-        font-size: 0.8rem;
-    }
-
-    .ranking-table th, .ranking-table td {
-        padding: 10px;
-    }
-}
-
-
-/* Enhanced Top 3 Styling */
-.ranking-table tr.top-1 td {
-    background: linear-gradient(145deg, #FFD700, #FFA500);
-    color: white;
-    font-weight: bold;
-    animation: glowGold 3s infinite alternate;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
-}
-
-.ranking-table tr.top-2 td {
-    background: linear-gradient(145deg, #C0C0C0, #A9A9A9);
-    color: white;
-    font-weight: bold;
-    animation: glowSilver 3s infinite alternate;
-    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.5);
-}
-
-.ranking-table tr.top-3 td {
-    background: linear-gradient(145deg, #CD7F32, #8B4513);
-    color: white;
-    font-weight: bold;
-    animation: glowBronze 3s infinite alternate;
-    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.5);
-}
-
-@keyframes glowGold {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(1.5) hue-rotate(10deg); }
-    100% { filter: brightness(1); }
-}
-
-@keyframes glowSilver {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(1.5) hue-rotate(10deg); }
-    100% { filter: brightness(1); }
-}
-
-@keyframes glowBronze {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(1.5) hue-rotate(10deg); }
-    100% { filter: brightness(1); }
-}
-
-
-/* Removing Glow from Top 3 */
-.ranking-table tr.top-1 td,
-.ranking-table tr.top-2 td,
-.ranking-table tr.top-3 td {
-    animation: none;
-}
-
-/* Removing Shimmer Effect from Header */
-.ranking-table th::after {
-    animation: none;
-    background: none;
-}
+            .ranking-table-container {
+                padding: 10px;
+            }
+        }
 
 .find-duel-button {
     background: linear-gradient(45deg, #ff4e50, #f9d423);
