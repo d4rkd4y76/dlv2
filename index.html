@@ -77,18 +77,6 @@ select {
     color: #333;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
-    font-family: 'Comfortaa', sans-serif; /* Comfortaa Fontunu Zorunlu Kıl */
-    /* Varsayılan ok işaretini gizler */
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    /* Özel ok işareti eklemek için */
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="%23333"><path d="M0 0l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 20px center;
-    background-size: 10px;
-    /* Cursor değişikliği */
-    cursor: pointer;
 }
 
 .friends-button {
@@ -2591,6 +2579,174 @@ option {
 
 
 
+
+
+
+
+.register-button {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1em;
+    margin-left: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.register-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.2);
+}
+
+.registration-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.registration-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.registration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.registration-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.registration-input:focus {
+    border-color: #4CAF50;
+    outline: none;
+    box-shadow: 0 0 5px rgba(74, 175, 80, 0.2);
+}
+
+.registration-submit {
+    width: 100%;
+    padding: 12px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.registration-submit:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.registration-submit:not(:disabled):hover {
+    background: #45a049;
+    transform: scale(1.02);
+}
+
+.registration-error {
+    color: #dc3545;
+    font-size: 0.9em;
+    text-align: center;
+    margin-top: 10px;
+    min-height: 20px;
+}
+
+.verification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000000;
+}
+
+.verification-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.verification-content h3 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+.verification-content p {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
 </head>
 <body>
@@ -2624,7 +2780,7 @@ option {
             <input type="password" id="student-password-input" placeholder="Şifre" disabled>
         </div>
         <button class="login-button" id="login-button" disabled>Giriş</button>
-        
+        <button class="register-button" id="register-button">Kayıt Ol</button> 
             </button>
         <div class="error" id="student-selection-error"></div>
     </div>
@@ -2825,6 +2981,48 @@ option {
 
 
 
+
+<!-- Yeni modal ekranları - body etiketinin sonuna, diğer modallardan önce eklenecek -->
+<div class="registration-overlay" id="registrationOverlay" style="display: none;">
+    <div class="registration-content">
+        <div class="registration-header">
+            <h2>Yeni Hesap Oluştur</h2>
+            <button class="close-button" id="closeRegistration">✖</button>
+        </div>
+        <div class="registration-form">
+            <select id="registerClassSelect" class="registration-input">
+                <option value="">Sınıf Seçin</option>
+            </select>
+            
+            <input type="text" id="registerUsername" 
+                   class="registration-input" 
+                   placeholder="Kullanıcı Adı (max 11 karakter)" 
+                   maxlength="11">
+            
+            <input type="password" id="registerPassword" 
+                   class="registration-input" 
+                   placeholder="Şifre (en az 6 karakter, harf ve rakam içermeli)">
+            
+            <input type="email" id="registerEmail" 
+                   class="registration-input" 
+                   placeholder="E-posta Adresi">
+            
+            <button id="submitRegistration" class="registration-submit" disabled>
+                Kayıt Ol
+            </button>
+        </div>
+        <div id="registrationError" class="registration-error"></div>
+    </div>
+</div>
+
+<div class="verification-overlay" id="verificationOverlay" style="display: none;">
+    <div class="verification-content">
+        <h3>E-posta Doğrulama</h3>
+        <p>E-posta adresinize doğrulama bağlantısı gönderildi.</p>
+        <p>Lütfen e-postanızı kontrol edin ve hesabınızı doğrulayın.</p>
+        <p>Doğrulama işlemi tamamlandıktan sonra giriş yapabilirsiniz.</p>
+    </div>
+</div>
 
 
 
@@ -5836,7 +6034,180 @@ document.getElementById('profileCloseButton').addEventListener('click', () => {
 
 
 
+// Kayıt sistemi için gerekli DOM elementleri
+const registerButton = document.getElementById('register-button');
+const registrationOverlay = document.getElementById('registrationOverlay');
+const closeRegistration = document.getElementById('closeRegistration');
+const registerClassSelect = document.getElementById('registerClassSelect');
+const registerUsername = document.getElementById('registerUsername');
+const registerPassword = document.getElementById('registerPassword');
+const registerEmail = document.getElementById('registerEmail');
+const submitRegistration = document.getElementById('submitRegistration');
+const registrationError = document.getElementById('registrationError');
+const verificationOverlay = document.getElementById('verificationOverlay');
 
+// Modal açma/kapama olayları
+registerButton.addEventListener('click', () => {
+    registrationOverlay.style.display = 'flex';
+    loadClassesForRegistration();
+});
+
+closeRegistration.addEventListener('click', () => {
+    registrationOverlay.style.display = 'none';
+    resetRegistrationForm();
+});
+
+// Sınıf listesini yükleme fonksiyonu
+function loadClassesForRegistration() {
+    registerClassSelect.innerHTML = '<option value="">Sınıf Seçin</option>';
+    database.ref('classes').once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const classId = childSnapshot.key;
+                const className = childSnapshot.val().name;
+                const option = document.createElement('option');
+                option.value = classId;
+                option.textContent = className;
+                registerClassSelect.appendChild(option);
+            });
+        }
+    }).catch(error => {
+        console.error("Sınıf bilgileri yüklenirken hata:", error);
+        registrationError.textContent = 'Sınıf bilgileri yüklenemedi';
+    });
+}
+
+// Form validasyonu için input olayları
+[registerClassSelect, registerUsername, registerPassword, registerEmail].forEach(element => {
+    element.addEventListener('input', validateRegistrationForm);
+});
+
+// Form validasyon fonksiyonu
+function validateRegistrationForm() {
+    const username = registerUsername.value.trim();
+    const password = registerPassword.value;
+    const email = registerEmail.value.trim();
+    const classId = registerClassSelect.value;
+    let isValid = true;
+    let errorMessage = '';
+
+    // Tüm alanların doluluğunu kontrol et
+    if (!username || !password || !email || !classId) {
+        isValid = false;
+        errorMessage = 'Tüm alanları doldurun';
+    }
+    // Kullanıcı adı uzunluk kontrolü
+    else if (username.length > 11) {
+        isValid = false;
+        errorMessage = 'Kullanıcı adı 11 karakterden uzun olamaz';
+    }
+    // Şifre kontrolü
+    else if (password.length < 6) {
+        isValid = false;
+        errorMessage = 'Şifre en az 6 karakter olmalı';
+    }
+    else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+        isValid = false;
+        errorMessage = 'Şifre en az bir harf ve bir rakam içermeli';
+    }
+    // Email format kontrolü
+    else if (!/\S+@\S+\.\S+/.test(email)) {
+        isValid = false;
+        errorMessage = 'Geçerli bir e-posta adresi girin';
+    }
+
+    submitRegistration.disabled = !isValid;
+    registrationError.textContent = errorMessage;
+    return isValid;
+}
+
+// Kullanıcı adı müsaitlik kontrolü
+async function isUsernameAvailable(username, classId) {
+    try {
+        const snapshot = await database.ref(`classes/${classId}/students`)
+            .orderByChild('name')
+            .equalTo(username)
+            .once('value');
+        return !snapshot.exists();
+    } catch (error) {
+        console.error("Kullanıcı adı kontrolünde hata:", error);
+        throw error;
+    }
+}
+
+// Kayıt formu gönderme işlemi
+submitRegistration.addEventListener('click', async () => {
+    if (!validateRegistrationForm()) return;
+
+    const username = registerUsername.value.trim();
+    const password = registerPassword.value;
+    const email = registerEmail.value.trim();
+    const classId = registerClassSelect.value;
+
+    try {
+        // Kullanıcı adı müsaitlik kontrolü
+        const usernameAvailable = await isUsernameAvailable(username, classId);
+        if (!usernameAvailable) {
+            registrationError.textContent = 'Bu kullanıcı adı zaten kullanılıyor';
+            return;
+        }
+
+        // Firebase Authentication ile kullanıcı oluştur
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // E-posta doğrulama gönder
+        await user.sendEmailVerification();
+
+        // Veritabanına kullanıcı bilgilerini kaydet
+        await database.ref(`classes/${classId}/students/${user.uid}`).set({
+            name: username,
+            password: password,
+            email: email,
+            diamond: 60,
+            photo: "https://firebasestorage.googleapis.com/v0/b/duellomatik.firebasestorage.app/o/icon-5355896_1920.png?alt=media&token=ac6bd293-f96c-45b9-84a9-35aff0e5784e",
+            gameCup: 0,
+            inDuel: false,
+            lastDiamondUpdate: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // Kayıt formunu kapat, doğrulama ekranını göster
+        registrationOverlay.style.display = 'none';
+        verificationOverlay.style.display = 'flex';
+        
+        // 5 saniye sonra doğrulama ekranını kapat
+        setTimeout(() => {
+            verificationOverlay.style.display = 'none';
+        }, 5000);
+
+        resetRegistrationForm();
+
+    } catch (error) {
+        console.error("Kayıt işleminde hata:", error);
+        registrationError.textContent = error.message;
+    }
+});
+
+// Form sıfırlama fonksiyonu
+function resetRegistrationForm() {
+    registerUsername.value = '';
+    registerPassword.value = '';
+    registerEmail.value = '';
+    registerClassSelect.value = '';
+    registrationError.textContent = '';
+    submitRegistration.disabled = true;
+}
+
+// E-posta doğrulama durumu kontrolü
+auth.onAuthStateChanged((user) => {
+    if (user && !user.emailVerified) {
+        user.reload().then(() => {
+            if (user.emailVerified) {
+                verificationOverlay.style.display = 'none';
+            }
+        });
+    }
+});
 
 
 
