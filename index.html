@@ -2395,7 +2395,43 @@ option {
 
 
 
-/* Profil değiştirme overlay ve içerik stilleri */
+/* Genel Sıfırlamalar (Opsiyonel) */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Profil İkonu Container Stilleri */
+.profile-icon-container {
+    position: fixed; /* Sabitleme */
+    top: 20px;       /* Üstten uzaklık */
+    right: 20px;     /* Sağdan uzaklık */
+    width: 50px;     /* İkon genişliği */
+    height: 50px;    /* İkon yüksekliği */
+    z-index: 1000;   /* Diğer öğelerin üzerinde görünmesini sağlar */
+    cursor: pointer; /* İkon üzerine gelindiğinde işaretçi görünümü */
+    transition: transform 0.3s ease; /* Hover efektleri için geçiş */
+}
+
+/* Profil İkonu Stilleri */
+.profile-icon {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;       /* Dairesel şekil */
+    object-fit: cover;        /* Görselin container'a uyum sağlaması */
+    border: 2px solid #ff8a00; /* İkon kenarlığı */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover efektleri için geçiş */
+}
+
+/* Hover Efekti */
+.profile-icon-container:hover .profile-icon {
+    transform: scale(1.1); /* Küçük büyüme efekti */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Gölge yoğunluğu artar */
+}
+
+/* Profil Değiştirme Overlay ve İçerik Stilleri (Mevcut Kodunuzdan) */
 .profile-change-overlay {
     position: fixed;
     top: 0;
@@ -2421,13 +2457,13 @@ option {
     animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
 }
 
-/* Profil başlık stili */
+/* Profil Başlık Stili */
 .profile-change-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
     border-bottom: 2px solid #f0f0f0;
 }
 
@@ -2437,7 +2473,7 @@ option {
     margin: 0;
 }
 
-/* Profil fotoğrafları grid düzeni */
+/* Profil Fotoğrafları Grid Düzeni */
 .profile-photos-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -2447,7 +2483,7 @@ option {
     overflow-y: auto;
 }
 
-/* Profil fotoğraf kartı stili */
+/* Profil Fotoğraf Kartı Stili */
 .profile-photo-item {
     background: white;
     border-radius: 15px;
@@ -2460,7 +2496,7 @@ option {
     transition: transform 0.3s ease;
 }
 
-/* Profil fotoğrafı */
+/* Profil Fotoğrafı */
 .profile-photo {
     width: 120px;
     height: 120px;
@@ -2469,7 +2505,7 @@ option {
     border: 3px solid #ff8a00;
 }
 
-/* Fiyat etiketi */
+/* Fiyat Etiketi */
 .profile-photo-price {
     background: #f8f9fa;
     padding: 5px 15px;
@@ -2480,7 +2516,7 @@ option {
     gap: 5px;
 }
 
-/* Buton stilleri */
+/* Buton Stilleri */
 .profile-photo-button {
     width: 100%;
     padding: 8px 0;
@@ -2501,7 +2537,7 @@ option {
     color: white;
 }
 
-/* Kapatma butonu */
+/* Kapatma Butonu */
 .profile-close-button {
     background: none;
     border: none;
@@ -2528,7 +2564,7 @@ option {
     }
 }
 
-/* Hover efektleri */
+/* Hover Efektleri */
 .profile-photo-item:hover {
     transform: translateY(-5px);
 }
@@ -2596,7 +2632,11 @@ option {
     <!-- Ana Ekran -->
     <div class="container" id="main-screen" style="display: none;">
 <div class="profile-icon-container">
-    <img src="" alt="Profile" id="profile-icon" class="profile-icon">
+    <img 
+        src="https://lh4.googleusercontent.com/proxy/2KLf3B_PxAjYQFcLmUbsYagbFC87BzmW4Ynv0pcPwMqRiceRpcQj-NG_waNV6kP7neV0tLp14ag-UDv0KOSL9nw" 
+        alt="Profile" 
+        id="profile-icon" 
+        class="profile-icon">
 </div>
         <div class="student-info">
     <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
@@ -2850,7 +2890,6 @@ option {
             <!-- Profil fotoğrafları buraya dinamik olarak eklenecek -->
         </div>
         
-        <button class="profile-back-button">Geri Dön</button>
     </div>
 </div>
 
@@ -5615,7 +5654,31 @@ const profilePhotos = [
         url: 'https://cdn.pixabay.com/animation/2024/02/23/15/15/15-15-50-56_512.gif',
         price: 500,
         id: 'photo3'
-    }
+    },
+
+    {
+        url: 'https://media.tenor.com/H_O_BxpiM0UAAAAj/besiktas-logo.gif',
+        price: 500,
+        id: 'photo4'
+    },
+
+    {
+        url: 'https://media.tenor.com/Uoxot7sqtkkAAAAM/galatasaray-galatasaray-sk.gif',
+        price: 600,
+        id: 'photo5'
+    },
+
+    {
+        url: 'https://www.icegif.com/wp-content/uploads/2024/04/roblox-icegif.gif',
+        price: 500,
+        id: 'photo7'
+    },
+
+    {
+        url: 'https://www.icegif.com/wp-content/uploads/2024/09/brawl-stars-icegif-11.gif',
+        price: 500,
+        id: 'photo8'
+    },
 ];
 
 function updateProfileIcon() {
