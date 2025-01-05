@@ -4929,7 +4929,7 @@ const countdownEl = document.getElementById('duelCountdown');
                     if (selectedStudent.studentId === inviterId && !initialData.gameStarted) {
                         // Puanları güncelle
                         database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
-                            .transaction(current => Math.max((current || 0) - 6, 0));
+                            .transaction(current => Math.max((current || 0) - 3, 0));
                         database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
                             .transaction(current => (current || 0) + 0);
                             
@@ -5033,8 +5033,8 @@ duelRef.child('gameStarted').on('value', snapshot => {
                 const currentPlayerId = selectedStudent.studentId;
                 
                 if (currentPlayerId === inviterId) {
-                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 6);
-                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 2, 0));
+                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 3);
+                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
                     await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
                 } else {
                     await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
