@@ -2405,8 +2405,8 @@ option {
 /* Profil İkonu Container Stilleri */
 .profile-icon-container {
     position: fixed; /* Sabitleme */
-    top: 20px;       /* Üstten uzaklık */
-    right: 20px;     /* Sağdan uzaklık */
+    top: 10px;       /* Üstten uzaklık */
+    right: 10px;     /* Sağdan uzaklık */
     width: 50px;     /* İkon genişliği */
     height: 50px;    /* İkon yüksekliği */
     z-index: 1000;   /* Diğer öğelerin üzerinde görünmesini sağlar */
@@ -5755,7 +5755,7 @@ async function useProfilePhoto(photoUrl) {
             .set(photoUrl);
 
         // Tüm profil fotoğrafı gösterimlerini güncelle
-        const photoElements = ['student-photo', 'profile-icon'];
+        const photoElements = ['student-photo'];
         photoElements.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.src = photoUrl;
