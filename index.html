@@ -6403,30 +6403,12 @@ function closeModal() {
 }
 
 // Mobil ve masaüstü için event listener'lar
-const profileIcon = document.querySelector('.profile-icon-container');
+profileIcon.addEventListener('click', openModal);
 
-// Tek bir event listener kullan
-profileIcon.addEventListener('click', (e) => {
-    e.preventDefault();
-    openModal();
-});
-
-// Touch olayını basitleştir
-profileIcon.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    openModal();
-}, {passive: false});
 
 closeStoreButton.addEventListener('click', closeModal);
 
-// iOS için scroll fix
-document.addEventListener('touchmove', function(e) {
-    if (profileStoreModal.style.display === 'flex') {
-        if (!e.target.closest('.profile-store-content')) {
-            e.preventDefault();
-        }
-    }
-}, { passive: false });
+
 
 // Kategori değiştirme
 categoryButtons.forEach(button => {
