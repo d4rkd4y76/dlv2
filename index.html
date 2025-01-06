@@ -2654,6 +2654,7 @@ option {
     justify-content: center;
     gap: 20px;
     margin-bottom: 30px;
+    flex-wrap: wrap;
 }
 
 .category-btn {
@@ -2778,35 +2779,6 @@ option {
     100% { transform: scale(1); }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .confirm-modal {
     position: fixed;
     top: 0;
@@ -2869,14 +2841,128 @@ option {
 
 /* Mobil için düzenlemeler */
 @media (max-width: 768px) {
+    .profile-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .profile-store-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .store-header h2 {
+        font-size: 20px;
+    }
+
+    .user-diamond-display {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .diamond-icon {
+        font-size: 20px;
+    }
+
+    .close-store {
+        font-size: 24px;
+    }
+
+    .category-selector {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .category-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .photo-preview {
+        width: 120px;
+        height: 120px;
+    }
+
+    .diamond-price {
+        font-size: 16px;
+    }
+
+    .buy-button, .use-button {
+        padding: 8px;
+        font-size: 14px;
+    }
+
     .confirm-content {
-        width: 280px;
+        width: 90%;
         padding: 15px;
     }
 
     .confirm-button, .cancel-button {
-        padding: 12px 15px;
+        padding: 8px 15px;
         font-size: 14px;
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-store-content {
+        padding: 10px;
+    }
+
+    .store-header h2 {
+        font-size: 18px;
+    }
+
+    .user-diamond-display {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .diamond-icon {
+        font-size: 18px;
+    }
+
+    .category-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .photo-preview {
+        width: 100px;
+        height: 100px;
+    }
+
+    .diamond-price {
+        font-size: 14px;
+    }
+
+    .buy-button, .use-button {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .confirm-content {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .confirm-button, .cancel-button {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 70px;
     }
 }
 
