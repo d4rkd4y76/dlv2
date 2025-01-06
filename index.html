@@ -2571,17 +2571,17 @@ option {
 
 .profile-categories {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    justify-content: space-between; /* değiştirildi */
+    width: 100%; /* eklendi */
+    padding: 10px 20px;
     margin-bottom: 20px;
-    padding: 10px;
 }
 
 .category-button {
-    padding: 12px 25px;
+    padding: 12px 25px;	
     border: none;
     border-radius: 15px;
-    font-size: 1.2em;
+    font-size: 0.9em;
     cursor: pointer;
     transition: all 0.3s ease;
     background: linear-gradient(145deg, #e6e6e6, #ffffff);
@@ -3125,9 +3125,14 @@ option {
 <div class="profile-change-overlay" id="profileChangeOverlay">
     <div class="profile-change-content">
     <div class="profile-change-header">
+<div class="current-diamonds">
+    <span class="diamond-icon">💎</span>
+    <span class="diamond-amount" id="currentDiamonds">0</span>
+</div>
         <h2>Profil Mağazası</h2>
         <button class="profile-close-button" id="profileCloseButton">✖</button>
     </div>
+
     
     <div class="profile-categories">
         <button class="category-button active" data-category="acemi">Acemi</button>
@@ -6060,7 +6065,14 @@ async function useProfilePhoto(photoUrl) {
    }
 }
 
+
 async function loadProfilePhotos(category = 'acemi') {
+   // Elmas değerini güncelle
+   const diamondSnapshot = await database.ref(
+       `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`
+   ).once('value');
+   document.getElementById('currentDiamonds').textContent = diamondSnapshot.val() || 0;
+
    const container = document.getElementById('profilePhotosContainer');
    container.innerHTML = '';
 
@@ -6080,6 +6092,10 @@ async function loadProfilePhotos(category = 'acemi') {
            img.src = photo.url;
            img.className = 'profile-photo';
 
+           const categoryBadge = document.createElement('div');
+           categoryBadge.className = `category-badge ${category}`;
+           categoryBadge.textContent = category.toUpperCase();
+
            const price = document.createElement('div');
            price.className = 'profile-photo-price';
 
@@ -6087,7 +6103,6 @@ async function loadProfilePhotos(category = 'acemi') {
            button.className = 'profile-photo-button';
 
            const encodedUrl = btoa(photo.url);
-
            if (purchasedPhotos[encodedUrl]) {
                price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
                button.textContent = 'Kullan';
@@ -6100,6 +6115,7 @@ async function loadProfilePhotos(category = 'acemi') {
                button.onclick = () => buyProfilePhoto(photo);
            }
 
+           div.appendChild(categoryBadge);
            div.appendChild(img);
            div.appendChild(price);
            div.appendChild(button);
