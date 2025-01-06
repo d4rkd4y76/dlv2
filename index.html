@@ -6389,15 +6389,33 @@ const photoCategories = {
 };
 
 // Modal açma fonksiyonu
+// Modal açma fonksiyonu
 function openModal() {
+    // Ekran genişliğini kontrol et (örneğin, 768px altında mobil)
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // Mobil cihazlar için tam ekran sınıfını ekle
+        profileStoreModal.classList.add('full-screen');
+    } else {
+        // Masaüstü için normal sınıfı ekle
+        profileStoreModal.classList.remove('full-screen');
+    }
+
+    // Modalı göster
     profileStoreModal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     updateDiamondDisplay();
     showCategoryPhotos('novice');
 }
 
+
 // Modal kapatma fonksiyonu
 function closeModal() {
+    // Tam ekran sınıfını kaldır
+    profileStoreModal.classList.remove('full-screen');
+    
+    // Modalı gizle
     profileStoreModal.style.display = 'none';
     document.body.style.overflow = '';
 }
