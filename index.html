@@ -2383,191 +2383,7 @@ option {
 
 
 
-/* Genel Sıfırlamalar (Opsiyonel) */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
-/* Profil İkonu Container Stilleri */
-.profile-icon-container {
-    position: fixed; /* Sabitleme */
-    top: 10px;       /* Üstten uzaklık */
-    right: 10px;     /* Sağdan uzaklık */
-    width: 50px;     /* İkon genişliği */
-    height: 50px;    /* İkon yüksekliği */
-    z-index: 1000;   /* Diğer öğelerin üzerinde görünmesini sağlar */
-    cursor: pointer; /* İkon üzerine gelindiğinde işaretçi görünümü */
-    transition: transform 0.3s ease; /* Hover efektleri için geçiş */
-}
-
-/* Profil İkonu Stilleri */
-.profile-icon {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;       /* Dairesel şekil */
-    object-fit: cover;        /* Görselin container'a uyum sağlaması */
-    border: 2px solid #ff8a00; /* İkon kenarlığı */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Hafif gölge */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover efektleri için geçiş */
-}
-
-/* Hover Efekti */
-.profile-icon-container:hover .profile-icon {
-    transform: scale(1.1); /* Küçük büyüme efekti */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Gölge yoğunluğu artar */
-}
-
-/* Profil Değiştirme Overlay ve İçerik Stilleri (Mevcut Kodunuzdan) */
-.profile-change-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(5px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    animation: fadeIn 0.3s ease;
-}
-
-.profile-change-content {
-    background: white;
-    border-radius: 20px;
-    padding: 30px;
-    width: 90%;
-    max-width: 600px; /* Panel genişliğini sınırla */
-    position: relative;
-    animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
-}
-
-/* Profil Başlık Stili */
-.profile-change-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.profile-change-header h2 {
-    font-size: 1.8em;
-    color: #333;
-    margin: 0;
-}
-
-/* Profil Fotoğrafları Grid Düzeni */
-.profile-photos-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 10px;
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-/* Profil Fotoğraf Kartı Stili */
-.profile-photo-item {
-    background: white;
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    transition: transform 0.3s ease;
-}
-
-/* Profil Fotoğrafı */
-.profile-photo {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ff8a00;
-}
-
-/* Fiyat Etiketi */
-.profile-photo-price {
-    background: #f8f9fa;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 1.1em;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* Buton Stilleri */
-.profile-photo-button {
-    width: 100%;
-    padding: 8px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.buy-button {
-    background: #28a745;
-    color: white;
-}
-
-.use-button {
-    background: #007bff;
-    color: white;
-}
-
-/* Kapatma Butonu */
-.profile-close-button {
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 1.5em;
-    cursor: pointer;
-    padding: 5px;
-}
-
-/* Animasyonlar */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes popIn {
-    from { 
-        opacity: 0; 
-        transform: scale(0.9);
-    }
-    to { 
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* Hover Efektleri */
-.profile-photo-item:hover {
-    transform: translateY(-5px);
-}
-
-.profile-close-button:hover {
-    color: #ff4444;
-}
-
-.buy-button:hover {
-    background: #218838;
-}
-
-.use-button:hover {
-    background: #0056b3;
-}
 
 
 
@@ -2727,6 +2543,255 @@ option {
         opacity: 1;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.profile-icon-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.profile-icon-container:hover {
+    transform: scale(1.1);
+}
+
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.profile-store-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.profile-store-content {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    background: linear-gradient(135deg, #f6f8fd 0%, #e9ecf5 100%);
+    margin: 20px auto;
+    border-radius: 20px;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    animation: slideUp 0.4s ease;
+}
+
+.store-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.store-header h2 {
+    color: #333;
+    font-size: 24px;
+    margin: 0;
+}
+
+.user-diamond-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+.diamond-icon {
+    font-size: 24px;
+}
+
+.close-store {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-store:hover {
+    color: #ff4444;
+}
+
+.category-selector {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.category-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #e0e0e0 0%, #d3d3d3 100%);
+    color: #666;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-btn.active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.photo-item {
+    position: relative;
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.photo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.photo-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    border: 3px solid #f0f0f0;
+    transition: transform 0.3s ease;
+}
+
+.photo-item:hover .photo-preview {
+    transform: scale(1.05);
+}
+
+.diamond-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 18px;
+    color: #4f46e5;
+    margin: 10px 0;
+}
+
+.buy-button, .use-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.buy-button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.buy-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.use-button {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+}
+
+.use-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+.buy-button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3074,22 +3139,35 @@ option {
 
 
 
-
-
-
-<div class="profile-change-overlay" id="profileChangeOverlay">
-    <div class="profile-change-content">
-        <div class="profile-change-header">
-            <h2>Profil Fotoğrafı Değiştir</h2>
-            <button class="profile-close-button" id="profileCloseButton">✖</button>
+<!-- Profil Mağazası Modal -->
+<div class="profile-store-modal" id="profileStoreModal">
+    <div class="profile-store-content">
+        <!-- Header -->
+        <div class="store-header">
+            <h2>Profil Mağazası</h2>
+            <div class="user-diamond-display">
+                <span class="diamond-icon">💎</span>
+                <span id="userDiamondCount">0</span>
+            </div>
+            <button class="close-store">&times;</button>
         </div>
-        
-        <div class="profile-photos-container" id="profilePhotosContainer">
-            <!-- Profil fotoğrafları buraya dinamik olarak eklenecek -->
+
+        <!-- Kategori Seçimi -->
+        <div class="category-selector">
+            <button class="category-btn active" data-category="novice">Acemi</button>
+            <button class="category-btn" data-category="brave">Cesur</button>
+            <button class="category-btn" data-category="leader">Lider</button>
         </div>
-        
+
+        <!-- Fotoğraf Grid Container -->
+        <div class="photos-grid" id="photosGrid">
+            <!-- Fotoğraflar JavaScript ile dinamik olarak eklenecek -->
+        </div>
     </div>
 </div>
+
+
+
 
 
 
@@ -5886,194 +5964,7 @@ window.addEventListener('beforeunload', () => {
 
 
 
-// Profil fotoğrafları verisi - ID'ler eklendi
-const profilePhotos = [
-    {
-        url: 'https://cdn.pixabay.com/animation/2022/08/02/19/43/19-43-44-141_512.gif',
-        price: 500,
-        id: 'photo1'
-    },
-    {
-        url: 'https://cdn.pixabay.com/animation/2022/07/31/06/04/06-04-32-13_512.gif',
-        price: 500,
-        id: 'photo2'
-    },
-    {
-        url: 'https://cdn.pixabay.com/animation/2024/02/23/15/15/15-15-50-56_512.gif',
-        price: 500,
-        id: 'photo3'
-    },
 
-    {
-        url: 'https://media.tenor.com/H_O_BxpiM0UAAAAj/besiktas-logo.gif',
-        price: 500,
-        id: 'photo4'
-    },
-
-    {
-        url: 'https://media.tenor.com/Uoxot7sqtkkAAAAM/galatasaray-galatasaray-sk.gif',
-        price: 600,
-        id: 'photo5'
-    },
-
-    {
-        url: 'https://www.icegif.com/wp-content/uploads/2024/04/roblox-icegif.gif',
-        price: 500,
-        id: 'photo7'
-    },
-
-    {
-        url: 'https://www.icegif.com/wp-content/uploads/2024/09/brawl-stars-icegif-11.gif',
-        price: 500,
-        id: 'photo8'
-    },
-];
-
-function updateProfileIcon() {
-    const profileIcon = document.getElementById('profile-icon');
-    if (selectedStudent && selectedStudent.studentId) {
-        database
-            .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
-            .once('value')
-            .then(snapshot => {
-                if (snapshot.exists()) {
-                    profileIcon.src = snapshot.val();
-                }
-            });
-    }
-}
-
-document.getElementById('profile-icon').addEventListener('click', () => {
-    document.getElementById('profileChangeOverlay').style.display = 'flex';
-    loadProfilePhotos();
-});
-
-async function buyProfilePhoto(photo) {
-    try {
-        // Öğrenci referansını al
-        const studentRef = database.ref(
-            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`
-        );
-
-        // Elmas sayısını kontrol et
-        const diamondSnapshot = await studentRef.child('diamond').once('value');
-        const currentDiamonds = diamondSnapshot.val() || 0;
-
-        // Yeterli elmas var mı?
-        if (currentDiamonds >= photo.price) {
-            // Güncellenecek verileri hazırlıyoruz
-            const updates = {};
-
-            // Elmas düşür
-            updates['diamond'] = currentDiamonds - photo.price;
-
-            // AŞAĞIDAKİ SATIRLAR DÜZELTİLDİ:
-            // purchasedPhotos altında boolean 'true' yerine obje kaydediyoruz
-updates[`purchasedPhotos/${btoa(photo.url)}`] = {
-  url: photo.url,
-  purchaseDate: Date.now()
-};
-
-            // Veritabanını güncelle
-            await studentRef.update(updates);
-
-            // UI'daki elmas sayısını güncelle
-            document.getElementById('diamond-value').textContent = currentDiamonds - photo.price;
-
-            // Başarı mesajı
-            await showAlert('✨ Profil fotoğrafı başarıyla satın alındı!');
-
-            // Fotoğraf listesini yenile
-            loadProfilePhotos();
-        } else {
-            // Elmas yetersiz
-            await showAlert('💎 Yeterli elmasınız yok!');
-        }
-    } catch (error) {
-        console.error('Satın alma hatası:', error);
-        await showAlert('❌ Satın alma işlemi başarısız oldu: ' + error.message);
-    }
-}
-
-async function useProfilePhoto(photoUrl) {
-    try {
-        // Seçilen fotoğrafı aktif yap
-        await database
-            .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
-            .set(photoUrl);
-
-        // Tüm profil fotoğrafı gösterimlerini güncelle
-        const photoElements = ['student-photo'];
-        photoElements.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.src = photoUrl;
-        });
-
-        await showAlert('✨ Profil fotoğrafı başarıyla değiştirildi!');
-    } catch (error) {
-        console.error('Fotoğraf değiştirme hatası:', error);
-        await showAlert('❌ Fotoğraf değiştirme işlemi başarısız oldu.');
-    }
-}
-
-async function loadProfilePhotos() {
-    const container = document.getElementById('profilePhotosContainer');
-    container.innerHTML = '';
-
-    try {
-        // Satın alınmış fotoğrafları kontrol et
-        const purchasedRef = database.ref(
-            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
-        );
-        const purchasedSnapshot = await purchasedRef.once('value');
-        const purchasedPhotos = purchasedSnapshot.val() || {};
-
-        // Tüm tanımlı fotoğrafları dön
-        profilePhotos.forEach(photo => {
-            const div = document.createElement('div');
-            div.className = 'profile-photo-item';
-
-            const img = document.createElement('img');
-            img.src = photo.url;
-            img.className = 'profile-photo';
-
-            const price = document.createElement('div');
-            price.className = 'profile-photo-price';
-
-            const button = document.createElement('button');
-            button.className = 'profile-photo-button';
-
-            // Base64 kodlu URL'yi kontrol et
-            const encodedUrl = btoa(photo.url);
-
-            // Eğer bu fotoğraf zaten satın alınmışsa
-            if (purchasedPhotos[encodedUrl]) {
-                price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
-                button.textContent = 'Kullan';
-                button.className = 'profile-photo-button use-button';
-                button.onclick = () => useProfilePhoto(photo.url);
-            } else {
-                // Henüz satın alınmamış
-                price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
-                button.textContent = 'Satın Al';
-                button.className = 'profile-photo-button buy-button';
-                button.onclick = () => buyProfilePhoto(photo);
-            }
-
-            div.appendChild(img);
-            div.appendChild(price);
-            div.appendChild(button);
-            container.appendChild(div);
-        });
-    } catch (error) {
-        console.error('Fotoğraf listesi yükleme hatası:', error);
-        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
-    }
-}
-
-document.getElementById('profileCloseButton').addEventListener('click', () => {
-    document.getElementById('profileChangeOverlay').style.display = 'none';
-});
 
 
 
@@ -6258,6 +6149,206 @@ auth.onAuthStateChanged((user) => {
         });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Profil mağazası için gerekli değişkenler
+const profileIcon = document.querySelector('.profile-icon-container');
+const profileStoreModal = document.getElementById('profileStoreModal');
+const closeStoreButton = document.querySelector('.close-store');
+const categoryButtons = document.querySelectorAll('.category-btn');
+const photosGrid = document.getElementById('photosGrid');
+const userDiamondCount = document.getElementById('userDiamondCount');
+
+// Fotoğraf kategorileri ve fiyatları
+const photoCategories = {
+    novice: [
+        { url: 'https://cdn.pixabay.com/animation/2022/08/02/19/43/19-43-44-141_512.gif', price: 100 },
+        { url: 'https://cdn.pixabay.com/animation/2022/07/31/06/04/06-04-32-13_512.gif', price: 150 },
+        { url: 'https://cdn.pixabay.com/animation/2023/03/22/04/48/04-48-41-618_512.gif', price: 200 }
+    ],
+    brave: [
+        { url: 'https://www.icegif.com/wp-content/uploads/2024/04/roblox-icegif.gif', price: 300 },
+        { url: 'https://www.icegif.com/wp-content/uploads/2024/09/brawl-stars-icegif-11.gif', price: 350 },
+        { url: 'https://cdn.pixabay.com/animation/2024/02/23/15/15/15-15-50-56_512.gif', price: 400 }
+    ],
+    leader: [
+        { url: 'https://media.tenor.com/H_O_BxpiM0UAAAAj/besiktas-logo.gif', price: 500 },
+        { url: 'https://media.tenor.com/Uoxot7sqtkkAAAAM/galatasaray-galatasaray-sk.gif', price: 550 },
+        { url: 'https://png.pngtree.com/png-clipart/20220225/ourlarge/pngtree-the-little-boy-pushed-the-shopping-cart-to-buy-something-gif-png-image_4393912.png', price: 600 }
+    ]
+};
+
+// Profil ikonuna tıklandığında mağazayı aç
+profileIcon.addEventListener('click', () => {
+    profileStoreModal.style.display = 'flex';
+    updateDiamondDisplay();
+    showCategoryPhotos('novice'); // Varsayılan olarak Acemi kategorisini göster
+});
+
+// Mağazayı kapatma
+closeStoreButton.addEventListener('click', () => {
+    profileStoreModal.style.display = 'none';
+});
+
+// Kategori değiştirme
+categoryButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        showCategoryPhotos(button.dataset.category);
+    });
+});
+
+// Elmas sayısını güncelleme
+async function updateDiamondDisplay() {
+    if (selectedStudent?.studentId) {
+        const diamondRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`);
+        const snapshot = await diamondRef.once('value');
+        userDiamondCount.textContent = snapshot.val() || 0;
+    }
+}
+
+// Kategori fotoğraflarını gösterme
+async function showCategoryPhotos(category) {
+    photosGrid.innerHTML = '';
+    const photos = photoCategories[category];
+
+    if (!selectedStudent?.studentId) return;
+
+    // Kullanıcının satın aldığı fotoğrafları al
+    const purchasedPhotosRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`);
+    const purchasedSnapshot = await purchasedPhotosRef.once('value');
+    const purchasedPhotos = purchasedSnapshot.val() || {};
+
+    photos.forEach(photo => {
+        const photoId = btoa(photo.url); // URL'i base64'e çevirerek benzersiz ID oluştur
+        const isPurchased = purchasedPhotos[photoId];
+        
+        const photoElement = document.createElement('div');
+        photoElement.className = 'photo-item';
+        photoElement.innerHTML = `
+            <img src="${photo.url}" class="photo-preview" alt="Profile Photo">
+            <div class="diamond-price">
+                <span class="diamond-icon">💎</span>
+                <span>${photo.price}</span>
+            </div>
+            ${isPurchased ? 
+                `<button class="use-button" onclick="usePhoto('${photo.url}')">Kullan</button>` :
+                `<button class="buy-button" onclick="purchasePhoto('${photo.url}', ${photo.price})">Satın Al</button>`
+            }
+        `;
+        photosGrid.appendChild(photoElement);
+    });
+}
+
+// Fotoğraf satın alma işlemi
+async function purchasePhoto(photoUrl, price) {
+    if (!selectedStudent?.studentId) return;
+
+    try {
+        // Önce mevcut elmas sayısını kontrol et
+        const diamondRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`);
+        const diamondSnapshot = await diamondRef.once('value');
+        const currentDiamonds = diamondSnapshot.val() || 0;
+
+        if (currentDiamonds < price) {
+            showAlert('Yeterli elmasınız yok!');
+            return;
+        }
+
+        const photoId = btoa(photoUrl);
+
+        // Elmas sayısını güncelle
+        await diamondRef.set(currentDiamonds - price);
+
+        // Satın alınan fotoğrafı kaydet
+        await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos/${photoId}`).set({
+            url: photoUrl,
+            purchaseDate: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        // UI'ı güncelle
+        updateDiamondDisplay();
+        showAlert('Fotoğraf başarıyla satın alındı!');
+            
+        // Aktif kategoriyi bul ve fotoğrafları yenile
+        const activeCategory = document.querySelector('.category-btn.active').dataset.category;
+        showCategoryPhotos(activeCategory);
+
+    } catch (error) {
+        console.error('Satın alma hatası:', error);
+        showAlert('Satın alma işlemi başarısız oldu!');
+    }
+}
+
+// Fotoğrafı kullanma/aktif etme
+async function usePhoto(photoUrl) {
+    if (!selectedStudent?.studentId) return;
+
+    try {
+        // Profil fotoğrafını güncelle
+        await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`).set(photoUrl);
+        
+        // Ana ekrandaki profil fotoğrafını güncelle
+        const studentPhotoElement = document.getElementById('student-photo');
+        if (studentPhotoElement) {
+            studentPhotoElement.src = photoUrl;
+            studentPhotoElement.style.display = 'block';
+        }
+        
+        // Profil ikonunu güncelle
+        document.querySelector('.profile-icon').src = photoUrl;
+
+        showAlert('Profil fotoğrafı güncellendi!');
+    } catch (error) {
+        console.error('Fotoğraf güncelleme hatası:', error);
+        showAlert('Fotoğraf güncellenirken bir hata oluştu!');
+    }
+}
+
+// Modal dışına tıklandığında kapatma
+profileStoreModal.addEventListener('click', (e) => {
+    if (e.target === profileStoreModal) {
+        profileStoreModal.style.display = 'none';
+    }
+});
+
+// Klavye kısayolu ile kapatma (ESC tuşu)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && profileStoreModal.style.display === 'flex') {
+        profileStoreModal.style.display = 'none';
+    }
+});
+
+
+
+
+
+
+
 
 
 
