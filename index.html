@@ -4546,16 +4546,21 @@ logoutButton.addEventListener('click', async () => {
         const alertMessage = document.getElementById('alertMessage');
         const alertOkButton = document.getElementById('alertOkButton');
 
-        function showAlert(message) {
-            alertMessage.textContent = message; // Sabit mesaj için textContent kullanıldı
-            alertOverlay.style.display = 'flex';
-            return new Promise(resolve => {
-                alertOkButton.onclick = () => {
-                    alertOverlay.style.display = 'none';
-                    resolve();
-                };
-            });
+        function showAlert(message, showButton = true) {
+    alertMessage.textContent = message;
+    alertOverlay.style.display = 'flex';
+    alertOkButton.style.display = showButton ? 'block' : 'none';
+    return new Promise(resolve => {
+        if (showButton) {
+            alertOkButton.onclick = () => {
+                alertOverlay.style.display = 'none';
+                resolve();
+            };
+        } else {
+            resolve();
         }
+    });
+}
 
         // Prompt fonksiyonu
         const promptOverlay = document.getElementById('promptOverlay');
@@ -4594,6 +4599,13 @@ async function sendInvitation(player) {
             
         if (!inviterSnapshot.exists()) {
             showAlert('Bağlantı hatası! Lütfen tekrar giriş yapın.');
+            return;
+        }
+
+        // Karşı tarafın aktif bir daveti var mı kontrol et
+        const activeInviteSnapshot = await database.ref(`invitations/${player.studentId}`).once('value');
+        if (activeInviteSnapshot.exists()) {
+            showAlert('Bu oyuncu şu anda başka bir davet değerlendiriyor.');
             return;
         }
 
@@ -4644,17 +4656,25 @@ async function sendInvitation(player) {
             invitedByClassId: selectedStudent.classId,
             invitedByStudentId: selectedStudent.studentId,
             invitedByPhoto: studentPhoto.src ? studentPhoto.src : "",
-            timestamp: firebase.database.ServerValue.TIMESTAMP // Davet zamanını ekle
+            timestamp: firebase.database.ServerValue.TIMESTAMP
         });
-        
-        showAlert(`${player.name} davet edildi!`);
+
+        // 10 saniyelik geri sayım mesajı göster
+        let timeLeft = 10;
+        const countdownInterval = setInterval(() => {
+            showAlert(`Davet gönderildi! ${timeLeft} saniye sonra kapanacak...`, false);
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('alertOverlay').style.display = 'none';
+            }
+        }, 1000);
         
     } catch (error) {
         console.error("Davet gönderme hatası:", error);
         showAlert('Davet gönderilirken bir hata oluştu.');
     }
 }
-
 
         function startInvitationListener(studentId) {
     const invitationRef = database.ref(`invitations/${studentId}`);
@@ -4664,9 +4684,12 @@ async function sendInvitation(player) {
         if (snapshot.exists()) {
             const data = snapshot.val();
             
-            // Davet 30 saniyeden eski ise otomatik olarak sil
-            if (data.timestamp && (Date.now() - data.timestamp) > 30000) {
+            // Davet 10 saniyeden eski ise otomatik olarak sil
+            if (data.timestamp && (Date.now() - data.timestamp) > 10000) {
                 await invitationRef.remove();
+                if (invitationOverlay.style.display === 'flex') {
+                    invitationOverlay.style.display = 'none';
+                }
                 return;
             }
             
@@ -4680,13 +4703,39 @@ async function sendInvitation(player) {
                 await invitationRef.remove();
                 if (invitationOverlay.style.display === 'flex') {
                     invitationOverlay.style.display = 'none';
-                    showAlert('Davet gönderen oyuncu artık çevrimiçi değil!');
                 }
                 return;
             }
             
             currentInvitation = { ...data };
             showInvitationModal(data);
+
+            // 10 saniyelik süre başlat
+            let timeLeft = 10;
+            const countdownInterval = setInterval(() => {
+                const countdownElement = document.createElement('div');
+                countdownElement.textContent = `${timeLeft} saniye kaldı`;
+                countdownElement.style.marginTop = '10px';
+                countdownElement.style.color = '#ff0000';
+                
+                // Eski countdown elementini kaldır
+                const oldCountdown = invitationMessage.parentElement.querySelector('.countdown-text');
+                if (oldCountdown) {
+                    oldCountdown.remove();
+                }
+                
+                countdownElement.classList.add('countdown-text');
+                invitationMessage.parentElement.appendChild(countdownElement);
+                
+                timeLeft--;
+                
+                if (timeLeft < 0 || !snapshot.exists()) {
+                    clearInterval(countdownInterval);
+                    invitationOverlay.style.display = 'none';
+                    invitationRef.remove();
+                }
+            }, 1000);
+
         } else {
             if (invitationOverlay.style.display === 'flex' && !currentInvitation) {
                 invitationOverlay.style.display = 'none';
@@ -4695,7 +4744,7 @@ async function sendInvitation(player) {
         }
     });
 
-    // Düelloları dinle (mevcut kodun geri kalanı aynı kalacak)
+    // Mevcut düello dinleyicileri aynen kalacak
     database.ref('duels').orderByChild('inviter/studentId').equalTo(studentId).on('child_added', snapshot => {
         if (currentDuelRef == null) {
             currentDuelRef = snapshot.ref;
@@ -4711,6 +4760,7 @@ async function sendInvitation(player) {
             switchToDuelScreen(snapshot.key);
         }
     });
+
 
     // Düello referansı silindiğinde
     database.ref('duels').on('child_removed', snapshot => {
