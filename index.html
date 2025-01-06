@@ -2578,10 +2578,10 @@ option {
 }
 
 .category-button {
-    padding: 12px 25px;
+    padding: 8px 17px;
     border: none;
     border-radius: 15px;
-    font-size: 0.6em;
+    font-size: 0.8em;
     cursor: pointer;
     transition: all 0.3s ease;
     background: linear-gradient(145deg, #e6e6e6, #ffffff);
@@ -2632,7 +2632,24 @@ option {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .current-diamonds {
+    position: relative; /* Pseudo-element için gerekli */
     background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
     color: white;
     padding: 10px 20px;
@@ -2642,17 +2659,97 @@ option {
     gap: 10px;
     margin: 10px 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    overflow: hidden; /* Pseudo-element taşmasını önlemek için */
+    transition: transform 0.3s ease; /* Hover animasyonu için */
+}
+
+.current-diamonds::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+    animation: waveMove 6s linear infinite;
+    pointer-events: none; /* İçerikle etkileşime girmesini engeller */
+}
+
+.current-diamonds::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: backgroundGlow 4s ease-in-out infinite; /* Arka plan parlaklık animasyonu */
+}
+
+.current-diamonds:hover::after {
+    opacity: 1;
+}
+
+.current-diamonds:hover {
+    transform: scale(1.05); /* Hover durumunda hafif büyüme */
 }
 
 .diamond-icon {
     font-size: 1.2em;
+    position: relative;
+    animation: float 3s ease-in-out infinite;
 }
 
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes waveMove {
+    0% {
+        transform: rotate(0deg) translate(0, 0);
+    }
+    50% {
+        transform: rotate(180deg) translate(10px, 10px);
+    }
+    100% {
+        transform: rotate(360deg) translate(0, 0);
+    }
+}
+
+/* Yeni Eklenen Arka Plan Parlaklık Animasyonu */
+@keyframes backgroundGlow {
+    0% {
+        box-shadow: 0 0 10px rgba(79, 195, 247, 0.3), 0 0 20px rgba(79, 195, 247, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(79, 195, 247, 0.6), 0 0 30px rgba(79, 195, 247, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(79, 195, 247, 0.3), 0 0 20px rgba(79, 195, 247, 0.2);
+    }
+}
+
+/* Metindeki Parlaklık Efektini Kaldırdım */
 .diamond-amount {
     font-weight: bold;
     font-size: 1.1em;
     color: #4fc3f7;
+    /* Metindeki glowText animasyonunu kaldırdık */
+    /* transition: color 0.3s ease; */
 }
+
+
+
+
+
 
 
 
