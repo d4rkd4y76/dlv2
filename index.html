@@ -2560,12 +2560,14 @@ option {
 
 
 .profile-icon-container {
-   position: absolute;
+   position: fixed; /* absolute yerine fixed kullan */
    top: 20px;
    right: 20px;
-   cursor: pointer;
-   transition: transform 0.3s ease;
    z-index: 1000;
+   cursor: pointer;
+   width: 50px; /* Sabit genişlik ekle */
+   height: 50px; /* Sabit yükseklik ekle */
+   touch-action: manipulation; /* Mobil için touch davranışını iyileştir */
 }
 
 .profile-icon-container:hover {
@@ -6401,9 +6403,19 @@ function closeModal() {
 }
 
 // Mobil ve masaüstü için event listener'lar
-profileIcon.addEventListener('click', openModal);
-profileIcon.addEventListener('touchstart', openModal, {passive: false});
-profileIcon.addEventListener('touchend', (e) => e.preventDefault(), {passive: false});
+const profileIcon = document.querySelector('.profile-icon-container');
+
+// Tek bir event listener kullan
+profileIcon.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal();
+});
+
+// Touch olayını basitleştir
+profileIcon.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    openModal();
+}, {passive: false});
 
 closeStoreButton.addEventListener('click', closeModal);
 
