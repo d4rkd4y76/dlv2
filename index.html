@@ -2807,6 +2807,100 @@ option {
 
 
 
+.confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.confirm-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 90%;
+    width: 300px;
+    text-align: center;
+    animation: modalSlideIn 0.3s ease;
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.confirm-button, .cancel-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.confirm-button {
+    background: #4CAF50;
+    color: white;
+}
+
+.cancel-button {
+    background: #f44336;
+    color: white;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobil için düzenlemeler */
+@media (max-width: 768px) {
+    .confirm-content {
+        width: 280px;
+        padding: 15px;
+    }
+
+    .confirm-button, .cancel-button {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6182,7 +6276,7 @@ const categoryButtons = document.querySelectorAll('.category-btn');
 const photosGrid = document.getElementById('photosGrid');
 const userDiamondCount = document.getElementById('userDiamondCount');
 
-// Fotoğraf kategorileri ve fiyatları
+// Fotoğraf kategorileri ve fiyatları (aynı kaldı)
 const photoCategories = {
     novice: [
         { url: 'https://cdn.pixabay.com/animation/2022/08/02/19/43/19-43-44-141_512.gif', price: 100 },
@@ -6201,17 +6295,35 @@ const photoCategories = {
     ]
 };
 
-// Profil ikonuna tıklandığında mağazayı aç
-profileIcon.addEventListener('click', () => {
+// Modal açma fonksiyonu
+function openModal() {
     profileStoreModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     updateDiamondDisplay();
-    showCategoryPhotos('novice'); // Varsayılan olarak Acemi kategorisini göster
-});
+    showCategoryPhotos('novice');
+}
 
-// Mağazayı kapatma
-closeStoreButton.addEventListener('click', () => {
+// Modal kapatma fonksiyonu
+function closeModal() {
     profileStoreModal.style.display = 'none';
-});
+    document.body.style.overflow = '';
+}
+
+// Mobil ve masaüstü için event listener'lar
+profileIcon.addEventListener('click', openModal);
+profileIcon.addEventListener('touchstart', openModal, {passive: false});
+profileIcon.addEventListener('touchend', (e) => e.preventDefault(), {passive: false});
+
+closeStoreButton.addEventListener('click', closeModal);
+
+// iOS için scroll fix
+document.addEventListener('touchmove', function(e) {
+    if (profileStoreModal.style.display === 'flex') {
+        if (!e.target.closest('.profile-store-content')) {
+            e.preventDefault();
+        }
+    }
+}, { passive: false });
 
 // Kategori değiştirme
 categoryButtons.forEach(button => {
@@ -6238,13 +6350,12 @@ async function showCategoryPhotos(category) {
 
     if (!selectedStudent?.studentId) return;
 
-    // Kullanıcının satın aldığı fotoğrafları al
     const purchasedPhotosRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`);
     const purchasedSnapshot = await purchasedPhotosRef.once('value');
     const purchasedPhotos = purchasedSnapshot.val() || {};
 
     photos.forEach(photo => {
-        const photoId = btoa(photo.url); // URL'i base64'e çevirerek benzersiz ID oluştur
+        const photoId = btoa(photo.url);
         const isPurchased = purchasedPhotos[photoId];
         
         const photoElement = document.createElement('div');
@@ -6257,10 +6368,50 @@ async function showCategoryPhotos(category) {
             </div>
             ${isPurchased ? 
                 `<button class="use-button" onclick="usePhoto('${photo.url}')">Kullan</button>` :
-                `<button class="buy-button" onclick="purchasePhoto('${photo.url}', ${photo.price})">Satın Al</button>`
+                `<button class="buy-button" onclick="confirmPurchase('${photo.url}', ${photo.price})">Satın Al</button>`
             }
         `;
         photosGrid.appendChild(photoElement);
+    });
+}
+
+// Satın alma onayı
+async function confirmPurchase(photoUrl, price) {
+    const confirmed = await showConfirm(`${price} 💎 karşılığında bu fotoğrafı satın almak istediğinizden emin misiniz?`);
+    if (confirmed) {
+        purchasePhoto(photoUrl, price);
+    }
+}
+
+// Onay modalı gösterme fonksiyonu
+function showConfirm(message) {
+    return new Promise((resolve) => {
+        const confirmModal = document.createElement('div');
+        confirmModal.className = 'confirm-modal';
+        confirmModal.innerHTML = `
+            <div class="confirm-content">
+                <p>${message}</p>
+                <div class="confirm-buttons">
+                    <button class="cancel-button">İptal</button>
+                    <button class="confirm-button">Onaylıyorum</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(confirmModal);
+        
+        const cancelBtn = confirmModal.querySelector('.cancel-button');
+        const confirmBtn = confirmModal.querySelector('.confirm-button');
+        
+        cancelBtn.onclick = () => {
+            document.body.removeChild(confirmModal);
+            resolve(false);
+        };
+        
+        confirmBtn.onclick = () => {
+            document.body.removeChild(confirmModal);
+            resolve(true);
+        };
     });
 }
 
@@ -6269,7 +6420,6 @@ async function purchasePhoto(photoUrl, price) {
     if (!selectedStudent?.studentId) return;
 
     try {
-        // Önce mevcut elmas sayısını kontrol et
         const diamondRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`);
         const diamondSnapshot = await diamondRef.once('value');
         const currentDiamonds = diamondSnapshot.val() || 0;
@@ -6290,11 +6440,9 @@ async function purchasePhoto(photoUrl, price) {
             purchaseDate: firebase.database.ServerValue.TIMESTAMP
         });
 
-        // UI'ı güncelle
         updateDiamondDisplay();
         showAlert('Fotoğraf başarıyla satın alındı!');
-            
-        // Aktif kategoriyi bul ve fotoğrafları yenile
+        
         const activeCategory = document.querySelector('.category-btn.active').dataset.category;
         showCategoryPhotos(activeCategory);
 
@@ -6304,22 +6452,19 @@ async function purchasePhoto(photoUrl, price) {
     }
 }
 
-// Fotoğrafı kullanma/aktif etme
+// Fotoğrafı kullanma
 async function usePhoto(photoUrl) {
     if (!selectedStudent?.studentId) return;
 
     try {
-        // Profil fotoğrafını güncelle
         await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`).set(photoUrl);
         
-        // Ana ekrandaki profil fotoğrafını güncelle
         const studentPhotoElement = document.getElementById('student-photo');
         if (studentPhotoElement) {
             studentPhotoElement.src = photoUrl;
             studentPhotoElement.style.display = 'block';
         }
         
-        // Profil ikonunu güncelle
         document.querySelector('.profile-icon').src = photoUrl;
 
         showAlert('Profil fotoğrafı güncellendi!');
@@ -6329,20 +6474,18 @@ async function usePhoto(photoUrl) {
     }
 }
 
-// Modal dışına tıklandığında kapatma
+// Modal dışına tıklama ve ESC ile kapatma
 profileStoreModal.addEventListener('click', (e) => {
     if (e.target === profileStoreModal) {
-        profileStoreModal.style.display = 'none';
+        closeModal();
     }
 });
 
-// Klavye kısayolu ile kapatma (ESC tuşu)
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && profileStoreModal.style.display === 'flex') {
-        profileStoreModal.style.display = 'none';
+        closeModal();
     }
 });
-
 
 
 
