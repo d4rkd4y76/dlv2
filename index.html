@@ -2586,6 +2586,9 @@ option {
     transition: all 0.3s ease;
     background: linear-gradient(145deg, #e6e6e6, #ffffff);
     box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+    flex: 1; /* eklendi */
+    margin: 0 10px; /* eklendi */
+    white-space: nowrap;
 }
 
 .category-button.active {
@@ -2614,6 +2617,29 @@ option {
     padding: 20px;
 }
 
+
+
+.current-diamonds {
+    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.diamond-icon {
+    font-size: 1.2em;
+}
+
+.diamond-amount {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #4fc3f7;
+}
 
 
 
@@ -5943,7 +5969,7 @@ const photoCategories = {
    acemi: [
        {
            url: 'https://cdn.pixabay.com/animation/2022/08/02/19/43/19-43-44-141_512.gif',
-           price: 500,
+           price: 1111,
            id: 'photo1'
        },
        {
