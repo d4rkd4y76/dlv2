@@ -2661,8 +2661,9 @@ option {
 @media (max-width: 768px) {
     .profile-store-content {
         width: 95%;
-        margin: 10px auto;
+        height: 90vh; /* Mobilde daha fazla alan kaplasın */
         padding: 15px;
+        margin: 0; /* Tüm marginler sıfırlandı */
     }
 
     .store-header h2 {
@@ -2682,8 +2683,6 @@ option {
         padding-right: max(20px, env(safe-area-inset-right));
     }
 }
-
-
 .diamond-icon {
     font-size: 24px;
 }
