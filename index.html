@@ -477,7 +477,9 @@ option {
     width: 80%; /* Genişlik (ekranın %80'i) */
     max-width: 900px; /* Maksimum genişlik */
     min-height: 300px; /* Minimum yükseklik */
-    background: linear-gradient(135deg, #ffffff, #f1f1f1); /* Arka plan gradyanı */
+    background: url('https://i.ibb.co/2FVVr25/Yeni-proje-2.gif') center center;
+    background-size: cover;
+    background-repeat: no-repeat;
     border: 5px solid transparent;
     border-radius: 20px; /* Köşe yuvarlama */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Yumuşak gölge */
@@ -641,93 +643,32 @@ option {
             to { opacity: 1; transform: scale(1); }
         }
 
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 55%;
+            align-items: flex-start;
+            animation: slideButtons 0.7s ease forwards;
+        }
 
         @keyframes slideButtons {
             from { opacity: 0; transform: translateY(50px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-.buttons-gallery {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    height: 400px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    scrollbar-width: none; /* Firefox için scrollbar'ı gizle */
-    -ms-overflow-style: none; /* IE ve Edge için scrollbar'ı gizle */
-    padding: 20px 0;
-    margin: 0 auto;
+.buttons {
+    display: flex; /* Flexbox düzeni */
+    flex-direction: column; /* Butonları dikey hizalar */
+    align-items: stretch; /* Butonları çerçeveye tam yayar */
+    justify-content: center; /* Butonlar arasında eşit hizalama */
+    gap: 20px; /* Butonlar arasında dikey boşluk */
+    padding: 10px; /* Çerçeve içi boşluk */
+    width: 100%; /* Çerçeve genişliği */
+    max-width: 900px; /* Maksimum genişlik */
+    margin: 0 auto; /* Ortalamak için */
+    box-sizing: border-box; /* Padding ve border dahil */
 }
-
-.buttons-gallery::-webkit-scrollbar {
-    display: none; /* Webkit tarayıcılar için scrollbar'ı gizle */
-}
-
-.buttons-gallery .button-item {
-    scroll-snap-align: center;
-    width: 100%;
-    height: 80px;
-    margin: 10px 0;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-.buttons-gallery .button-item.active {
-    transform: scale(1);
-}
-
-/* Her bir buton için stil */
-.buttons-gallery button {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 15px;
-    font-size: 1.2em;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-/* Dokunmatik kaydırma indikatörü */
-.scroll-indicator {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 100px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    pointer-events: none;
-}
-
-.scroll-indicator::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 30px;
-    background: #6366f1;
-    border-radius: 2px;
-    top: 0;
-    animation: scrollIndicator 2s infinite;
-}
-
-@keyframes scrollIndicator {
-    0% { top: 0; }
-    50% { top: calc(100% - 30px); }
-    100% { top: 0; }
-}
-
-
-
 
 .buttons button {
     width: 100%; /* Butonlar çerçeveye tam sığar */
@@ -3053,43 +2994,26 @@ option {
         </div>
     </div>
 </div>
-
-
-<div class="buttons-gallery">
-    <div class="scroll-indicator"></div>
-    <div class="button-item">
-        <button class="single-player">
-            <i class="button-icon">🎮</i>
-            <span>Tek Kişilik Oyun</span>
-        </button>
-    </div>
-    <div class="button-item">
-        <button class="find-duel-button" id="findDuelButton">
-            <i class="button-icon">⚔️</i>
+        <div class="buttons">
+            <button class="single-player">Tek Kişilik Oyun</button>
+    <button class="find-duel-button" id="findDuelButton">
+        <span class="button-content">
+            <i class="duel-icon">⚔️</i>
             <span>Düello Ara</span>
-        </button>
-    </div>
-    <div class="button-item">
-        <button class="friends-button" id="friends-button">
-            <i class="button-icon">👥</i>
-            <span>Arkadaşlar</span>
-        </button>
-    </div>
-    <div class="button-item">
-        <button class="kupa-siralama-button" id="kupa-siralama-button">
-            <i class="button-icon">🏆</i>
-            <span>Kupa Sıralaması</span>
-        </button>
-    </div>
-    <div class="button-item">
-        <button class="logout-button" id="logout-button">
-            <i class="button-icon">🚪</i>
-            <span>Çıkış Yap</span>
-        </button>
-    </div>
-</div>
+        </span>
+        <div class="button-glow"></div>
+    </button>
+	    <button class="friends-button" id="friends-button">
+               👥 Arkadaşlar
+            </button>
+            <!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
+            <button class="kupa-siralama-button" id="kupa-siralama-button">
+                🏆 Kupa Sıralaması
+            </button>
+	    <button class="logout-button" id="logout-button">Çıkış Yap</button>
 
-
+        </div>
+    </div>
 
 <!-- Arkadaşlar Ekranı -->
 <div class="friends-container" id="friends-screen" style="display: none;">
@@ -6060,74 +5984,28 @@ function endDuelGame() {
 
     <script>
         // Ensure the script runs after the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Buton galerisi ve ranking panel elemanları
-    const buttonsGallery = document.querySelector('.buttons-gallery');
-    const buttonItems = document.querySelectorAll('.button-item');
-    const kupaSiralamaButton = document.getElementById('kupa-siralama-button');
-    const rankingBackButton = document.getElementById('rankingBackButton');
-    const rankingPanel = document.getElementById('rankingPanel');
+        document.addEventListener('DOMContentLoaded', () => {
+            const kupaSiralamaButton = document.getElementById('kupa-siralama-button');
+            const rankingBackButton = document.getElementById('rankingBackButton');
+            const rankingPanel = document.getElementById('rankingPanel');
 
-    // Ranking panel'i başlangıçta gizle
-    rankingPanel.style.display = 'none';
+            // Hide the ranking panel initially
+            rankingPanel.style.display = 'none';
 
-    // Scroll olayını dinle
-    buttonsGallery.addEventListener('scroll', () => {
-        const scrollPosition = buttonsGallery.scrollTop;
-        
-        buttonItems.forEach(item => {
-            const itemPosition = item.offsetTop - buttonsGallery.offsetTop;
-            const itemHeight = item.offsetHeight;
-            
-            if (scrollPosition >= itemPosition - itemHeight / 2 && 
-                scrollPosition < itemPosition + itemHeight / 2) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
+            // Show the ranking panel when the button is clicked
+            if (kupaSiralamaButton) {
+                kupaSiralamaButton.addEventListener('click', () => {
+                    rankingPanel.style.display = 'flex';
+                });
+            }
+
+            // Hide the ranking panel when the back button is clicked
+            if (rankingBackButton) {
+                rankingBackButton.addEventListener('click', () => {
+                    rankingPanel.style.display = 'none';
+                });
             }
         });
-    });
-
-    // Dokunmatik kaydırma için
-    let startY;
-    buttonsGallery.addEventListener('touchstart', (e) => {
-        startY = e.touches[0].pageY;
-    });
-
-    buttonsGallery.addEventListener('touchmove', (e) => {
-        if (!startY) return;
-        
-        const currentY = e.touches[0].pageY;
-        const diff = startY - currentY;
-        buttonsGallery.scrollTop += diff / 5;
-        startY = currentY;
-    });
-
-    buttonsGallery.addEventListener('touchend', () => {
-        startY = null;
-    });
-
-    // Kupa sıralama butonu tıklama olayı
-    if (kupaSiralamaButton) {
-        kupaSiralamaButton.addEventListener('click', () => {
-            rankingPanel.style.display = 'flex';
-            buttonsGallery.style.pointerEvents = 'none'; // Galeriyi devre dışı bırak
-        });
-    }
-
-    // Geri dön butonu tıklama olayı
-    if (rankingBackButton) {
-        rankingBackButton.addEventListener('click', () => {
-            rankingPanel.style.display = 'none';
-            buttonsGallery.style.pointerEvents = 'auto'; // Galeriyi tekrar etkinleştir
-        });
-    }
-
-    // İlk yüklemede ilk butonu aktif et
-    if (buttonItems.length > 0) {
-        buttonItems[0].classList.add('active');
-    }
-});
 
 
 
