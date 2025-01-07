@@ -4873,20 +4873,32 @@ async function sendInvitation(player) {
 
         // 10 saniyelik geri sayım mesajı göster
         let timeLeft = 10;
+        const alertOverlay = document.getElementById('alertOverlay');
         const countdownInterval = setInterval(() => {
-            showAlert(`Davet gönderildi! ${timeLeft} saniye sonra kapanacak...`, false);
-            timeLeft--;
-            if (timeLeft < 0) {
+            if (timeLeft > 0) {
+                showAlert(`Davet gönderildi! ${timeLeft} saniye sonra kapanacak...`, false);
+                timeLeft--;
+            } else {
                 clearInterval(countdownInterval);
-                document.getElementById('alertOverlay').style.display = 'none';
+                alertOverlay.style.display = 'none';
             }
         }, 1000);
+
+        // Daveti dinle - red veya kabul durumunda alert'i kapat
+        invitationRef.on('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                clearInterval(countdownInterval);
+                alertOverlay.style.display = 'none';
+                invitationRef.off(); // Listener'ı kaldır
+            }
+        });
         
     } catch (error) {
         console.error("Davet gönderme hatası:", error);
         showAlert('Davet gönderilirken bir hata oluştu.');
     }
 }
+
 
         function startInvitationListener(studentId) {
     const invitationRef = database.ref(`invitations/${studentId}`);
@@ -4994,32 +5006,41 @@ async function sendInvitation(player) {
         const invitationAcceptButton = document.getElementById('invitationAcceptButton');
 
 invitationDeclineButton.addEventListener('click', async () => {
-    if (currentInvitation && selectedStudent.studentId) {
-        try {
-            // Reddedilen daveti kaydet
-            const rejectedInviteRef = database.ref('rejectedInvites').push();
-            await rejectedInviteRef.set({
-                inviterId: currentInvitation.invitedByStudentId,
-                invitedId: selectedStudent.studentId,
-                timestamp: Date.now()
-            });
+    if (!currentInvitation) {
+        console.error("Geçerli davet bulunamadı");
+        return;
+    }
 
-            // 30 saniye sonra reddedilen daveti sil
-            setTimeout(async () => {
-                await rejectedInviteRef.remove();
-            }, 30000);
+    try {
+        // Önce reddedilen daveti kaydet
+        await database.ref('rejectedInvites').push().set({
+            inviterId: currentInvitation.invitedByStudentId,
+            invitedId: selectedStudent.studentId,
+            timestamp: Date.now()
+        });
 
-            // Mevcut daveti kaldır
-            await database.ref(`invitations/${selectedStudent.studentId}`).remove();
-            invitationOverlay.style.display = 'none';
-            currentInvitation = null;
+        // Davet referansını oluştur ve kaldır
+        const invitationRef = database.ref(`invitations/${selectedStudent.studentId}`);
+        await invitationRef.remove();
 
-        } catch (error) {
-            console.error("Davet reddetme hatası:", error);
-            showAlert('Davet reddedilirken bir hata oluştu.');
-        }
+        // Davet dinleyicisini kaldır
+        invitationRef.off();
+
+        // Overlay'i kapat
+        invitationOverlay.style.display = 'none';
+        
+        // currentInvitation'ı temizle
+        currentInvitation = null;
+
+        // İsteğe bağlı: Kullanıcıya bildirim göster
+        await showAlert('Davet reddedildi');
+
+    } catch (error) {
+        console.error("Davet reddetme hatası:", error);
+        await showAlert('Davet reddedilirken hata oluştu: ' + error.message);
     }
 });
+
 
 async function cleanupRejectedInvites() {
     const thirtySecondsAgo = Date.now() - 30000;
