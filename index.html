@@ -4015,6 +4015,7 @@ async function addFriend(student) {
     }
 }
 
+// Arkadaş listesini yükleme fonksiyonunu güncelle
 async function loadFriendsList() {
     try {
         friendsList.innerHTML = '<div class="loading">Yükleniyor...</div>';
@@ -4030,18 +4031,22 @@ async function loadFriendsList() {
         friendsList.innerHTML = '';
         const friends = [];
 
-        snapshot.forEach(childSnapshot => {
-            const friendData = childSnapshot.val();
+        // Arkadaşları topla
+        for (const [friendId, friendData] of Object.entries(snapshot.val())) {
+            // Güncel fotoğrafı çek
+            const currentPhotoSnap = await database.ref(`classes/${friendData.friendClassId}/students/${friendId}/photo`).once('value');
+            const currentPhoto = currentPhotoSnap.exists() ? currentPhotoSnap.val() : (friendData.friendPhoto || 'https://via.placeholder.com/50');
+
             friends.push({
-                studentId: friendData.friendId,
+                studentId: friendId,
                 name: friendData.friendName,
                 classId: friendData.friendClassId,
                 className: friendData.friendClassName,
-                photo: friendData.friendPhoto,
+                photo: currentPhoto,
                 inDuel: false,
                 isOnline: false
             });
-        });
+        }
 
         for (const friend of friends) {
             // inDuel durumunu kontrol et
@@ -4071,16 +4076,56 @@ async function loadFriendsList() {
                 isDisabled = true;
             }
 
+            // Silme butonu için stil ekle
+            const style = document.createElement('style');
+            style.textContent = `
+                .remove-friend-button {
+                    background-color: #dc3545;
+                    color: white;
+                    border: none;
+                    border-radius: 50%;
+                    width: 25px;
+                    height: 25px;
+                    line-height: 25px;
+                    text-align: center;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    font-size: 14px;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                }
+                
+                .remove-friend-button:hover {
+                    background-color: #c82333;
+                    transform: scale(1.1);
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                }
+            `;
+            document.head.appendChild(style);
+
             li.innerHTML = `
-                <img src="${friend.photo || 'https://via.placeholder.com/50'}" alt="${friend.name}" class="player-photo">
+                <img src="${friend.photo}" alt="${friend.name}" class="player-photo">
                 <span class="player-name">${friend.name} / (${friend.className})</span>
-                <button class="${buttonClass}" ${isDisabled ? 'disabled' : ''}>${buttonText}</button>
+                <div style="display: flex; align-items: center;">
+                    <button class="${buttonClass}" ${isDisabled ? 'disabled' : ''}>${buttonText}</button>
+                    <button class="remove-friend-button" title="Arkadaşı Sil">✖</button>
+                </div>
             `;
 
             if (!isDisabled) {
-                const davetButton = li.querySelector('.davet-et-button');
+                const davetButton = li.querySelector(`.${buttonClass}`);
                 davetButton.onclick = () => sendInvitation(friend);
             }
+
+            // Silme butonu için event listener
+            const removeButton = li.querySelector('.remove-friend-button');
+            removeButton.onclick = async (e) => {
+                e.stopPropagation();
+                if (await showConfirmation(`${friend.name} arkadaşlıktan çıkarılacak. Emin misiniz?`)) {
+                    await removeFriend(friend.studentId);
+                    await loadFriendsList(); // Listeyi yenile
+                }
+            };
 
             friendsList.appendChild(li);
         }
@@ -4091,68 +4136,81 @@ async function loadFriendsList() {
     }
 }
 
-function updateFriendStatus(friendId, statusDiv) {
-    database.ref(`loggedinPlayers`).orderByChild('studentId').equalTo(friendId).once('value', snapshot => {
-        if (snapshot.exists()) {
-            // Arkadaş online
-            database.ref(`classes/${selectedStudent.classId}/students/${friendId}/inDuel`).once('value', duelSnapshot => {
-                if (duelSnapshot.exists() && duelSnapshot.val() === true) {
-                    statusDiv.textContent = 'Oyunda';
-                    statusDiv.className = 'friend-status status-in-game';
-                } else {
-                    statusDiv.textContent = 'Aktif';
-                    statusDiv.className = 'friend-status status-online';
-                }
-            });
-        } else {
-            // Arkadaş offline
-            statusDiv.textContent = 'Aktif Değil';
-            statusDiv.className = 'friend-status status-offline';
-        }
-    });
-}
-
-function listenToFriendStatus(friendId, statusDiv, inviteButton) {
-    const loggedInRef = database.ref('loggedinPlayers').orderByChild('studentId').equalTo(friendId);
-    const inDuelRef = database.ref(`classes/${selectedStudent.classId}/students/${friendId}/inDuel`);
-
-    loggedInRef.on('value', snapshot => {
-        const isOnline = snapshot.exists();
-        
-        if (isOnline) {
-            inDuelRef.on('value', duelSnapshot => {
-                const isInDuel = duelSnapshot.exists() && duelSnapshot.val() === true;
-                
-                if (isInDuel) {
-                    statusDiv.textContent = 'Oyunda';
-                    statusDiv.className = 'friend-status status-in-game';
-                    inviteButton.style.display = 'none';
-                } else {
-                    statusDiv.textContent = 'Aktif';
-                    statusDiv.className = 'friend-status status-online';
-                    inviteButton.style.display = 'block';
-                }
-            });
-        } else {
-            statusDiv.textContent = 'Aktif Değil';
-            statusDiv.className = 'friend-status status-offline';
-            inviteButton.style.display = 'none';
-        }
-    });
-
-    // Temizlik işlevi
-    return () => {
-        loggedInRef.off();
-        inDuelRef.off();
-    };
-}
-
-// Sayfa yüklendiğinde arkadaş listesini yükle
-window.addEventListener('load', () => {
-    if (selectedStudent && selectedStudent.studentId) {
-        loadFriendsList();
+// Arkadaş silme fonksiyonu
+async function removeFriend(friendId) {
+    try {
+        // Her iki taraftan da arkadaşlığı kaldır
+        await database.ref(`friendships/${selectedStudent.studentId}/${friendId}`).remove();
+        await database.ref(`friendships/${friendId}/${selectedStudent.studentId}`).remove();
+        await showAlert('Arkadaş başarıyla silindi!');
+    } catch (error) {
+        console.error('Arkadaş silme hatası:', error);
+        await showAlert('Arkadaş silinirken bir hata oluştu!');
     }
-});
+}
+
+function showConfirmation(message) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        `;
+
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        `;
+
+        dialog.innerHTML = `
+            <p style="margin-bottom: 20px;">${message}</p>
+            <button id="confirmYes" style="
+                background: #dc3545;
+                color: white;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 5px;
+                margin-right: 10px;
+                cursor: pointer;
+            ">Evet</button>
+            <button id="confirmNo" style="
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            ">Hayır</button>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        const handleClick = (result) => {
+            document.body.removeChild(overlay);
+            resolve(result);
+        };
+
+        dialog.querySelector('#confirmYes').onclick = () => handleClick(true);
+        dialog.querySelector('#confirmNo').onclick = () => handleClick(false);
+    });
+}
+
+
+
 
         backButtons.forEach(backButton => {
             backButton.addEventListener('click', () => {
@@ -5108,6 +5166,49 @@ setInterval(cleanupRejectedInvites, 30000);
 });
 
 
+const cupStyle = document.createElement('style');
+cupStyle.textContent = `
+    .duel-player-cup {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 8px;
+        padding: 5px 10px;
+        background: linear-gradient(135deg, #ffd700, #ffa500);
+        border-radius: 15px;
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        animation: cupGlow 2s infinite alternate;
+    }
+
+    .duel-player-cup .cup-icon {
+        font-size: 1.2em;
+        animation: cupBounce 2s infinite ease-in-out;
+    }
+
+    .duel-player-cup .cup-value {
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes cupGlow {
+        from {
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        to {
+            box-shadow: 0 2px 12px rgba(255, 215, 0, 0.6);
+        }
+    }
+
+    @keyframes cupBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+`;
+document.head.appendChild(cupStyle);
+
+// Düello başlatma fonksiyonunu güncelle
 async function createDuelSession(inviterId, inviterClassId, inviterName, inviterPhoto) {
     const duelRef = database.ref('duels').push();
     
@@ -5119,18 +5220,29 @@ async function createDuelSession(inviterId, inviterClassId, inviterName, inviter
     inviterInDuelRef.onDisconnect().set(false);
     invitedInDuelRef.onDisconnect().set(false);
 
+    // Kupa değerlerini al
+    const inviterCupRef = database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`);
+    const invitedCupRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/gameCup`);
+    
+    const [inviterCupSnap, invitedCupSnap] = await Promise.all([
+        inviterCupRef.once('value'),
+        invitedCupRef.once('value')
+    ]);
+
     await duelRef.set({
         inviter: {
             classId: inviterClassId,
             studentId: inviterId,
             name: inviterName,
-            photo: inviterPhoto
+            photo: inviterPhoto,
+            gameCup: inviterCupSnap.val() || 0
         },
         invited: {
             classId: selectedStudent.classId,
             studentId: selectedStudent.studentId,
             name: selectedStudent.studentName,
-            photo: (studentPhoto.src && studentPhoto.src !== "") ? studentPhoto.src : ""
+            photo: (studentPhoto.src && studentPhoto.src !== "") ? studentPhoto.src : "",
+            gameCup: invitedCupSnap.val() || 0
         },
         selections: {
             class: "",
@@ -5149,9 +5261,10 @@ async function createDuelSession(inviterId, inviterClassId, inviterName, inviter
     duelRef.onDisconnect().remove();
 
     currentDuelRef = duelRef;
-    isInviter = true;
+    isInviter = false;
     switchToDuelScreen(duelRef.key);
 }
+
 
 function switchToDuelScreen(duelKey) {
     mainScreen.style.display = 'none';
@@ -5268,6 +5381,31 @@ duelRef.child('gameStarted').on('value', snapshot => {
         duelInviterName.textContent = data.inviter.name;
         duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
         duelInvitedName.textContent = data.invited.name;
+
+// Kupa değerlerini güncelle/ekle
+            const inviterInfo = document.getElementById('duel-inviter-info');
+            const invitedInfo = document.getElementById('duel-invited-info');
+
+            // Mevcut kupa elementlerini kaldır (varsa)
+            const existingCups = document.querySelectorAll('.duel-player-cup');
+            existingCups.forEach(cup => cup.remove());
+
+            // Yeni kupa elementlerini ekle
+            const inviterCup = document.createElement('div');
+            inviterCup.className = 'duel-player-cup';
+            inviterCup.innerHTML = `
+                <span class="cup-icon">🏆</span>
+                <span class="cup-value">${data.inviter.gameCup}</span>
+            `;
+            inviterInfo.appendChild(inviterCup);
+
+            const invitedCup = document.createElement('div');
+            invitedCup.className = 'duel-player-cup';
+            invitedCup.innerHTML = `
+                <span class="cup-icon">🏆</span>
+                <span class="cup-value">${data.invited.gameCup}</span>
+            `;
+            invitedInfo.appendChild(invitedCup);
 
         // Sınıf seçimi yapıldığında dersleri yükle
         if (data.selections.class && data.selections.class !== duelClassSelect.value) {
