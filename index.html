@@ -489,16 +489,17 @@ option {
 
 /* Hareketli ışık efekti */
 #main-screen::before {
+    /* Bu bloğu tamamen kaldırabilir veya şu şekilde değiştirebilirsiniz: */
     content: '';
     position: absolute;
     top: -20%;
     left: -150%;
     width: 300%;
     height: 200%;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
-    animation: lightMove 5s infinite linear; /* Hareketli ışık efekti */
+    background: none; /* linear-gradient yerine none kullanarak efekti kaldırıyoruz */
+    animation: none; /* Animasyonu da kaldırıyoruz */
     z-index: 0;
-    pointer-events: none; /* Etkileşimden kaçınır */
+    pointer-events: none;
 }
 
 /* Çerçeve parlaması */
@@ -2401,31 +2402,31 @@ option {
 
 /* Profil İkonu Container Stilleri */
 .profile-icon-container {
-    position: fixed; /* Sabitleme */
-    top: 10px;       /* Üstten uzaklık */
-    right: 10px;     /* Sağdan uzaklık */
-    width: 50px;     /* İkon genişliği */
-    height: 50px;    /* İkon yüksekliği */
-    z-index: 1000;   /* Diğer öğelerin üzerinde görünmesini sağlar */
-    cursor: pointer; /* İkon üzerine gelindiğinde işaretçi görünümü */
-    transition: transform 0.3s ease; /* Hover efektleri için geçiş */
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    z-index: 1000;
+    cursor: pointer;
+    transition: none; /* Geçiş efektini kaldırıyoruz */
 }
 
 /* Profil İkonu Stilleri */
 .profile-icon {
     width: 100%;
     height: 100%;
-    border-radius: 50%;       /* Dairesel şekil */
-    object-fit: cover;        /* Görselin container'a uyum sağlaması */
-    border: 2px solid #ff8a00; /* İkon kenarlığı */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Hafif gölge */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover efektleri için geçiş */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ff8a00;
+    box-shadow: none; /* Gölgeyi kaldırıyoruz */
+    transition: none; /* Geçiş efektini kaldırıyoruz */
 }
 
 /* Hover Efekti */
 .profile-icon-container:hover .profile-icon {
-    transform: scale(1.1); /* Küçük büyüme efekti */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Gölge yoğunluğu artar */
+    transform: none; /* scale efektini kaldırıyoruz */
+    box-shadow: none; /* gölge efektini kaldırıyoruz */
 }
 
 /* Profil Değiştirme Overlay ve İçerik Stilleri (Mevcut Kodunuzdan) */
