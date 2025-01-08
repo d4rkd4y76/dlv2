@@ -1670,24 +1670,23 @@ option {
         }
 
         /* Yeni Eklenen Stil: Ranking Panel (Yan Panel) */
-.ranking-panel {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 400px;
-    height: 100%;
-    background: url('https://i.ibb.co/3WbfF25/33333.gif') center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.3);
-    transition: right 0.5s ease;
-    z-index: 1000;
-    border-radius: 0 20px 20px 0;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    color: #ffffff;
-}
+        .ranking-panel {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Başlangıçta görünmez */
+            width: 450px;
+            max-width: 90%;
+            height: 100%;
+            background-color: #fffbea;
+            box-shadow: -3px 0 10px rgba(0,0,0,0.3);
+            transition: right 0.3s ease;
+            z-index: 1000000;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+            animation: slideInPanel 0.3s forwards;
+        }
 
         @keyframes slideInPanel {
             from { right: -100%; }
@@ -1733,46 +1732,35 @@ option {
         }
 
         /* Ranking Panel */
-.ranking-panel {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 400px;
-    height: 100%;
-    background: url('https://i.ibb.co/3WbfF25/33333.gif') center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.3);
-    transition: right 0.5s ease;
-    z-index: 1000;
-    border-radius: 0 20px 20px 0;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    color: #ffffff;
-}
+        .ranking-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -2px 0 15px rgba(0, 0, 0, 0.3);
+            transition: right 0.5s ease;
+            z-index: 1000;
+            border-radius: 0 20px 20px 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
 
         .ranking-panel.open {
             right: 0;
         }
 
         /* Ranking Panel Header */
-.ranking-panel h2 {
-    font-size: 2.5em;
-    background: linear-gradient(to right, #FFD700, #FFA500, #FF8C00);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: center;
-    margin-bottom: 25px;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    position: relative;
-    padding: 10px;
-    animation: titleGlow 2s ease-in-out infinite alternate;
-}
-
-
+        .ranking-panel h2 {
+            font-size: 2em;
+            color: #ff8a00;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 1px 1px #f7786b;
+            animation: fadeInDown 0.8s ease forwards;
+        }
 
         /* Geri Dön Butonu */
         .ranking-back-button {
@@ -3027,7 +3015,7 @@ option {
             </button>
             <!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
             <button class="kupa-siralama-button" id="kupa-siralama-button">
-                🏆 Kupa Sıralaması
+                🏆 Sezon Sıralaması
             </button>
 	    <button class="logout-button" id="logout-button">Çıkış Yap</button>
 
@@ -3063,12 +3051,12 @@ option {
 
     <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
     <div class="ranking-panel" id="rankingPanel" style="display: none;">
-        <h2>Kupa Sıralaması</h2>
+        <h2>Sezon Sıralaması</h2>
         <div class="ranking-table-container">
             <table class="ranking-table" id="ranking-table">
                 <thead>
                     <tr>
-                        <th>Rank</th>
+                        <th>Sıra</th>
                         <th>Fotoğraf</th>
                         <th>İsim</th>
                         <th>Sınıf</th>
