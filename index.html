@@ -480,7 +480,7 @@ option {
     background: url('https://i.ibb.co/2FVVr25/Yeni-proje-2.gif') center center;
     background-size: cover;
     background-repeat: no-repeat;
-    border: 5px solid transparent;
+    border: 5px solid transparent;z
     border-radius: 20px; /* Köşe yuvarlama */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Yumuşak gölge */
     overflow: hidden; /* Taşmaları gizler */
@@ -2011,14 +2011,7 @@ option {
 }
 
 .button-glow {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-    transform: rotate(45deg);
-    animation: glowRotate 3s infinite;
+    display: none; /* Dönen efekti kaldır */
 }
 
 @keyframes swordsSway {
@@ -2028,8 +2021,8 @@ option {
 }
 
 @keyframes glowRotate {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+    0% { transform: none; }
+    100% { transform: none; }
 }
 
 /* Arama ekranı için stil */
@@ -2623,17 +2616,7 @@ option {
     }
 }
 
-.category-button::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-    transform: rotate(45deg);
-    animation: glowRotate 3s infinite;
-}
+
 
 .category-button.active {
     background: linear-gradient(145deg, #4f46e5, #4338ca);
