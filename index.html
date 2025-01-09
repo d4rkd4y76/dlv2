@@ -6327,14 +6327,52 @@ const photoCategories = {
            id: 'photo11'
        }
    ], 
-    sampiyon: [
-        {
-            url: 'https://i.ibb.co/tZPqc1p/YYSON.gif',
-            price: 5,
-            id: 'photo12'
-        }
-    ]
+   sampiyon: [] // Başlangıçta boş
 };
+
+// Yeni eklenen fonksiyon - Şampiyon fotoğraflarını yükle
+// Yeni eklenen fonksiyon - Şampiyon fotoğraflarını yükle
+async function loadChampionPhotos() {
+    try {
+        const championPhotoRef = database.ref(
+            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/championPhoto`
+        );
+        const snapshot = await championPhotoRef.once('value');
+        const championPhoto = snapshot.val();
+
+        if (championPhoto) {
+            // Eğer championPhoto bir dizi ise, tüm fotoğrafları işle
+            if (Array.isArray(championPhoto)) {
+                photoCategories.sampiyon = championPhoto.map((url, index) => ({
+                    url: url,
+                    price: 5,
+                    id: 'championSpecial' + index
+                }));
+            } else {
+                // championPhoto tek bir URL ise
+                photoCategories.sampiyon = [
+                    {
+                        url: championPhoto,
+                        price: 5,
+                        id: 'championSpecial'
+                    }
+                ];
+            }
+            const championButton = document.querySelector('[data-category="sampiyon"]');
+            if (championButton) {
+                championButton.style.display = 'flex';
+            }
+        } else {
+            const championButton = document.querySelector('[data-category="sampiyon"]');
+            if (championButton) {
+                championButton.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Şampiyon fotoğrafı yüklenirken hata:', error);
+    }
+}
+
 
 function updateProfileIcon() {
    const profileIcon = document.getElementById('profile-icon');
@@ -6350,10 +6388,11 @@ function updateProfileIcon() {
    }
 }
 
-// Profil ikonuna tıklama olayı
-document.getElementById('profile-icon').addEventListener('click', () => {
+// Profil ikonuna tıklama olayı - güncellendi
+document.getElementById('profile-icon').addEventListener('click', async () => {
    document.getElementById('profileChangeOverlay').style.display = 'flex';
-   loadProfilePhotos('acemi'); // Varsayılan kategori
+   await loadChampionPhotos(); // Önce şampiyon fotoğrafını yükle
+   loadProfilePhotos('acemi'); // Sonra varsayılan kategoriyi yükle
 });
 
 // Kategori butonlarına tıklama olayları
@@ -6418,7 +6457,6 @@ async function useProfilePhoto(photoUrl) {
    }
 }
 
-
 async function loadProfilePhotos(category = 'acemi') {
    // Elmas değerini güncelle
    const diamondSnapshot = await database.ref(
@@ -6435,6 +6473,12 @@ async function loadProfilePhotos(category = 'acemi') {
        );
        const purchasedSnapshot = await purchasedRef.once('value');
        const purchasedPhotos = purchasedSnapshot.val() || {};
+
+       // Eğer kategori şampiyon ve fotoğraf yoksa, mesaj göster
+       if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
+           container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
+           return;
+       }
 
        photoCategories[category].forEach((photo, index) => {
            const div = document.createElement('div');
@@ -6479,6 +6523,33 @@ async function loadProfilePhotos(category = 'acemi') {
        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
    }
 }
+
+// Stil ekleme
+const style = document.createElement('style');
+style.textContent = `
+.no-champion {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+[data-category="sampiyon"] {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: white;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-category="sampiyon"]::after {
+    content: "👑";
+    margin-left: 5px;
+}
+`;
+document.head.appendChild(style);
+
+
 
 document.getElementById('profileCloseButton').addEventListener('click', () => {
    document.getElementById('profileChangeOverlay').style.display = 'none';
