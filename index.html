@@ -2505,22 +2505,27 @@ option {
 
 /* Fiyat Etiketi */
 .profile-photo-price {
-    background: #f8f9fa;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 1.1em;
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 15px 0;
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
 }
 
 /* Buton Stilleri */
 .profile-photo-button {
     width: 100%;
-    padding: 8px 0;
+    padding: 12px;
     border: none;
-    border-radius: 8px;
-    font-size: 1em;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -2584,20 +2589,25 @@ option {
     justify-content: center;
     gap: 15px;
     margin: 20px 0;
-    padding: 10px;
+    padding: 15px;
+    background: linear-gradient(145deg, #f6f7f9, #ffffff);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .category-button {
-    padding: 8px 17px;
+    padding: 12px 24px;
     border: none;
     border-radius: 15px;
-    font-size: 0.8em;
+    font-size: 1em;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: linear-gradient(145deg, #e6e6e6, #ffffff);
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
     box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
     position: relative;
     overflow: hidden;
+    color: #666;
 }
 
 .category-button::after {
@@ -2613,20 +2623,23 @@ option {
 }
 
 .category-button.active {
-    background: linear-gradient(145deg, #ff8a00, #ff6b6b);
+    background: linear-gradient(145deg, #4f46e5, #4338ca);
     color: white;
     transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
 }
 
 .profile-photo-item {
-    transform: translateY(20px);
-    opacity: 0;
-    animation: fadeInUp 0.5s forwards;
-    transition: transform 0.3s ease;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
 }
 
 .profile-photo-item:hover {
     transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12);
 }
 
 @keyframes fadeInUp {
@@ -3373,6 +3386,7 @@ option {
         <button class="category-button active" data-category="acemi">Acemi</button>
         <button class="category-button" data-category="cesur">Cesur</button>
         <button class="category-button" data-category="lider">Lider</button>
+        <button class="category-button" data-category="sampiyon">Şampiyon</button>
     </div>
 
     <div class="profile-photos-container" id="profilePhotosContainer"></div>
@@ -6324,7 +6338,14 @@ const photoCategories = {
            price: 5,
            id: 'photo11'
        }
-   ]
+   ], 
+    sampiyon: [
+        {
+            url: 'https://cdn.pixabay.com/animation/2024/04/27/19/29/19-29-06-468_512.gif',
+            price: 2000,
+            id: 'photo12'
+        }
+    ]
 };
 
 function updateProfileIcon() {
