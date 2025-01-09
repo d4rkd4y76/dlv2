@@ -2586,28 +2586,41 @@ option {
 
 .profile-categories {
     display: flex;
+    flex-wrap: wrap; /* Allow wrapping on mobile */
     justify-content: center;
-    gap: 15px;
-    margin: 20px 0;
-    padding: 15px;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 10px;
     background: linear-gradient(145deg, #f6f7f9, #ffffff);
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-radius: 15px;
 }
 
 .category-button {
-    padding: 12px 24px;
+    padding: 10px 15px; /* Reduced padding */
     border: none;
-    border-radius: 15px;
-    font-size: 1em;
+    border-radius: 12px;
+    font-size: 0.9em; /* Smaller font size */
+    min-width: 80px; /* Minimum width */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
-    position: relative;
-    overflow: hidden;
-    color: #666;
+    box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff;
+    white-space: nowrap; /* Prevent text wrapping within button */
+}
+
+/* Add responsive breakpoint */
+@media (max-width: 480px) {
+    .profile-categories {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .category-button {
+        padding: 8px 12px;
+        font-size: 0.8em;
+        min-width: 70px;
+    }
 }
 
 .category-button::after {
