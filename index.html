@@ -3659,37 +3659,81 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
         let duelGameStarted = false;
 
 window.onload = async () => {
-    const storedStudent = localStorage.getItem('selectedStudent');
-    if (storedStudent) {
-        selectedStudent = JSON.parse(storedStudent);
-        mainScreen.style.display = 'flex';
-        studentSelectionScreen.style.display = 'none';
-        studentSelectionError.textContent = '';
-        studentPasswordInput.value = '';
+    try {
+        // Cleanup işlemini başlat
+        startRejectedInvitesCleanup();
 
-        database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`).once('value').then(photoSnapshot => {
-            if (photoSnapshot.exists()) {
-                const photoURL = photoSnapshot.val();
-                studentPhoto.src = photoURL;
-                studentPhoto.style.display = 'block';
-            } else {
+        const storedStudent = localStorage.getItem('selectedStudent');
+        if (storedStudent) {
+            selectedStudent = JSON.parse(storedStudent);
+            
+            // Ana ekranı göster
+            mainScreen.style.display = 'flex';
+            studentSelectionScreen.style.display = 'none';
+            studentSelectionError.textContent = '';
+            studentPasswordInput.value = '';
+
+            // Fotoğraf yükleme
+            try {
+                const photoSnapshot = await database.ref(
+                    `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`
+                ).once('value');
+
+                if (photoSnapshot.exists()) {
+                    const photoURL = photoSnapshot.val();
+                    studentPhoto.src = photoURL;
+                    studentPhoto.style.display = 'block';
+                } else {
+                    studentPhoto.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Fotoğraf çekilirken hata:", error);
                 studentPhoto.style.display = 'none';
             }
-        }).catch(error => {
-            console.error("Fotoğraf çekilirken hata:", error);
-            studentPhoto.style.display = 'none';
-        });
 
-        studentName.textContent = selectedStudent.studentName;
-        addLoggedInPlayer(selectedStudent);
-        startInvitationListener(selectedStudent.studentId);
-        fetchAndDisplayGameCup();
-        onMainScreenLoad(); // Elmas sistemini başlat
-    } else {
-        studentSelectionScreen.style.display = 'flex';
+            // Öğrenci bilgilerini ayarla
+            studentName.textContent = selectedStudent.studentName;
+
+            // Sırasıyla sistemleri başlat
+            await addLoggedInPlayer(selectedStudent);
+            startInvitationListener(selectedStudent.studentId);
+            await fetchAndDisplayGameCup();
+            onMainScreenLoad(); // Elmas sistemini başlat
+
+            // 30 saniye aralıklarla reddedilen davetleri kontrol et ve temizle
+            setInterval(async () => {
+                try {
+                    const rejectedInvitesRef = database.ref('rejectedInvites')
+                        .orderByChild('timestamp')
+                        .endAt(Date.now() - 30000);
+                    
+                    const snapshot = await rejectedInvitesRef.once('value');
+                    if (snapshot.exists()) {
+                        const updates = {};
+                        snapshot.forEach(child => {
+                            updates[child.key] = null;
+                        });
+                        await database.ref('rejectedInvites').update(updates);
+                    }
+                } catch (error) {
+                    console.error("Reddedilen davetleri temizlerken hata:", error);
+                }
+            }, 30000); // Her 30 saniyede bir kontrol et
+
+        } else {
+            studentSelectionScreen.style.display = 'flex';
+        }
+
+        // Gerekli verileri yükle
+        await Promise.all([
+            fetchClassesForSelection(),
+            fetchChampionData()
+        ]);
+
+    } catch (error) {
+        console.error("Uygulama başlatma hatası:", error);
+        showAlert('Bir hata oluştu. Lütfen sayfayı yenileyin.');
     }
-    fetchClassesForSelection();
-    fetchChampionData();
 };
 
         async function fetchAllClasses() {
@@ -4873,7 +4917,8 @@ logoutButton.addEventListener('click', async () => {
         // Davet Etme ve Dinleme
 async function sendInvitation(player) {
     try {
-        // Önce davet gönderen kişinin hala online olup olmadığını kontrol et
+        console.log("Davet gönderilmeye çalışılıyor, oyuncu:", player);
+
         const inviterSnapshot = await database.ref('loggedinPlayers')
             .orderByChild('studentId')
             .equalTo(selectedStudent.studentId)
@@ -4884,14 +4929,19 @@ async function sendInvitation(player) {
             return;
         }
 
-        // Karşı tarafın aktif bir daveti var mı kontrol et
-        const activeInviteSnapshot = await database.ref(`invitations/${player.studentId}`).once('value');
+        console.log("Davet gönderilecek oyuncu ID:", player.studentId);
+        const invitationPath = `invitations/${player.studentId}`;
+        console.log("Davet path:", invitationPath);
+        
+        const invitationRef = database.ref(invitationPath);
+        const activeInviteSnapshot = await invitationRef.once('value');
+        
         if (activeInviteSnapshot.exists()) {
             showAlert('Bu oyuncu şu anda başka bir davet değerlendiriyor.');
             return;
         }
 
-        // Reddedilen davet kontrolü
+        // Geliştirilmiş reddedilen davet kontrolü
         const rejectedInviteRef = database.ref('rejectedInvites')
             .orderByChild('inviterId')
             .equalTo(selectedStudent.studentId);
@@ -4899,6 +4949,8 @@ async function sendInvitation(player) {
         const snapshot = await rejectedInviteRef.once('value');
         let canSendInvite = true;
         let remainingTime = 0;
+        const updates = {};
+        let needsUpdate = false;
 
         if (snapshot.exists()) {
             snapshot.forEach(child => {
@@ -4908,9 +4960,20 @@ async function sendInvitation(player) {
                     if (timeDiff < 30000) {
                         canSendInvite = false;
                         remainingTime = Math.ceil((30000 - timeDiff) / 1000);
+                    } else {
+                        // 30 saniyeyi geçen kayıtları silmek için işaretle
+                        updates[child.key] = null;
+                        needsUpdate = true;
                     }
                 }
             });
+
+            // Eğer silinecek kayıt varsa hepsini tek seferde sil
+            if (needsUpdate) {
+                await database.ref('rejectedInvites').update(updates);
+                // Kayıtlar silindiyse, daveti göndermeye izin ver
+                canSendInvite = true;
+            }
         }
 
         if (!canSendInvite) {
@@ -4918,7 +4981,6 @@ async function sendInvitation(player) {
             return;
         }
 
-        // Düello kontrolü
         const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
         const isInDuel = inDuelSnapshot.exists() ? inDuelSnapshot.val() : false;
         
@@ -4927,21 +4989,18 @@ async function sendInvitation(player) {
             return;
         }
 
-        // Davet gönderme
-        const invitationRef = database.ref(`invitations/${player.studentId}`);
-        
-        // Davet gönderenin bağlantısı koptuğunda daveti otomatik silme
-        invitationRef.onDisconnect().remove();
-        
-        await invitationRef.set({
+        const inviteData = {
             invitedByName: selectedStudent.studentName,
             invitedByClassId: selectedStudent.classId,
             invitedByStudentId: selectedStudent.studentId,
             invitedByPhoto: studentPhoto.src ? studentPhoto.src : "",
             timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
+        };
 
-        // 10 saniyelik geri sayım mesajı göster
+        console.log("Gönderilecek davet verisi:", inviteData);
+        await invitationRef.set(inviteData);
+        console.log("Davet veritabanına yazıldı");
+
         let timeLeft = 10;
         const alertOverlay = document.getElementById('alertOverlay');
         const countdownInterval = setInterval(() => {
@@ -4951,230 +5010,334 @@ async function sendInvitation(player) {
             } else {
                 clearInterval(countdownInterval);
                 alertOverlay.style.display = 'none';
+                invitationRef.remove().then(() => {
+                    console.log("Davet zaman aşımı nedeniyle silindi");
+                });
             }
         }, 1000);
 
-        // Daveti dinle - red veya kabul durumunda alert'i kapat
-        invitationRef.on('value', (snapshot) => {
+        const unsubscribe = invitationRef.on('value', (snapshot) => {
             if (!snapshot.exists()) {
                 clearInterval(countdownInterval);
                 alertOverlay.style.display = 'none';
-                invitationRef.off(); // Listener'ı kaldır
+                invitationRef.off('value', unsubscribe);
             }
         });
-        
+
     } catch (error) {
         console.error("Davet gönderme hatası:", error);
         showAlert('Davet gönderilirken bir hata oluştu.');
     }
 }
 
+// Periyodik temizleme fonksiyonu - Bu fonksiyonu window.onload içinde çağırın
+function startRejectedInvitesCleanup() {
+    setInterval(async () => {
+        try {
+            const rejectedInvitesRef = database.ref('rejectedInvites');
+            const snapshot = await rejectedInvitesRef.once('value');
 
-        function startInvitationListener(studentId) {
-    const invitationRef = database.ref(`invitations/${studentId}`);
-    
-    // Davetleri dinle
-    invitationRef.on('value', async snapshot => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            
-            // Davet 10 saniyeden eski ise otomatik olarak sil
-            if (data.timestamp && (Date.now() - data.timestamp) > 10000) {
-                await invitationRef.remove();
-                if (invitationOverlay.style.display === 'flex') {
-                    invitationOverlay.style.display = 'none';
-                }
-                return;
-            }
-            
-            // Davet gönderen kişinin online durumunu kontrol et
-            const inviterOnlineSnapshot = await database.ref('loggedinPlayers')
-                .orderByChild('studentId')
-                .equalTo(data.invitedByStudentId)
-                .once('value');
-                
-            if (!inviterOnlineSnapshot.exists()) {
-                await invitationRef.remove();
-                if (invitationOverlay.style.display === 'flex') {
-                    invitationOverlay.style.display = 'none';
-                }
-                return;
-            }
-            
-            currentInvitation = { ...data };
-            showInvitationModal(data);
+            if (snapshot.exists()) {
+                const updates = {};
+                let hasExpired = false;
 
-            // 10 saniyelik süre başlat
-            let timeLeft = 10;
-            const countdownInterval = setInterval(() => {
-                const countdownElement = document.createElement('div');
-                countdownElement.textContent = `${timeLeft} saniye kaldı`;
-                countdownElement.style.marginTop = '10px';
-                countdownElement.style.color = '#ff0000';
-                
-                // Eski countdown elementini kaldır
-                const oldCountdown = invitationMessage.parentElement.querySelector('.countdown-text');
-                if (oldCountdown) {
-                    oldCountdown.remove();
-                }
-                
-                countdownElement.classList.add('countdown-text');
-                invitationMessage.parentElement.appendChild(countdownElement);
-                
-                timeLeft--;
-                
-                if (timeLeft < 0 || !snapshot.exists()) {
-                    clearInterval(countdownInterval);
-                    invitationOverlay.style.display = 'none';
-                    invitationRef.remove();
-                }
-            }, 1000);
-
-        } else {
-            if (invitationOverlay.style.display === 'flex' && !currentInvitation) {
-                invitationOverlay.style.display = 'none';
-            }
-            currentInvitation = null;
-        }
-    });
-
-    // Mevcut düello dinleyicileri aynen kalacak
-    database.ref('duels').orderByChild('inviter/studentId').equalTo(studentId).on('child_added', snapshot => {
-        if (currentDuelRef == null) {
-            currentDuelRef = snapshot.ref;
-            isInviter = true;
-            switchToDuelScreen(snapshot.key);
-        }
-    });
-
-    database.ref('duels').orderByChild('invited/studentId').equalTo(studentId).on('child_added', snapshot => {
-        if (currentDuelRef == null) {
-            currentDuelRef = snapshot.ref;
-            isInviter = false;
-            switchToDuelScreen(snapshot.key);
-        }
-    });
-
-
-    // Düello referansı silindiğinde
-    database.ref('duels').on('child_removed', snapshot => {
-        if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) {
-            showAlert('...')
-                .then(() => {
-                    window.location.reload();
+                snapshot.forEach(child => {
+                    const invite = child.val();
+                    if (Date.now() - invite.timestamp > 30000) {
+                        updates[child.key] = null;
+                        hasExpired = true;
+                    }
                 });
+
+                if (hasExpired) {
+                    await rejectedInvitesRef.update(updates);
+                }
+            }
+        } catch (error) {
+            console.error("Temizleme hatası:", error);
         }
-    });
+    }, 5000); // Her 5 saniyede bir kontrol
 }
 
-        function showInvitationModal(data) {
-            invitationMessage.textContent = `${data.invitedByName} (${classNameMap[data.invitedByClassId] ? classNameMap[data.invitedByClassId] : data.invitedByClassId}) seni düelloya davet ediyor.`;
-            invitationOverlay.style.display = 'flex';
-        }
+        function startInvitationListener(studentId) {
+   const invitationRef = database.ref(`invitations/${studentId}`);
+   
+   // Mevcut dinleyiciyi temizle
+   invitationRef.off();
 
-        const invitationDeclineButton = document.getElementById('invitationDeclineButton');
-        const invitationAcceptButton = document.getElementById('invitationAcceptButton');
+   // Eski reddedilen davetleri temizle
+   cleanupOldRejectedInvites(studentId);
+   
+   // Davetleri dinle
+   invitationRef.on('value', async snapshot => {
+       try {
+           if (snapshot.exists()) {
+               const data = snapshot.val();
+               
+               // Davet zaten değerlendirilmiş veya timeout olmuşsa çık
+               if (!data || (data.timestamp && (Date.now() - data.timestamp) > 10000)) {
+                   await invitationRef.remove();
+                   invitationOverlay.style.display = 'none';
+                   return;
+               }
+
+               // Reddedilen davet kontrolü
+               const rejectedInviteRef = database.ref('rejectedInvites')
+                   .orderByChild('inviterId')
+                   .equalTo(data.invitedByStudentId);
+
+               const rejectedSnapshot = await rejectedInviteRef.once('value');
+               let isRejected = false;
+
+               if (rejectedSnapshot.exists()) {
+                   rejectedSnapshot.forEach(child => {
+                       const invite = child.val();
+                       if (invite.invitedId === studentId) {
+                           const timeDiff = Date.now() - invite.timestamp;
+                           if (timeDiff >= 30000) {
+                               database.ref(`rejectedInvites/${child.key}`).remove();
+                           } else {
+                               isRejected = true;
+                           }
+                       }
+                   });
+               }
+
+               if (isRejected) {
+                   await invitationRef.remove();
+                   invitationOverlay.style.display = 'none';
+                   return;
+               }
+               
+               // Davet gönderenin online durumunu kontrol et
+               const inviterOnlineSnapshot = await database.ref('loggedinPlayers')
+                   .orderByChild('studentId')
+                   .equalTo(data.invitedByStudentId)
+                   .once('value');
+                   
+               if (!inviterOnlineSnapshot.exists()) {
+                   await invitationRef.remove();
+                   invitationOverlay.style.display = 'none';
+                   return;
+               }
+               
+               // Davet gönderen düelloda mı kontrol et
+               const inDuelSnapshot = await database.ref(`classes/${data.invitedByClassId}/students/${data.invitedByStudentId}/inDuel`).once('value');
+               if (inDuelSnapshot.val()) {
+                   await invitationRef.remove();
+                   invitationOverlay.style.display = 'none';
+                   return;
+               }
+               
+               // Eğer geçerli bir davetse göster
+               currentInvitation = { ...data };
+               showInvitationModal(data);
+               
+               // 10 saniyelik geri sayım
+               let timeLeft = 10;
+               const countdownInterval = setInterval(() => {
+                   // Eğer overlay kapalıysa interval'i temizle
+                   if (invitationOverlay.style.display !== 'flex') {
+                       clearInterval(countdownInterval);
+                       return;
+                   }
+                   
+                   // Eski countdown elementini bul ve kaldır
+                   const oldCountdown = document.querySelector('.countdown-text');
+                   if (oldCountdown) {
+                       oldCountdown.remove();
+                   }
+                   
+                   if (timeLeft > 0) {
+                       const countdownElement = document.createElement('div');
+                       countdownElement.textContent = `${timeLeft} saniye kaldı`;
+                       countdownElement.className = 'countdown-text';
+                       countdownElement.style.marginTop = '10px';
+                       countdownElement.style.color = timeLeft <= 5 ? '#ff0000' : '#000000';
+                       invitationMessage.parentElement.appendChild(countdownElement);
+                       timeLeft--;
+                   } else {
+                       clearInterval(countdownInterval);
+                       invitationRef.remove();
+                       invitationOverlay.style.display = 'none';
+                   }
+               }, 1000);
+           } else {
+               // Davet yoksa veya silindiyse overlay'i kapat
+               if (invitationOverlay.style.display === 'flex') {
+                   invitationOverlay.style.display = 'none';
+               }
+               currentInvitation = null;
+           }
+       } catch (error) {
+           console.error("Davet işleme hatası:", error);
+           invitationOverlay.style.display = 'none';
+           currentInvitation = null;
+       }
+   });
+
+   // Düello dinleyicileri
+   const duelInviterRef = database.ref('duels').orderByChild('inviter/studentId').equalTo(studentId);
+   const duelInvitedRef = database.ref('duels').orderByChild('invited/studentId').equalTo(studentId);
+   
+   // Mevcut dinleyicileri temizle
+   duelInviterRef.off();
+   duelInvitedRef.off();
+   
+   // Yeni dinleyicileri ekle
+   duelInviterRef.on('child_added', snapshot => {
+       if (!currentDuelRef) {
+           currentDuelRef = snapshot.ref;
+           isInviter = true;
+           switchToDuelScreen(snapshot.key);
+       }
+   });
+
+   duelInvitedRef.on('child_added', snapshot => {
+       if (!currentDuelRef) {
+           currentDuelRef = snapshot.ref;
+           isInviter = false;
+           switchToDuelScreen(snapshot.key);
+       }
+   });
+
+   // Düello silinme dinleyicisi
+   database.ref('duels').on('child_removed', snapshot => {
+       if (currentDuelRef && snapshot.key === currentDuelRef.key && !duelEnded) {
+           showAlert('...').then(() => window.location.reload());
+       }
+   });
+}
+
+function showInvitationModal(data) {
+   invitationMessage.textContent = `${data.invitedByName} (${classNameMap[data.invitedByClassId] ? classNameMap[data.invitedByClassId] : data.invitedByClassId}) seni düelloya davet ediyor.`;
+   invitationOverlay.style.display = 'flex';
+}
+
+const invitationDeclineButton = document.getElementById('invitationDeclineButton');
+const invitationAcceptButton = document.getElementById('invitationAcceptButton');
 
 invitationDeclineButton.addEventListener('click', async () => {
-    if (!currentInvitation) {
-        console.error("Geçerli davet bulunamadı");
-        return;
-    }
+   if (!currentInvitation) {
+       console.error("Geçerli davet bulunamadı");
+       return;
+   }
 
-    try {
-        // Önce reddedilen daveti kaydet
-        await database.ref('rejectedInvites').push().set({
-            inviterId: currentInvitation.invitedByStudentId,
-            invitedId: selectedStudent.studentId,
-            timestamp: Date.now()
-        });
+   try {
+       // Önce reddedilen daveti kaydet
+       await database.ref('rejectedInvites').push().set({
+           inviterId: currentInvitation.invitedByStudentId,
+           invitedId: selectedStudent.studentId,
+           timestamp: Date.now()
+       });
 
-        // Davet referansını oluştur ve kaldır
-        const invitationRef = database.ref(`invitations/${selectedStudent.studentId}`);
-        await invitationRef.remove();
+       // Davet referansını oluştur ve kaldır
+       const invitationRef = database.ref(`invitations/${selectedStudent.studentId}`);
+       await invitationRef.remove();
 
-        // Davet dinleyicisini kaldır
-        invitationRef.off();
+       // Overlay'i kapat
+       invitationOverlay.style.display = 'none';
+       
+       // currentInvitation'ı temizle
+       currentInvitation = null;
 
-        // Overlay'i kapat
-        invitationOverlay.style.display = 'none';
-        
-        // currentInvitation'ı temizle
-        currentInvitation = null;
+       await showAlert('Davet reddedildi');
 
-        // İsteğe bağlı: Kullanıcıya bildirim göster
-        await showAlert('Davet reddedildi');
-
-    } catch (error) {
-        console.error("Davet reddetme hatası:", error);
-        await showAlert('Davet reddedilirken hata oluştu: ' + error.message);
-    }
+   } catch (error) {
+       console.error("Davet reddetme hatası:", error);
+       await showAlert('Davet reddedilirken hata oluştu: ' + error.message);
+   }
 });
 
-
 async function cleanupRejectedInvites() {
-    const thirtySecondsAgo = Date.now() - 30000;
-    const rejectedInvitesRef = database.ref('rejectedInvites');
-    const oldInvitesSnapshot = await rejectedInvitesRef
-        .orderByChild('timestamp')
-        .endAt(thirtySecondsAgo)
-        .once('value');
+   const thirtySecondsAgo = Date.now() - 30000;
+   const rejectedInvitesRef = database.ref('rejectedInvites');
+   const oldInvitesSnapshot = await rejectedInvitesRef
+       .orderByChild('timestamp')
+       .endAt(thirtySecondsAgo)
+       .once('value');
 
-    if (oldInvitesSnapshot.exists()) {
-        const updates = {};
-        oldInvitesSnapshot.forEach(child => {
-            updates[child.key] = null;
-        });
-        await rejectedInvitesRef.update(updates);
-    }
+   if (oldInvitesSnapshot.exists()) {
+       const updates = {};
+       oldInvitesSnapshot.forEach(child => {
+           updates[child.key] = null;
+       });
+       await rejectedInvitesRef.update(updates);
+   }
+}
+
+// Eski reddedilen davetleri temizleme helper fonksiyonu
+async function cleanupOldRejectedInvites(studentId) {
+   try {
+       const rejectedInvitesRef = database.ref('rejectedInvites');
+       const snapshot = await rejectedInvitesRef
+           .orderByChild('invitedId')
+           .equalTo(studentId)
+           .once('value');
+
+       if (snapshot.exists()) {
+           const updates = {};
+           snapshot.forEach(child => {
+               const invite = child.val();
+               if (Date.now() - invite.timestamp >= 30000) {
+                   updates[child.key] = null;
+               }
+           });
+           
+           if (Object.keys(updates).length > 0) {
+               await rejectedInvitesRef.update(updates);
+           }
+       }
+   } catch (error) {
+       console.error("Eski reddedilen davetleri temizlerken hata:", error);
+   }
 }
 
 // Her 30 saniyede bir temizlik yap
 setInterval(cleanupRejectedInvites, 30000);
 
-        invitationAcceptButton.addEventListener('click', async () => {
-    if (currentInvitation && selectedStudent.studentId) {
-        try {
-            // Önce davet gönderen kişinin hala online olup olmadığını kontrol et
-            const inviterOnlineSnapshot = await database.ref('loggedinPlayers')
-                .orderByChild('studentId')
-                .equalTo(currentInvitation.invitedByStudentId)
-                .once('value');
-                
-            if (!inviterOnlineSnapshot.exists()) {
-                await database.ref(`invitations/${selectedStudent.studentId}`).remove();
-                invitationOverlay.style.display = 'none';
-                currentInvitation = null;
-                showAlert('Davet gönderen oyuncu artık çevrimiçi değil!');
-                return;
-            }
+invitationAcceptButton.addEventListener('click', async () => {
+   if (currentInvitation && selectedStudent.studentId) {
+       try {
+           // Önce davet gönderen kişinin hala online olup olmadığını kontrol et
+           const inviterOnlineSnapshot = await database.ref('loggedinPlayers')
+               .orderByChild('studentId')
+               .equalTo(currentInvitation.invitedByStudentId)
+               .once('value');
+               
+           if (!inviterOnlineSnapshot.exists()) {
+               await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+               invitationOverlay.style.display = 'none';
+               currentInvitation = null;
+               showAlert('Davet gönderen oyuncu artık çevrimiçi değil!');
+               return;
+           }
 
-            const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
-            const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
+           const inDuelSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).once('value');
+           const isInDuel = inDuelSnap.exists() ? inDuelSnap.val() : false;
 
-            if (isInDuel) {
-                showAlert(`Zaten bir düellodasın!`);
-                invitationOverlay.style.display = 'none';
-                currentInvitation = null;
-                return;
-            }
+           if (isInDuel) {
+               showAlert(`Zaten bir düellodasın!`);
+               invitationOverlay.style.display = 'none';
+               currentInvitation = null;
+               return;
+           }
 
-            // Yeni: "Oyundakiler" ekranını kapat
-            playersOverlay.style.display = 'none';
-
-            invitationOverlay.style.display = 'none';
-            await createDuelSession(
-                currentInvitation.invitedByStudentId, 
-                currentInvitation.invitedByClassId, 
-                currentInvitation.invitedByName, 
-                currentInvitation.invitedByPhoto
-            );
-            await database.ref(`invitations/${selectedStudent.studentId}`).remove();
-        } catch (error) {
-            console.error("Düello başlatılırken hata:", error);
-            showAlert('Düello başlatılırken bir hata oluştu.');
-        }
-    }
+           playersOverlay.style.display = 'none';
+           invitationOverlay.style.display = 'none';
+           
+           await createDuelSession(
+               currentInvitation.invitedByStudentId, 
+               currentInvitation.invitedByClassId, 
+               currentInvitation.invitedByName, 
+               currentInvitation.invitedByPhoto
+           );
+           await database.ref(`invitations/${selectedStudent.studentId}`).remove();
+       } catch (error) {
+           console.error("Düello başlatılırken hata:", error);
+           showAlert('Düello başlatılırken bir hata oluştu.');
+       }
+   }
 });
 
 
