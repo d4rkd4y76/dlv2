@@ -2962,10 +2962,10 @@ option {
                 <option value="">Seçiniz</option>
             </select>
 
-            <label for="selection-name-select">Öğrenciyi Seç:</label>
-            <select id="selection-name-select">
-                <option value="">Seçiniz</option>
-            </select>
+<!-- Eski select yerine eklenecek input -->
+<label for="selection-name-input">Kullanıcı Adı:</label>
+<input type="text" id="selection-name-input" placeholder="Kullanıcı adınızı giriniz" disabled>
+
 
             <label for="student-password-input">Şifre Giriniz:</label>
             <input type="password" id="student-password-input" placeholder="Şifre" disabled>
@@ -3663,6 +3663,20 @@ window.onload = async () => {
         // Cleanup işlemini başlat
         startRejectedInvitesCleanup();
 
+        // Sınıf ve öğrenci seçimi için event listener'lar
+        selectionClassSelect.addEventListener('change', () => {
+            if (selectionClassSelect.value === "") {
+                selectionNameInput.disabled = true;
+                selectionNameInput.value = "";
+            } else {
+                selectionNameInput.disabled = false;
+            }
+            checkLoginButtonState();
+        });
+
+        // Yeni input event listener'ı
+        selectionNameInput.addEventListener('input', checkLoginButtonState);
+
         const storedStudent = localStorage.getItem('selectedStudent');
         if (storedStudent) {
             selectedStudent = JSON.parse(storedStudent);
@@ -3757,37 +3771,52 @@ window.onload = async () => {
         });
 
 loginButton.addEventListener('click', async () => {
-    selectedStudent.classId = selectionClassSelect.value;
-    selectedStudent.studentId = selectionNameSelect.value;
-    selectedStudent.studentName = selectionNameSelect.options[selectionNameSelect.selectedIndex].text;
+    const selectedClass = selectionClassSelect.value;
+    const enteredUsername = selectionNameInput.value.trim(); // Yeni input değerini al
     const enteredPassword = studentPasswordInput.value.trim();
 
-    if (selectedStudent.classId && selectedStudent.studentId) {
+    if (!selectedClass || !enteredUsername) {
+        studentSelectionError.textContent = 'Lütfen tüm alanları doldurunuz.';
+        return;
+    }
+
+    // Kullanıcı ID'sini ve bilgilerini veritabanından al
+    try {
+        const studentsRef = database.ref(`classes/${selectedClass}/students`);
+        const snapshot = await studentsRef.orderByChild('name').equalTo(enteredUsername).once('value');
+
+        if (!snapshot.exists()) {
+            studentSelectionError.textContent = 'Kullanıcı bulunamadı.';
+            return;
+        }
+
+        // Snapshot'tan ilk (ve muhtemelen tek) kullanıcıyı al
+        const studentData = Object.entries(snapshot.val())[0];
+        const studentId = studentData[0]; // Firebase tarafından oluşturulan ID
+        const studentInfo = studentData[1]; // Kullanıcı bilgileri
+
+        // selectedStudent nesnesini güncelle
+        selectedStudent.classId = selectedClass;
+        selectedStudent.studentId = studentId;
+        selectedStudent.studentName = studentInfo.name;
+
         if (enteredPassword === "") {
             studentSelectionError.textContent = 'Lütfen şifrenizi giriniz.';
             return;
         }
 
+        // Buradan sonrası mevcut şifre kontrolü ve giriş işlemleri aynen devam edebilir
         database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/password`).once('value').then(async snapshot => {
             if (snapshot.exists()) {
                 const correctPassword = snapshot.val();
                 if (enteredPassword === correctPassword) {
-                    // Kullanıcının diamond değerini kontrol et
-        const diamondRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`);
-const lastUpdateRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/lastDiamondUpdate`);
-
-const diamondSnapshot = await diamondRef.once('value');
-if (!diamondSnapshot.exists()) {
-    // Yeni kullanıcı için 60 elmas tanımla
-    await diamondRef.set(60);
-    await lastUpdateRef.set(firebase.database.ServerValue.TIMESTAMP);
-}
-
+                    // Mevcut giriş başarılı işlemleri...
                     studentSelectionScreen.style.display = 'none';
                     mainScreen.style.display = 'flex';
                     studentSelectionError.textContent = '';
                     studentPasswordInput.value = '';
 
+                    // Fotoğraf yükleme işlemi...
                     database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`).once('value').then(photoSnapshot => {
                         if (photoSnapshot.exists()) {
                             const photoURL = photoSnapshot.val();
@@ -3805,7 +3834,7 @@ if (!diamondSnapshot.exists()) {
                     await addLoggedInPlayer(selectedStudent);
                     startInvitationListener(selectedStudent.studentId);
                     fetchAndDisplayGameCup();
-                    onMainScreenLoad(); // Elmas sistemini başlat
+                    onMainScreenLoad();
 
                     localStorage.setItem('selectedStudent', JSON.stringify(selectedStudent));
                 } else {
@@ -3818,6 +3847,10 @@ if (!diamondSnapshot.exists()) {
             console.error("Şifre kontrol hata:", error);
             studentSelectionError.textContent = 'Şifre kontrol edilirken hata oluştu.';
         });
+
+    } catch (error) {
+        console.error("Kullanıcı arama hatası:", error);
+        studentSelectionError.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
     }
 });
 
@@ -3872,6 +3905,76 @@ function onMainScreenLoad() {
     updateDiamondCount();
     // Her saat başı kontrol et
     setInterval(updateDiamondCount, 1000 * 60 * 60);
+}
+
+// Yeni input elementi için referans
+const selectionNameInput = document.getElementById('selection-name-input');
+
+// Login butonuna yeni kontrol fonksiyonu
+async function handleLogin() {
+    const enteredUsername = selectionNameInput.value.trim();
+    const selectedClass = selectionClassSelect.value;
+    const enteredPassword = studentPasswordInput.value.trim();
+
+    if (!enteredUsername || !selectedClass || !enteredPassword) {
+        studentSelectionError.textContent = 'Lütfen tüm alanları doldurunuz.';
+        return;
+    }
+
+    try {
+        // Kullanıcı adını veritabanında ara
+        const studentsRef = database.ref(`classes/${selectedClass}/students`);
+        const snapshot = await studentsRef.orderByChild('name').equalTo(enteredUsername).once('value');
+
+        if (!snapshot.exists()) {
+            studentSelectionError.textContent = 'Kullanıcı bulunamadı.';
+            return;
+        }
+
+        // Kullanıcı bilgilerini al
+        const studentData = Object.entries(snapshot.val())[0];
+        const studentId = studentData[0];
+        const studentInfo = studentData[1];
+
+        // Şifre kontrolü
+        if (enteredPassword !== studentInfo.password) {
+            studentSelectionError.textContent = 'Yanlış şifre.';
+            return;
+        }
+
+        // Login işlemleri
+        selectedStudent = {
+            classId: selectedClass,
+            studentId: studentId,
+            studentName: studentInfo.name
+        };
+
+        // Ana ekrana geçiş ve diğer işlemler
+        mainScreen.style.display = 'flex';
+        studentSelectionScreen.style.display = 'none';
+        studentSelectionError.textContent = '';
+        studentPasswordInput.value = '';
+
+        // Fotoğraf ve diğer bilgileri yükle
+        if (studentInfo.photo) {
+            studentPhoto.src = studentInfo.photo;
+            studentPhoto.style.display = 'block';
+        } else {
+            studentPhoto.style.display = 'none';
+        }
+
+        studentName.textContent = studentInfo.name;
+        await addLoggedInPlayer(selectedStudent);
+        startInvitationListener(selectedStudent.studentId);
+        fetchAndDisplayGameCup();
+        onMainScreenLoad();
+
+        localStorage.setItem('selectedStudent', JSON.stringify(selectedStudent));
+
+    } catch (error) {
+        console.error("Login hatası:", error);
+        studentSelectionError.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+    }
 }
 
 // Ana değişkenler
@@ -4338,31 +4441,7 @@ function showConfirmation(message) {
             }
         }
 
-        function fetchStudents(classId, studentNameSelectElement) {
-            studentNameSelectElement.innerHTML = '<option value="">Seçiniz</option>';
-            if (classId === "") return;
 
-            database.ref(`classes/${classId}/students`).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const studentId = childSnapshot.key;
-                        const studentName = childSnapshot.val().name;
-
-                        const option = document.createElement('option');
-                        option.value = studentId;
-                        option.textContent = studentName;
-                        studentNameSelectElement.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.value = "";
-                    option.textContent = "Bu sınıfa ait öğrenci yok";
-                    studentNameSelectElement.appendChild(option);
-                }
-            }).catch(error => {
-                console.error("Öğrenci çekme hata:", error);
-            });
-        }
 
         function fetchChampionData() {
             database.ref('championData/headings').once('value').then(snapshot => {
@@ -4464,33 +4543,30 @@ function showConfirmation(message) {
             }
         }
 
-        selectionClassSelect.addEventListener('change', () => {
-            const selectedClass = selectionClassSelect.value;
-            if (selectedClass === "") {
-                selectionNameSelect.innerHTML = '<option value="">Seçiniz</option>';
-                checkLoginButtonState();
-                return;
-            }
-            fetchStudents(selectedClass, selectionNameSelect);
-            checkLoginButtonState();
-        });
+selectionClassSelect.addEventListener('change', () => {
+    if (selectionClassSelect.value === "") {
+        selectionNameInput.disabled = true;
+        selectionNameInput.value = "";
+    } else {
+        selectionNameInput.disabled = false;
+    }
+    checkLoginButtonState();
+});
 
-        selectionNameSelect.addEventListener('change', () => {
-            checkLoginButtonState();
-        });
 
-        function checkLoginButtonState() {
-            if (selectionClassSelect.value !== "" && selectionNameSelect.value !== "") {
-                loginButton.classList.add('active');
-                loginButton.disabled = false;
-                studentPasswordInput.disabled = false;
-            } else {
-                loginButton.classList.remove('active');
-                loginButton.disabled = true;
-                studentPasswordInput.disabled = true;
-                studentPasswordInput.value = '';
-            }
-        }
+
+function checkLoginButtonState() {
+    if (selectionClassSelect.value !== "" && selectionNameInput.value.trim() !== "") {
+        loginButton.classList.add('active');
+        loginButton.disabled = false;
+        studentPasswordInput.disabled = false;
+    } else {
+        loginButton.classList.remove('active');
+        loginButton.disabled = true;
+        studentPasswordInput.disabled = true;
+        studentPasswordInput.value = '';
+    }
+}
 
         classSelect.addEventListener('change', () => {
             const selectedClass = classSelect.value;
@@ -5476,6 +5552,37 @@ duelRef.once('value').then(initialSnap => {
         invitedId = initialData.invited.studentId;
         invitedClassId = initialData.invited.classId;
 
+database.ref(`classes/${selectedStudent.classId}`).once('value').then(classSnapshot => {
+        if (classSnapshot.exists()) {
+            const studentClassName = classSnapshot.val().name;
+
+            // championData'dan sınıfları çek ve eşleştir
+            database.ref('championData/headings').once('value').then(snapshot => {
+                duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const classId = childSnapshot.key;
+                        const championClassName = childSnapshot.val().name;
+                        
+                        // Eğer classes'daki sınıf adı championData'daki sınıf adıyla eşleşiyorsa
+                        if (championClassName === studentClassName) {
+                            const option = document.createElement('option');
+                            option.value = classId;
+                            option.textContent = championClassName;
+                            duelClassSelect.appendChild(option);
+                            duelClassSelect.value = classId; // Otomatik seç
+                            
+                            // Dersleri yükle
+                            if (isInviter) {
+                                fetchLessons(classId, duelSubjectSelect);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+
 const countdownEl = document.getElementById('duelCountdown');
             let timeLeft = 60;
             
@@ -5692,12 +5799,10 @@ duelRef.child('gameStarted').on('value', snapshot => {
             duelMusic.currentTime = 0;
         }
 
-        duelClassSelect.addEventListener('change', () => {
-            if (isInviter) {
-                fetchLessons(duelClassSelect.value, duelSubjectSelect);
-                updateDuelSelection('class', duelClassSelect.value);
-            }
-        });
+duelClassSelect.addEventListener('change', (e) => {
+    e.preventDefault(); // Değişikliği engelle
+    return false;
+});
 
         duelSubjectSelect.addEventListener('change', () => {
             if (isInviter) {
@@ -5712,10 +5817,15 @@ duelRef.child('gameStarted').on('value', snapshot => {
             }
         });
 
-        function updateDuelSelection(field, value) {
-            currentDuelRef.child('selections').child(field).set(value);
-            checkDuelSelections();
-        }
+function updateDuelSelection(field, value) {
+    // Sınıf seçimini değiştirmeye çalışıyorsa engelle
+    if (field === 'class' && value !== duelClassSelect.value) {
+        return;
+    }
+    
+    currentDuelRef.child('selections').child(field).set(value);
+    checkDuelSelections();
+}
 
         function checkDuelSelections() {
             if (isInviter) {
@@ -5736,6 +5846,22 @@ duelRef.child('gameStarted').on('value', snapshot => {
             duelClassId = duelClassSelect.value;
             duelSubjectId = duelSubjectSelect.value;
             duelTopicId = duelTopicSelect.value;
+
+    const classSnapshot = await database.ref(`classes/${selectedStudent.classId}`).once('value');
+    const championDataSnapshot = await database.ref(`championData/headings/${duelClassSelect.value}`).once('value');
+    
+    if (!classSnapshot.exists() || !championDataSnapshot.exists()) {
+        showAlert('Sınıf seçimi ile ilgili bir hata oluştu.');
+        return;
+    }
+
+    const studentClassName = classSnapshot.val().name;
+    const championClassName = championDataSnapshot.val().name;
+
+    if (studentClassName !== championClassName) {
+        showAlert('Sınıf seçimi uyuşmazlığı tespit edildi.');
+        return;
+    }
 
             const questionsRef = database.ref(`championData/headings/${duelClassId}/lessons/${duelSubjectId}/topics/${duelTopicId}/questions`);
             const snapshot = await questionsRef.once('value');
