@@ -2040,6 +2040,15 @@ option {
     flex-direction: column;
 }
 
+.friend-added-text {
+    display: inline-block;
+    font-size: 0.9em;
+    background-color: #e9ecef;
+    color: #495057;
+    border-radius: 6px;
+    padding: 8px 14px;
+}
+
 .matchmaking-content {
     background: white;
     padding: 30px;
@@ -2924,7 +2933,81 @@ option {
 
 
 
+.user-ranking-stats {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    margin: 20px;
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
+    animation: fadeInUp 0.5s ease-out;
+}
 
+.stats-header {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stats-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.rank-info {
+    display: flex;
+    gap: 20px;
+}
+
+.rank-number, .total-players {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.rank-label, .total-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.rank-value, .total-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.user-trophy {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 215, 0, 0.2);
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.trophy-icon {
+    font-size: 2em;
+    animation: trophyBounce 2s infinite ease-in-out;
+}
+
+.trophy-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes trophyBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
 
 
 
@@ -3070,6 +3153,26 @@ option {
                 </tbody>
             </table>
         </div>
+
+<div class="user-ranking-stats">
+        <div class="stats-header">Genel Sıralama Durumunuz</div>
+        <div class="stats-content">
+            <div class="rank-info">
+                <div class="rank-number" id="userRankNumber">
+                    <span class="rank-label">Sıralama</span>
+                    <span class="rank-value">-</span>
+                </div>
+                <div class="total-players" id="totalPlayers">
+                    <span class="total-label">Toplam Oyuncu</span>
+                    <span class="total-value">-</span>
+                </div>
+            </div>
+            <div class="user-trophy">
+                <span class="trophy-icon">🏆</span>
+                <span class="trophy-value" id="userTrophyCount">-</span>
+            </div>
+        </div>
+    </div>
         <button class="ranking-back-button" id="rankingBackButton">Geri Dön</button>
     </div>
 
@@ -4013,30 +4116,31 @@ async function searchFriends() {
     searchResults.innerHTML = '<div class="loading">Aranıyor...</div>';
     
     try {
-        const snapshot = await database.ref('classes').once('value');
+        // Sadece öğrencinin kendi sınıfını referans al
+        const classRef = database.ref(`classes/${selectedStudent.classId}`);
+        const snapshot = await classRef.once('value');
         const results = [];
         
-        snapshot.forEach(classSnapshot => {
-            const className = classSnapshot.val().name;
-            const students = classSnapshot.child('students').val();
-            
-            if (students) {
-                Object.entries(students).forEach(([studentId, studentData]) => {
-                    if (studentData.name?.toLowerCase().includes(searchTerm) && 
-                        studentId !== selectedStudent.studentId) {
-                        results.push({
-                            studentId,
-                            classId: classSnapshot.key,
-                            className,
-                            ...studentData
-                        });
-                    }
-                });
-            }
-        });
+        const classData = snapshot.val();
+        const students = classData.students;
+        
+        if (students) {
+            Object.entries(students).forEach(([studentId, studentData]) => {
+                if (studentData.name?.toLowerCase().includes(searchTerm) && 
+                    studentId !== selectedStudent.studentId) {
+                    results.push({
+                        studentId,
+                        classId: selectedStudent.classId,
+                        className: classData.name || selectedStudent.classId,
+                        ...studentData
+                    });
+                }
+            });
+        }
         
         displaySearchResults(results);
     } catch (error) {
+        console.error("Arama hatası:", error);
         searchResults.innerHTML = '<div class="error">Arama hatası oluştu</div>';
     }
 }
@@ -4061,22 +4165,26 @@ async function displaySearchResults(results) {
         const photo = student.photo || 'https://via.placeholder.com/50';
         const className = classNameMap[student.classId] || student.classId;
 
+        // Arkadaşlık durumuna göre buton veya metin gösterme
+        let actionHtml = '';
+        if (inDuel) {
+            actionHtml = '<button class="oyunda-button" disabled>Oyunda</button>';
+        } else if (isFriend) {
+            actionHtml = '<span class="friend-added-text" style="padding: 8px 14px; background-color: #e9ecef; color: #495057; border-radius: 6px;">Arkadaşsınız</span>';
+        } else {
+            actionHtml = '<button class="add-friend-button">+ Arkadaş Ekle</button>';
+        }
+
         li.innerHTML = `
             <img src="${photo}" alt="${student.name}" class="player-photo">
             <span class="player-name">${student.name} / (${className})</span>
-            ${inDuel ? 
-                '<button class="oyunda-button" disabled>Oyunda</button>' :
-                isFriend ? 
-                    '<button class="davet-et-button">Davet Et</button>' : 
-                    '<button class="add-friend-button">+ Arkadaş Ekle</button>'
-            }
+            ${actionHtml}
         `;
 
-        const button = li.querySelector('button');
-        if (!inDuel) {
-            if (isFriend) {
-                button.onclick = () => sendInvitation({...student, classId: student.classId});
-            } else {
+        // Sadece arkadaş değilse ve oyunda değilse buton işlevselliği ekle
+        if (!isFriend && !inDuel) {
+            const button = li.querySelector('.add-friend-button');
+            if (button) {
                 button.onclick = () => addFriend({
                     id: student.studentId,
                     name: student.name,
@@ -4090,6 +4198,7 @@ async function displaySearchResults(results) {
         searchResults.appendChild(li);
     }
 }
+
 
 async function addFriend(student) {
     try {
@@ -4462,64 +4571,57 @@ function showConfirmation(message) {
             });
         }
 
-        function fetchLessons(classId, subjectSelectElement) {
-            subjectSelectElement.innerHTML = '<option value="">Seçiniz</option>';
-            if (subjectSelectElement.id === 'duel-subject-select') {
-                duelTopicSelect.innerHTML = '<option value="">Seçiniz</option>';
-            } else {
-                topicSelect.innerHTML = '<option value="">Seçiniz</option>';
-            }
+async function fetchLessons(classId, subjectSelectElement) {
+    // Önce select elementini temizle
+    subjectSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+    
+    if (!classId) return;
 
-            if (classId === "") return;
-
-            database.ref(`championData/headings/${classId}/lessons`).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const lessonId = childSnapshot.key;
-                        const lessonName = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
-
-                        const option = document.createElement('option');
-                        option.value = lessonId;
-                        option.textContent = lessonName;
-                        subjectSelectElement.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.value = "";
-                    option.textContent = "Bu sınıfa ait ders yok";
-                    subjectSelectElement.appendChild(option);
-                }
-            }).catch(error => {
-                console.error("Ders bilgileri hata:", error);
+    try {
+        const snapshot = await database.ref(`championData/headings/${classId}/lessons`).once('value');
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const lessonId = childSnapshot.key;
+                const lessonName = childSnapshot.val().name || 'No name';
+                const option = document.createElement('option');
+                option.value = lessonId;
+                option.textContent = lessonName;
+                subjectSelectElement.appendChild(option);
             });
+            // Select elementinin içeriği dolduktan sonra true döndür
+            return true;
         }
+    } catch (error) {
+        console.error("Dersler yüklenirken hata:", error);
+    }
+    return false;
+}
 
-        function fetchTopics(classId, lessonId, topicSelectElement) {
-            topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+async function fetchTopics(classId, lessonId, topicSelectElement) {
+    // Önce select elementini temizle
+    topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+    
+    if (!classId || !lessonId) return;
 
-            if (lessonId === "") return;
-
-            database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const topicId = childSnapshot.key;
-                        const topicName = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
-
-                        const option = document.createElement('option');
-                        option.value = topicId;
-                        option.textContent = topicName;
-                        topicSelectElement.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.value = "";
-                    option.textContent = "Bu derse ait konu yok";
-                    topicSelectElement.appendChild(option);
-                }
-            }).catch(error => {
-                console.error("Konu bilgileri hata:", error);
+    try {
+        const snapshot = await database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value');
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const topicId = childSnapshot.key;
+                const topicName = childSnapshot.val().name || 'No name';
+                const option = document.createElement('option');
+                option.value = topicId;
+                option.textContent = topicName;
+                topicSelectElement.appendChild(option);
             });
+            // Select elementinin içeriği dolduktan sonra true döndür
+            return true;
         }
+    } catch (error) {
+        console.error("Konular yüklenirken hata:", error);
+    }
+    return false;
+}
 
         const singlePlayerSelects = singlePlayerScreen.querySelectorAll('select');
         singlePlayerSelects.forEach(select => {
@@ -5657,107 +5759,168 @@ duelRef.child('gameStarted').on('value', snapshot => {
     });
 
     duelRef.on('value', async (snap) => {
-    if (snap.exists()) {
-        const data = snap.val();
-        duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
-        duelInviterName.textContent = data.inviter.name;
-        duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
-        duelInvitedName.textContent = data.invited.name;
+   if (snap.exists()) {
+       const data = snap.val();
+       duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
+       duelInviterName.textContent = data.inviter.name;
+       duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
+       duelInvitedName.textContent = data.invited.name;
 
-// Kupa değerlerini güncelle/ekle
-            const inviterInfo = document.getElementById('duel-inviter-info');
-            const invitedInfo = document.getElementById('duel-invited-info');
+       // Kupa değerlerini güncelle/ekle
+       const inviterInfo = document.getElementById('duel-inviter-info');
+       const invitedInfo = document.getElementById('duel-invited-info');
 
-            // Mevcut kupa elementlerini kaldır (varsa)
-            const existingCups = document.querySelectorAll('.duel-player-cup');
-            existingCups.forEach(cup => cup.remove());
+       // Mevcut kupa elementlerini kaldır (varsa)
+       const existingCups = document.querySelectorAll('.duel-player-cup');
+       existingCups.forEach(cup => cup.remove());
 
-            // Yeni kupa elementlerini ekle
-            const inviterCup = document.createElement('div');
-            inviterCup.className = 'duel-player-cup';
-            inviterCup.innerHTML = `
-                <span class="cup-icon">🏆</span>
-                <span class="cup-value">${data.inviter.gameCup}</span>
-            `;
-            inviterInfo.appendChild(inviterCup);
+       // Yeni kupa elementlerini ekle
+       const inviterCup = document.createElement('div');
+       inviterCup.className = 'duel-player-cup';
+       inviterCup.innerHTML = `
+           <span class="cup-icon">🏆</span>
+           <span class="cup-value">${data.inviter.gameCup}</span>
+       `;
+       inviterInfo.appendChild(inviterCup);
 
-            const invitedCup = document.createElement('div');
-            invitedCup.className = 'duel-player-cup';
-            invitedCup.innerHTML = `
-                <span class="cup-icon">🏆</span>
-                <span class="cup-value">${data.invited.gameCup}</span>
-            `;
-            invitedInfo.appendChild(invitedCup);
+       const invitedCup = document.createElement('div');
+       invitedCup.className = 'duel-player-cup';
+       invitedCup.innerHTML = `
+           <span class="cup-icon">🏆</span>
+           <span class="cup-value">${data.invited.gameCup}</span>
+       `;
+       invitedInfo.appendChild(invitedCup);
 
-        // Sınıf seçimi yapıldığında dersleri yükle
-        if (data.selections.class && data.selections.class !== duelClassSelect.value) {
-            duelClassSelect.value = data.selections.class;
-            try {
-                await fetchLessons(data.selections.class, duelSubjectSelect);
-            } catch (error) {
-                console.error("Dersler yüklenirken hata:", error);
-            }
-        }
+       // Seçimleri senkronize şekilde yükle ve güncelle
+       if (data.selections) {
+           try {
+               // Sınıf seçimi ve dersleri yükle
+               if (data.selections.class) {
+                   duelClassSelect.value = data.selections.class;
+                   
+                   // Önce dersleri yükle
+                   const lessonsLoaded = await fetchLessons(data.selections.class, duelSubjectSelect);
+                   if (lessonsLoaded && data.selections.subject) {
+                       // Ders seçimini güncelle
+                       duelSubjectSelect.value = data.selections.subject;
+                       
+                       // Konuları yükle
+                       const topicsLoaded = await fetchTopics(data.selections.class, data.selections.subject, duelTopicSelect);
+                       if (topicsLoaded && data.selections.topic) {
+                           // Konu seçimini güncelle
+                           duelTopicSelect.value = data.selections.topic;
+                       }
+                   }
+               }
 
-        // Ders seçimi yapıldığında konuları yükle
-        if (data.selections.subject && data.selections.subject !== duelSubjectSelect.value) {
-            duelSubjectSelect.value = data.selections.subject;
-            try {
-                if (data.selections.class) {
-                    await fetchTopics(data.selections.class, data.selections.subject, duelTopicSelect);
-                }
-            } catch (error) {
-                console.error("Konular yüklenirken hata:", error);
-            }
-        }
+               // Select elementlerini güncelle
+               if (!isInviter) {
+                   // Misafir oyuncu için select elementlerini doldur
+                   if (data.selections.class) {
+                       const classOptions = await getClassOptions();
+                       duelClassSelect.innerHTML = classOptions;
+                       duelClassSelect.value = data.selections.class;
+                   }
+                   
+                   if (data.selections.subject) {
+                       const subjectOptions = await getLessonOptions(data.selections.class);
+                       duelSubjectSelect.innerHTML = subjectOptions;
+                       duelSubjectSelect.value = data.selections.subject;
+                   }
+                   
+                   if (data.selections.topic) {
+                       const topicOptions = await getTopicOptions(data.selections.class, data.selections.subject);
+                       duelTopicSelect.innerHTML = topicOptions;
+                       duelTopicSelect.value = data.selections.topic;
+                   }
+               }
 
-        // Konu seçimini güncelle
-        if (data.selections.topic) {
-            duelTopicSelect.value = data.selections.topic;
-        }
+           } catch (error) {
+               console.error("Seçimler güncellenirken hata:", error);
+           }
+       }
 
-        if (data.gameStarted && !duelGameStarted) {
-            duelGameStarted = true;
-            duelEnded = false;
-            startDuelGame(data);
-        }
+       if (data.gameStarted && !duelGameStarted) {
+           duelGameStarted = true;
+           duelEnded = false;
+           startDuelGame(data);
+       }
 
-        if (!isInviter) {
-            duelClassSelect.disabled = true;
-            duelSubjectSelect.disabled = true;
-            duelTopicSelect.disabled = true;
-            duelStartButton.disabled = true;
-        } else {
-            checkDuelSelections();
-        }
-    } else {
-        if (!duelEnded) {
-            try {
-                const currentPlayerId = selectedStudent.studentId;
-                
-                if (currentPlayerId === inviterId) {
-                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 3);
-                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
-                    await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
-                } else {
-                    await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
-                    await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
-                    await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
-                }
+       // Misafir oyuncu kontrolleri
+       if (!isInviter) {
+           duelClassSelect.disabled = true;
+           duelSubjectSelect.disabled = true;
+           duelTopicSelect.disabled = true;
+           duelStartButton.disabled = true;
+       } else {
+           checkDuelSelections();
+       }
+   } else {
+       if (!duelEnded) {
+           try {
+               const currentPlayerId = selectedStudent.studentId;
+               
+               if (currentPlayerId === inviterId) {
+                   await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 3);
+                   await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
+                   await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
+               } else {
+                   await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
+                   await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
+                   await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
+               }
 
-                await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false);
-                await database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false);
+               await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false);
+               await database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false);
 
-                window.location.reload();
+               window.location.reload();
 
-            } catch (error) {
-                console.error("Oyun sonlandırma hatası:", error);
-                await showAlert('Oyun sonlandırılırken bir hata oluştu');
-                window.location.reload();
-            }
-        }
-    }
+           } catch (error) {
+               console.error("Oyun sonlandırma hatası:", error);
+               await showAlert('Oyun sonlandırılırken bir hata oluştu');
+               window.location.reload();
+           }
+       }
+   }
 });
+
+// Select elementleri için yardımcı fonksiyonlar
+async function getClassOptions() {
+   const snapshot = await database.ref('championData/headings').once('value');
+   let options = '<option value="">Seçiniz</option>';
+   if (snapshot.exists()) {
+       snapshot.forEach(childSnapshot => {
+           const className = childSnapshot.val().name;
+           options += `<option value="${childSnapshot.key}">${className}</option>`;
+       });
+   }
+   return options;
+}
+
+async function getLessonOptions(classId) {
+   const snapshot = await database.ref(`championData/headings/${classId}/lessons`).once('value');
+   let options = '<option value="">Seçiniz</option>';
+   if (snapshot.exists()) {
+       snapshot.forEach(childSnapshot => {
+           const lessonName = childSnapshot.val().name;
+           options += `<option value="${childSnapshot.key}">${lessonName}</option>`;
+       });
+   }
+   return options;
+}
+
+async function getTopicOptions(classId, lessonId) {
+   const snapshot = await database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value');
+   let options = '<option value="">Seçiniz</option>';
+   if (snapshot.exists()) {
+       snapshot.forEach(childSnapshot => {
+           const topicName = childSnapshot.val().name;
+           options += `<option value="${childSnapshot.key}">${topicName}</option>`;
+       });
+   }
+   return options;
+}
+
 
     const hiddenPlayButton = document.createElement('button');
     hiddenPlayButton.style.display = 'none';
@@ -6200,85 +6363,84 @@ function endDuelGame() {
         }
 
         async function loadRanking() {
-            rankingTableBody.innerHTML = ''; // Temizle
+    rankingTableBody.innerHTML = '';
+    
+    try {
+        const snapshot = await database.ref('classes').once('value');
+        let players = [];
+        let currentUserRank = 0;
+        let totalPlayers = 0;
+        let userTrophyCount = 0;
 
-            // Tüm öğrencileri çek ve sıralama yap
-            const snapshot = await database.ref('classes').once('value');
-            let players = [];
-
-            if (snapshot.exists()) {
-                snapshot.forEach(classSnapshot => {
-                    const classId = classSnapshot.key;
-                    const className = classSnapshot.val().name ? classSnapshot.val().name : classId;
-                    const studentsSnapshot = classSnapshot.child('students');
-                    if (studentsSnapshot.exists()) {
-                        studentsSnapshot.forEach(studentSnapshot => {
-                            const studentId = studentSnapshot.key;
-                            const studentData = studentSnapshot.val();
-                            const gameCup = studentData.gameCup || 0;
-                            const photo = studentData.photo || 'https://via.placeholder.com/50';
-                            players.push({
-                                name: studentData.name || 'Anonim',
-                                className: className,
-                                gameCup: gameCup,
-                                photo: photo
-                            });
+        if (snapshot.exists()) {
+            snapshot.forEach(classSnapshot => {
+                const classId = classSnapshot.key;
+                const className = classSnapshot.val().name;
+                const studentsSnapshot = classSnapshot.child('students');
+                
+                if (studentsSnapshot.exists()) {
+                    studentsSnapshot.forEach(studentSnapshot => {
+                        const studentId = studentSnapshot.key;
+                        const studentData = studentSnapshot.val();
+                        const gameCup = studentData.gameCup || 0;
+                        
+                        if (studentId === selectedStudent.studentId) {
+                            userTrophyCount = gameCup;
+                        }
+                        
+                        players.push({
+                            id: studentId,
+                            name: studentData.name || 'Anonim',
+                            className: className,
+                            gameCup: gameCup,
+                            photo: studentData.photo || 'https://via.placeholder.com/50'
                         });
-                    }
-                });
+                    });
+                }
+            });
 
-                // Oyun kupasına göre sırala (büyükten küçüğe)
-                players.sort((a, b) => b.gameCup - a.gameCup);
+            // Kupa sayısına göre sırala
+            players.sort((a, b) => b.gameCup - a.gameCup);
+            totalPlayers = players.length;
 
-                // İlk 25 oyuncuyu al
-                const topPlayers = players.slice(0, 25);
+            // Kullanıcının sıralamasını bul
+            currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
 
-                topPlayers.forEach((player, index) => {
-                    const tr = document.createElement('tr');
-                    // Rank
-                    const rankTd = document.createElement('td');
-                    rankTd.textContent = index + 1;
-                    tr.appendChild(rankTd);
+            // İlk 25 oyuncuyu tabloda göster
+            const topPlayers = players.slice(0, 25);
+            topPlayers.forEach((player, index) => {
+                const tr = document.createElement('tr');
+                
+                // İlk 3 için özel sınıf ekle
+                if (index < 3) {
+                    tr.classList.add(`top-${index + 1}`);
+                }
 
-                    // Fotoğraf
-                    const photoTd = document.createElement('td');
-                    const img = document.createElement('img');
-                    img.src = player.photo;
-                    img.alt = `${player.name} Fotoğrafı`;
-                    img.className = 'ranking-player-photo';
-                    photoTd.appendChild(img);
-                    tr.appendChild(photoTd);
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><img src="${player.photo}" alt="${player.name}" class="ranking-player-photo"></td>
+                    <td>${player.name}</td>
+                    <td>${player.className}</td>
+                    <td>${player.gameCup}</td>
+                `;
+                
+                rankingTableBody.appendChild(tr);
+            });
 
-                    // İsim
-                    const nameTd = document.createElement('td');
-                    nameTd.textContent = player.name;
-                    tr.appendChild(nameTd);
-
-                    // Sınıf
-                    const classTd = document.createElement('td');
-                    classTd.textContent = player.className;
-                    tr.appendChild(classTd);
-
-                    // Kupa Skoru
-                    const scoreTd = document.createElement('td');
-                    scoreTd.textContent = player.gameCup;
-                    tr.appendChild(scoreTd);
-
-                    // Top 3 için özel sınıflar ekle
-                    if (index === 0) {
-                        tr.classList.add('top-1');
-                    } else if (index === 1) {
-                        tr.classList.add('top-2');
-                    } else if (index === 2) {
-                        tr.classList.add('top-3');
-                    }
-
-                    rankingTableBody.appendChild(tr);
-                });
-            } else {
-                rankingTableBody.innerHTML = '<tr><td colspan="5">Henüz sıralama yapılmadı.</td></tr>';
-            }
+            // Kullanıcı istatistiklerini güncelle
+            document.querySelector('#userRankNumber .rank-value').textContent = 
+                currentUserRank > 0 ? `#${currentUserRank}` : '-';
+            document.querySelector('#totalPlayers .total-value').textContent = totalPlayers;
+            document.querySelector('#userTrophyCount').textContent = userTrophyCount;
+        } else {
+            rankingTableBody.innerHTML = '<tr><td colspan="5">Henüz sıralama yapılmadı.</td></tr>';
         }
+    } catch (error) {
+        console.error("Sıralama yüklenirken hata:", error);
+        rankingTableBody.innerHTML = '<tr><td colspan="5">Sıralama yüklenirken bir hata oluştu.</td></tr>';
+    }
+}
+
     </script>
 
     <script>
