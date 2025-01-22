@@ -3050,6 +3050,147 @@ option {
 
 
 
+.credits-stats {
+    background: linear-gradient(145deg, #fc8403, #fc8403);
+    position: relative;
+}
+
+.credits-glow {
+    background: radial-gradient(circle at center,
+        rgba(99, 102, 241, 0.3) 0%,
+        transparent 70%);
+    animation: pulseCredits 2s ease-in-out infinite;
+}
+
+.credits-stats .stats-icon {
+    animation: floatGame 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+}
+
+.credits-stats .stats-value {
+    background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerCredits 3s linear infinite;
+}
+
+.tip-title {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes pulseCredits {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes floatGame {
+    0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+    50% { transform: translateY(-3px) scale(1.05); filter: brightness(1.2); }
+}
+
+@keyframes shimmerCredits {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+
+
+
+
+
+.duel-credits-store {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.credits-packages-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 10px;
+}
+
+.credit-package {
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.credit-package:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+}
+
+.credit-package.unlimited {
+    background: linear-gradient(145deg, #4f46e5, #4338ca);
+    color: white;
+}
+
+.package-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.package-amount {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.package-subtitle {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.package-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+.buy-button {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.buy-button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+.credit-package.unlimited .buy-button {
+    background: linear-gradient(135deg, #ffffff20, #ffffff40);
+    border: 1px solid white;
+}
+
 
 
 
@@ -3119,6 +3260,14 @@ option {
                 <div class="stats-glow diamond-glow"></div>
                 <span class="stats-icon">💎</span>
                 <span class="stats-value diamond-value" id="diamond-value">0</span>
+</div>
+
+<div class="stats-item credits-stats" id="credits-stats">
+        <div class="stats-glow credits-glow"></div>
+        <span class="stats-icon">🎮</span>
+        <span class="stats-value credits-value" id="duel-credits-value">0</span>
+        <div class="tip-title" style="display: none;">Düello Hakkı</div>
+
             </div>
         </div>
     </div>
@@ -3500,26 +3649,89 @@ option {
 
 <div class="profile-change-overlay" id="profileChangeOverlay">
     <div class="profile-change-content">
-    <div class="profile-change-header">
-<div class="current-diamonds">
-    <span class="diamond-icon">💎</span>
-    <span class="diamond-amount" id="currentDiamonds">0</span>
-</div>
-        <h2>Mağaza 🛒</h2>
-        <button class="profile-close-button" id="profileCloseButton">✖</button>
+        <div class="profile-change-header">
+            <div class="current-diamonds">
+                <span class="diamond-icon">💎</span>
+                <span class="diamond-amount" id="currentDiamonds">0</span>
+            </div>
+            <h2>Mağaza 🛒</h2>
+            <button class="profile-close-button" id="profileCloseButton">✖</button>
+        </div>
+        
+        <div class="profile-categories">
+            <button class="category-button" data-category="duel">⚔️ Düello Hakları</button>
+            <button class="category-button active" data-category="acemi">Acemi</button>
+            <button class="category-button" data-category="cesur">Cesur</button>
+            <button class="category-button" data-category="lider">Lider</button>
+            <button class="category-button" data-category="sampiyon">👑Şampiyon</button>
+        </div>
+
+        <!-- Düello Hakları Mağazası -->
+        <div class="duel-credits-store" id="duelCreditsStore" style="display: none;">
+            <div class="credits-packages-container">
+                <!-- 100 Hak Paketi -->
+                <div class="credit-package">
+                    <div class="package-header">
+                        <span class="package-amount">100 Düello Hakkı</span>
+                    </div>
+                    <div class="package-price">
+                        <span class="diamond-amount">100</span>
+                        <span class="diamond-icon">💎</span>
+                    </div>
+                    <button class="buy-button" onclick="purchaseCredits(100, 100)">
+                        Satın Al
+                    </button>
+                </div>
+
+                <!-- 300 Hak Paketi -->
+                <div class="credit-package">
+                    <div class="package-header">
+                        <span class="package-amount">300 Düello Hakkı</span>
+                    </div>
+                    <div class="package-price">
+                        <span class="diamond-amount">250</span>
+                        <span class="diamond-icon">💎</span>
+                    </div>
+                    <button class="buy-button" onclick="purchaseCredits(300, 250)">
+                        Satın Al
+                    </button>
+                </div>
+
+                <!-- 750 Hak Paketi -->
+                <div class="credit-package">
+                    <div class="package-header">
+                        <span class="package-amount">750 Düello Hakkı</span>
+                    </div>
+                    <div class="package-price">
+                        <span class="diamond-amount">500</span>
+                        <span class="diamond-icon">💎</span>
+                    </div>
+                    <button class="buy-button" onclick="purchaseCredits(750, 500)">
+                        Satın Al
+                    </button>
+                </div>
+
+                <!-- Sınırsız Paket -->
+                <div class="credit-package unlimited">
+                    <div class="package-header">
+                        <span class="package-amount">1 Aylık Sınırsız</span>
+                        <span class="package-subtitle">30 Gün Boyunca Sınırsız Düello!</span>
+                    </div>
+                    <div class="package-price">
+                        <span class="diamond-amount">1000</span>
+                        <span class="diamond-icon">💎</span>
+                    </div>
+                    <button class="buy-button" onclick="purchaseUnlimited(1000)">
+                        Satın Al
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profil Fotoğrafları Konteyneri -->
+        <div class="profile-photos-container" id="profilePhotosContainer"></div>
     </div>
-
-    
-    <div class="profile-categories">
-        <button class="category-button active" data-category="acemi">Acemi</button>
-        <button class="category-button" data-category="cesur">Cesur</button>
-        <button class="category-button" data-category="lider">Lider</button>
-        <button class="category-button" data-category="sampiyon">👑Şampiyon</button>
-    </div>
-
-    <div class="profile-photos-container" id="profilePhotosContainer"></div>
 </div>
-
 
 
 
@@ -4043,7 +4255,28 @@ async function updateDiamondCount() {
 // Ana ekrana gelindiğinde elmas sayısını güncelle
 function onMainScreenLoad() {
     updateDiamondCount();
-    // Her saat başı kontrol et
+    
+    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    studentRef.once('value').then(snapshot => {
+        const userData = snapshot.val();
+        const creditsStats = document.getElementById('credits-stats');
+        const creditsValue = document.getElementById('duel-credits-value');
+        
+        if (userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now()) {
+            creditsStats.classList.add('unlimited');
+            const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
+            creditsValue.innerHTML = `
+                <span class="unlimited-text">
+                    SINIRSIZ 
+                    <span class="days-left">${daysLeft} GÜN</span>
+                </span>
+            `;
+        } else {
+            creditsStats.classList.remove('unlimited');
+            creditsValue.textContent = userData.duelCredits || 0;
+        }
+    });
+
     setInterval(updateDiamondCount, 1000 * 60 * 60);
 }
 
@@ -6946,71 +7179,128 @@ async function useProfilePhoto(photoUrl) {
 }
 
 async function loadProfilePhotos(category = 'acemi') {
-   // Elmas değerini güncelle
-   const diamondSnapshot = await database.ref(
-       `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/diamond`
-   ).once('value');
-   document.getElementById('currentDiamonds').textContent = diamondSnapshot.val() || 0;
+    // Sınırsız düello kontrolü ve elmas değeri için kullanıcı verilerini çek
+    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    const studentSnapshot = await studentRef.once('value');
+    const userData = studentSnapshot.val();
+    
+    document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
 
-   const container = document.getElementById('profilePhotosContainer');
-   container.innerHTML = '';
+    // Düello mağazası için özel kontrol
+    if (category === 'duel') {
+        const duelStore = document.getElementById('duelCreditsStore');
+        duelStore.style.display = 'block';
+        document.getElementById('profilePhotosContainer').style.display = 'none';
 
-   try {
-       const purchasedRef = database.ref(
-           `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
-       );
-       const purchasedSnapshot = await purchasedRef.once('value');
-       const purchasedPhotos = purchasedSnapshot.val() || {};
+        const unlimitedPackage = duelStore.querySelector('.unlimited');
+        const buyButton = unlimitedPackage.querySelector('.buy-button');
 
-       // Eğer kategori şampiyon ve fotoğraf yoksa, mesaj göster
-       if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
-           container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
-           return;
-       }
+        if (userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now()) {
+            const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
+            buyButton.innerHTML = `${daysLeft} GÜN KALDI`;
+            buyButton.style.backgroundColor = '#6B7280';
+            buyButton.style.cursor = 'not-allowed';
+            buyButton.disabled = true;
+            buyButton.classList.add('disabled-button');
+        } else {
+            buyButton.innerHTML = 'Satın Al';
+            buyButton.style.backgroundColor = '';
+            buyButton.style.cursor = 'pointer';
+            buyButton.disabled = false;
+            buyButton.onclick = () => purchaseUnlimited(1000);
+            buyButton.classList.remove('disabled-button');
+        }
+        return;
+    }
 
-       photoCategories[category].forEach((photo, index) => {
-           const div = document.createElement('div');
-           div.className = 'profile-photo-item';
-           div.style.animationDelay = `${index * 0.1}s`;
+    // Profil fotoğrafları için normal akış
+    const container = document.getElementById('profilePhotosContainer');
+    container.style.display = 'grid';
+    document.getElementById('duelCreditsStore').style.display = 'none';
+    container.innerHTML = '';
 
-           const img = document.createElement('img');
-           img.src = photo.url;
-           img.className = 'profile-photo';
+    try {
+        const purchasedRef = database.ref(
+            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
+        );
+        const purchasedSnapshot = await purchasedRef.once('value');
+        const purchasedPhotos = purchasedSnapshot.val() || {};
 
-           const categoryBadge = document.createElement('div');
-           categoryBadge.className = `category-badge ${category}`;
-           categoryBadge.textContent = category.toUpperCase();
+        if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
+            container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
+            return;
+        }
 
-           const price = document.createElement('div');
-           price.className = 'profile-photo-price';
+        photoCategories[category].forEach((photo, index) => {
+            const div = document.createElement('div');
+            div.className = 'profile-photo-item';
+            div.style.animationDelay = `${index * 0.1}s`;
 
-           const button = document.createElement('button');
-           button.className = 'profile-photo-button';
+            const img = document.createElement('img');
+            img.src = photo.url;
+            img.className = 'profile-photo';
 
-           const encodedUrl = btoa(photo.url);
-           if (purchasedPhotos[encodedUrl]) {
-               price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
-               button.textContent = 'Kullan';
-               button.className = 'profile-photo-button use-button';
-               button.onclick = () => useProfilePhoto(photo.url);
-           } else {
-               price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
-               button.textContent = 'Satın Al';
-               button.className = 'profile-photo-button buy-button';
-               button.onclick = () => buyProfilePhoto(photo);
-           }
+            const categoryBadge = document.createElement('div');
+            categoryBadge.className = `category-badge ${category}`;
+            categoryBadge.textContent = category.toUpperCase();
 
-           div.appendChild(categoryBadge);
-           div.appendChild(img);
-           div.appendChild(price);
-           div.appendChild(button);
-           container.appendChild(div);
-       });
-   } catch (error) {
-       console.error('Fotoğraf listesi yükleme hatası:', error);
-       container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
-   }
+            const price = document.createElement('div');
+            price.className = 'profile-photo-price';
+
+            const button = document.createElement('button');
+            button.className = 'profile-photo-button';
+
+            const encodedUrl = btoa(photo.url);
+            if (purchasedPhotos[encodedUrl]) {
+                price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
+                button.textContent = 'Kullan';
+                button.className = 'profile-photo-button use-button';
+                button.onclick = () => useProfilePhoto(photo.url);
+            } else {
+                price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
+                button.textContent = 'Satın Al';
+                button.className = 'profile-photo-button buy-button';
+                button.onclick = () => buyProfilePhoto(photo);
+            }
+
+            div.appendChild(categoryBadge);
+            div.appendChild(img);
+            div.appendChild(price);
+            div.appendChild(button);
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Fotoğraf listesi yükleme hatası:', error);
+        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
+    }
 }
+
+
+
+
+
+const storeStyle = document.createElement('style');
+storeStyle.textContent = `
+    .disabled-button {
+        opacity: 0.8 !important;
+        pointer-events: none !important;
+        filter: grayscale(30%) !important;
+    }
+
+    .disabled-button:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+`;
+document.head.appendChild(storeStyle);
+
+
+
+
+
+
+
+
 
 // Stil ekleme
 const style = document.createElement('style');
@@ -7228,6 +7518,99 @@ auth.onAuthStateChanged((user) => {
 });
 
 
+
+
+
+
+
+
+
+document.querySelectorAll('.category-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // Aktif kategoriyi güncelle
+        document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Doğru içeriği göster
+        const duelStore = document.getElementById('duelCreditsStore');
+        const photosContainer = document.getElementById('profilePhotosContainer');
+        
+        if (button.dataset.category === 'duel') {
+            duelStore.style.display = 'block';
+            photosContainer.style.display = 'none';
+        } else {
+            duelStore.style.display = 'none';
+            photosContainer.style.display = 'grid';
+            loadProfilePhotos(button.dataset.category);
+        }
+    });
+});
+
+// Düello kredisi satın alma fonksiyonu
+async function purchaseCredits(amount, cost) {
+    try {
+        const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+        const snapshot = await studentRef.once('value');
+        const userData = snapshot.val();
+        const currentDiamonds = userData.diamond || 0;
+        const currentCredits = userData.duelCredits || 0;
+
+        if (currentDiamonds < cost) {
+            await showAlert('Yeterli elmasınız yok!');
+            return;
+        }
+
+        await studentRef.update({
+            diamond: currentDiamonds - cost,
+            duelCredits: currentCredits + amount
+        });
+
+        // Ana ekrandaki değerleri güncelle
+        document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
+        document.getElementById('duel-credits-value').textContent = currentCredits + amount;
+        
+        await showAlert('Düello hakkı satın alma başarılı!');
+        
+    } catch (error) {
+        console.error('Satın alma hatası:', error);
+        await showAlert('Satın alma işlemi başarısız oldu!');
+    }
+}
+
+// Sınırsız düello hakkı satın alma fonksiyonu
+async function purchaseUnlimited(cost) {
+    try {
+        const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+        const snapshot = await studentRef.once('value');
+        const userData = snapshot.val();
+        const currentDiamonds = userData.diamond || 0;
+
+        if (currentDiamonds < cost) {
+            await showAlert('Yeterli elmasınız yok!');
+            return;
+        }
+
+        const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+        await studentRef.update({
+            diamond: currentDiamonds - cost,
+            unlimitedCreditsUntil: Date.now() + thirtyDaysInMs
+        });
+
+        // Ana ekrandaki değerleri güncelle
+        document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
+        const creditsStats = document.getElementById('credits-stats');
+        const creditsValue = document.getElementById('duel-credits-value');
+        
+        creditsStats.classList.add('unlimited');
+        creditsValue.innerHTML = `SINIRSIZ <span class="unlimited-badge">30 GÜN</span>`;
+
+        await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
+        
+    } catch (error) {
+        console.error('Satın alma hatası:', error);
+        await showAlert('Satın alma işlemi başarısız oldu!');
+    }
+}
 
 
 
