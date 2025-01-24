@@ -3112,87 +3112,106 @@ option {
 
 
 .duel-credits-store {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #1a1c2b, #2d324d);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .credits-packages-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    padding: 10px;
+    padding: 15px;
 }
 
 .credit-package {
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 15px;
     padding: 20px;
-    text-align: center;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .credit-package:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-}
-
-.credit-package.unlimited {
-    background: linear-gradient(145deg, #4f46e5, #4338ca);
-    color: white;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
 }
 
 .package-header {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    text-align: center;
+    margin-bottom: 15px;
 }
 
 .package-amount {
-    font-size: 0.9em;
+    font-size: 1.4em;
     font-weight: bold;
+    background: linear-gradient(45deg, #f5d020, #ff9933);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
 }
 
 .package-subtitle {
+    color: #a0aec0;
     font-size: 0.9em;
-    opacity: 0.8;
 }
 
 .package-price {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    font-size: 0.9em;
-    font-weight: bold;
+    gap: 8px;
+    margin: 15px 0;
+    font-size: 1.2em;
+    color: #4fd1c5;
 }
 
 .buy-button {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: white;
+    width: 100%;
+    padding: 12px;
     border: none;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 0.9em;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4c1d95, #6d28d9);
+    color: white;
+    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .buy-button:hover {
-    opacity: 0.9;
-    transform: scale(1.02);
+    background: linear-gradient(135deg, #6d28d9, #4c1d95);
+    transform: scale(1.05);
 }
 
-.credit-package.unlimited .buy-button {
-    background: linear-gradient(135deg, #ffffff20, #ffffff40);
-    border: 1px solid white;
+.credit-package.unlimited {
+    background: linear-gradient(145deg, #4f46e5, #4338ca);
+    color: white;
+    position: relative;
+    overflow: hidden;
 }
 
+.credit-package.unlimited::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255,255,255,0.1),
+        transparent
+    );
+    animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
 
 
 
