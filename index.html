@@ -2513,15 +2513,17 @@ option {
 }
 
 /* Profil Fotoğrafı */
-    .profile-photo {
-        width: 100%;
-        aspect-ratio: 1;
-        object-fit: cover;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        border: 3px solid rgba(255, 255, 255, 0.1);
-        transition: transform 0.3s ease;
-    }
+.profile-photo {
+   width: 120px;  
+   height: 120px;
+   border-radius: 50%;
+   object-fit: cover;
+   display: block; /* Block görünüme al */
+   margin: 0 auto; /* Yatayda otomatik margin ile ortalar */
+   border: 3px solid #ff8a00;
+   box-shadow: 0 0 15px rgba(255, 138, 0, 0.3);
+   transition: transform 0.3s ease;
+}
 
 .profile-photo-item:hover .profile-photo {
     transform: scale(1.05);
@@ -2534,11 +2536,11 @@ option {
     justify-content: center;
     gap: 8px;
     background: rgba(0, 0, 0, 0.7);
-    padding: 12px;
-    border-radius: 12px;
-    margin: 15px auto;
+    padding: 8px;
+    border-radius: 8px;
+    margin: 10px auto;
     width: fit-content;
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: bold;
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -2546,11 +2548,11 @@ option {
 
 /* Buton Stilleri */
 .profile-photo-button {
-    width: 100%;
-    padding: 12px;
+    width: 70%;
+    padding: 8px;
     border: none;
     border-radius: 12px;
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -2690,11 +2692,8 @@ option {
 }
 
 .profile-photo-item {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
+   text-align: center; /* İçerikleri ortalar */
+   padding: 15px;
 }
 
 .profile-photo-item:hover {
@@ -3172,7 +3171,7 @@ option {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 1200px; /* Daha geniş ekranlarda ortalamak için */
   margin: 0 auto;    /* Ortalamak için */
-  height: auto;      /* Sabit yükseklikten kaçın */
+  max-height: 400px;      /* Sabit yükseklikten kaçın */
   overflow-y: auto;  /* İçerik uzadığında dikeyde kaydırma yapabilmek için */
 }
 
@@ -7044,13 +7043,18 @@ async function createPlayerItem(player) {
      .once('value');
    const photoUrl = photoSnapshot.exists() ? photoSnapshot.val() : 'https://via.placeholder.com/50';
    
-   div.innerHTML = `
-       <img src="${photoUrl}" alt="${player.name}" class="player-photo">
-       <span class="player-name">${player.name} / ${classNameMap[player.classId]}</span>
-       <button class="duel-request-button">
-           <i class="duel-icon">⚔️</i>
-       </button>
-   `;
+div.innerHTML = `
+    <img src="${photo.url}" class="profile-photo" alt="Avatar">
+    <div class="profile-photo-price">
+        ${isPurchased 
+            ? '<span class="purchased-badge">✓ Satın Alındı</span>'
+            : `${photo.price} <span class="diamond-icon">💎</span>`
+        }
+    </div>
+    <button class="profile-photo-button ${isPurchased ? 'use-button' : 'buy-button'}">
+        ${isPurchased ? 'Kullan' : 'Satın Al'}
+    </button>
+`;
    
    const duelButton = div.querySelector('.duel-request-button');
    duelButton.addEventListener('click', async () => {
@@ -7428,7 +7432,6 @@ function createPhotoCard(photo, purchasedPhotos, category, container, index) {
     const isPurchased = purchasedPhotos[encodedUrl];
 
     div.innerHTML = `
-        <div class="category-badge ${category}">${category.toUpperCase()}</div>
         <img src="${photo.url}" class="profile-photo" alt="Avatar">
         <div class="profile-photo-price">
             ${isPurchased 
