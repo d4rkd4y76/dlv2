@@ -96,18 +96,18 @@ select {
 
 .student-stats-container {
     position: relative;
-    margin-top: 15px; /* Azaltıldı: 20px -> 15px */
-    padding: 3px; /* Azaltıldı: 5px -> 3px */
+    margin-top: 10px; /* Azaltıldı: 20px -> 15px */
+    padding: 2px; /* Azaltıldı: 5px -> 3px */
     perspective: 1000px;
 }
 
 .student-stats {
     display: flex;
     justify-content: center;
-    gap: 9px; /* Azaltıldı: 25px -> 15px */
-    padding: 7px; /* Azaltıldı: 15px -> 10px */
+    gap: 6px; /* Azaltıldı: 25px -> 15px */
+    padding: 5px; /* Azaltıldı: 15px -> 10px */
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px; /* Azaltıldı: 20px -> 15px */
+    border-radius: 12px; /* Azaltıldı: 20px -> 15px */
     backdrop-filter: blur(10px);
     box-shadow: 0 6px 24px 0 rgba(31, 38, 135, 0.37); /* Azaltıldı shadow */
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -119,9 +119,9 @@ select {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 6px; /* Azaltıldı: 12px -> 8px */
-    padding: 6px 12px; /* Azaltıldı: 12px 20px -> 8px 15px */
-    border-radius: 10px; /* Azaltıldı: 16px -> 12px */
+    gap: 4px; /* Azaltıldı: 12px -> 8px */
+    padding: 4px 8px; /* Azaltıldı: 12px 20px -> 8px 15px */
+    border-radius: 8px; /* Azaltıldı: 16px -> 12px */
     background: rgba(255, 255, 255, 0.05);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -156,7 +156,7 @@ select {
 
 .stats-icon {
     position: relative;
-    font-size: 1.3em; /* Azaltıldı: 2em -> 1.3em */
+    font-size: 1.1em; /* Azaltıldı: 2em -> 1.3em */
     z-index: 2;
 }
 
@@ -172,17 +172,17 @@ select {
 
 .stats-value {
     position: relative;
-    font-size: 1.2em; /* Azaltıldı: 1.6em -> 1.2em */
+    font-size: 1em; /* Azaltıldı: 1.6em -> 1.2em */
     font-weight: bold;
     z-index: 2;
 }
 
 .trophy-stats .stats-value {
-    background: linear-gradient(45deg, #ffd700, #ffa500, #ff8c00);
+    font-size: 1em;
+    background: linear-gradient(45deg, #ffd700, #ff8c00);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmerGold 3s linear infinite;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .diamond-stats .stats-value {
