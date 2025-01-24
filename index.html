@@ -2487,39 +2487,61 @@ option {
 
 /* Profil Fotoğraf Kartı Stili */
 .profile-photo-item {
-    background: white;
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    transition: transform 0.3s ease;
+    background: linear-gradient(145deg, #ffffff05, #ffffff15);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-photo-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: 0.5s;
 }
 
 /* Profil Fotoğrafı */
-.profile-photo {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ff8a00;
+    .profile-photo {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+.profile-photo-item:hover .profile-photo {
+    transform: scale(1.05);
 }
 
 /* Fiyat Etiketi */
 .profile-photo-price {
-    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
-    padding: 10px 20px;
-    border-radius: 15px;
-    font-size: 1.2em;
-    font-weight: 600;
-    margin: 15px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 15px auto;
+    width: fit-content;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Buton Stilleri */
@@ -2529,19 +2551,44 @@ option {
     border: none;
     border-radius: 12px;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .buy-button {
-    background: #28a745;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
 }
 
 .use-button {
-    background: #007bff;
+    background: linear-gradient(135deg, #2196F3, #1976D2);
     color: white;
+}
+
+.profile-photo-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.category-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.8em;
+    font-weight: bold;
+    z-index: 1;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(-25deg); }
+    100% { transform: translateX(100%) rotate(-25deg); }
 }
 
 /* Kapatma Butonu */
@@ -2573,7 +2620,13 @@ option {
 
 /* Hover Efektleri */
 .profile-photo-item:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+
+.profile-photo-item:hover::before {
+    animation: shine 1.5s infinite;
 }
 
 .profile-close-button:hover {
@@ -7092,7 +7145,13 @@ window.addEventListener('beforeunload', () => {
 
 
 
-// Fotoğraf kategorileri tanımı
+const CACHE_KEYS = {
+    PHOTOS: 'storePhotos',
+    CHAMPION: 'championPhotos',
+    PURCHASED: 'purchasedPhotos'
+};
+
+// Main photo categories with added cache handling
 const photoCategories = {
    acemi: [
        {
@@ -7149,14 +7208,39 @@ const photoCategories = {
            price: 2000,
            id: 'photo11'
        }
-   ], 
-   sampiyon: [] // Başlangıçta boş
+   ],
+   sampiyon: []
 };
 
-// Yeni eklenen fonksiyon - Şampiyon fotoğraflarını yükle
-// Yeni eklenen fonksiyon - Şampiyon fotoğraflarını yükle
+// Cache management functions
+function saveToCache(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.error('Cache save error:', error);
+    }
+}
+
+function getFromCache(key) {
+    try {
+        const cached = localStorage.getItem(key);
+        return cached ? JSON.parse(cached) : null;
+    } catch (error) {
+        console.error('Cache read error:', error);
+        return null;
+    }
+}
+
 async function loadChampionPhotos() {
     try {
+        // Try cache first
+        const cached = getFromCache(CACHE_KEYS.CHAMPION);
+        if (cached) {
+            photoCategories.sampiyon = cached;
+            updateChampionButton(cached.length > 0);
+            return;
+        }
+
         const championPhotoRef = database.ref(
             `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/championPhoto`
         );
@@ -7164,278 +7248,210 @@ async function loadChampionPhotos() {
         const championPhoto = snapshot.val();
 
         if (championPhoto) {
-            // Eğer championPhoto bir dizi ise, tüm fotoğrafları işle
-            if (Array.isArray(championPhoto)) {
-                photoCategories.sampiyon = championPhoto.map((url, index) => ({
+            const photos = Array.isArray(championPhoto) 
+                ? championPhoto.map((url, index) => ({
                     url: url,
                     price: 5,
                     id: 'championSpecial' + index
-                }));
-            } else {
-                // championPhoto tek bir URL ise
-                photoCategories.sampiyon = [
-                    {
-                        url: championPhoto,
-                        price: 5,
-                        id: 'championSpecial'
-                    }
-                ];
-            }
-            const championButton = document.querySelector('[data-category="sampiyon"]');
-            if (championButton) {
-                championButton.style.display = 'flex';
-            }
+                }))
+                : [{
+                    url: championPhoto,
+                    price: 5,
+                    id: 'championSpecial'
+                }];
+
+            photoCategories.sampiyon = photos;
+            saveToCache(CACHE_KEYS.CHAMPION, photos);
+            updateChampionButton(true);
         } else {
-            const championButton = document.querySelector('[data-category="sampiyon"]');
-            if (championButton) {
-                championButton.style.display = 'none';
-            }
+            updateChampionButton(false);
         }
     } catch (error) {
-        console.error('Şampiyon fotoğrafı yüklenirken hata:', error);
+        console.error('Champion photo load error:', error);
     }
 }
 
-
-function updateProfileIcon() {
-   const profileIcon = document.getElementById('profile-icon');
-   if (selectedStudent?.studentId) {
-       database
-           .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
-           .once('value')
-           .then(snapshot => {
-               if (snapshot.exists()) {
-                   profileIcon.src = snapshot.val();
-               }
-           });
-   }
+function updateChampionButton(show) {
+    const championButton = document.querySelector('[data-category="sampiyon"]');
+    if (championButton) {
+        championButton.style.display = show ? 'flex' : 'none';
+    }
 }
 
-// Profil ikonuna tıklama olayı - güncellendi
+function updateProfileIcon() {
+    const profileIcon = document.getElementById('profile-icon');
+    if (!selectedStudent?.studentId) return;
+
+    const cached = getFromCache('currentUserPhoto');
+    if (cached) {
+        profileIcon.src = cached;
+    }
+
+    database
+        .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
+        .once('value')
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                const photoUrl = snapshot.val();
+                profileIcon.src = photoUrl;
+                saveToCache('currentUserPhoto', photoUrl);
+            }
+        });
+}
+
 document.getElementById('profile-icon').addEventListener('click', async () => {
-   document.getElementById('profileChangeOverlay').style.display = 'flex';
-   await loadChampionPhotos(); // Önce şampiyon fotoğrafını yükle
-   loadProfilePhotos('acemi'); // Sonra varsayılan kategoriyi yükle
+    document.getElementById('profileChangeOverlay').style.display = 'flex';
+    await loadChampionPhotos();
+    loadProfilePhotos('acemi');
 });
 
-// Kategori butonlarına tıklama olayları
 document.querySelectorAll('.category-button').forEach(button => {
-   button.addEventListener('click', () => {
-       document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
-       button.classList.add('active');
-       loadProfilePhotos(button.dataset.category);
-   });
+    button.addEventListener('click', () => {
+        document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        loadProfilePhotos(button.dataset.category);
+    });
 });
 
 async function buyProfilePhoto(photo) {
-   try {
-       const studentRef = database.ref(
-           `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`
-       );
+    try {
+        const studentRef = database.ref(
+            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`
+        );
 
-       const diamondSnapshot = await studentRef.child('diamond').once('value');
-       const currentDiamonds = diamondSnapshot.val() || 0;
+        const diamondSnapshot = await studentRef.child('diamond').once('value');
+        const currentDiamonds = diamondSnapshot.val() || 0;
 
-       if (currentDiamonds >= photo.price) {
-           const updates = {
-               diamond: currentDiamonds - photo.price,
-               [`purchasedPhotos/${btoa(photo.url)}`]: {
-                   url: photo.url,
-                   purchaseDate: Date.now()
-               }
-           };
+        if (currentDiamonds >= photo.price) {
+            const updates = {
+                diamond: currentDiamonds - photo.price,
+                [`purchasedPhotos/${btoa(photo.url)}`]: {
+                    url: photo.url,
+                    purchaseDate: Date.now()
+                }
+            };
 
-           await studentRef.update(updates);
-           document.getElementById('diamond-value').textContent = currentDiamonds - photo.price;
-           await showAlert('✨ Profil fotoğrafı başarıyla satın alındı!');
-           
-           // Güncel kategoriyi al ve o kategoriyi yeniden yükle
-           const activeCategory = document.querySelector('.category-button.active').dataset.category;
-           loadProfilePhotos(activeCategory);
-       } else {
-           await showAlert('💎 Yeterli elmasınız yok!');
-       }
-   } catch (error) {
-       console.error('Satın alma hatası:', error);
-       await showAlert('❌ Satın alma işlemi başarısız oldu: ' + error.message);
-   }
+            await studentRef.update(updates);
+            document.getElementById('diamond-value').textContent = currentDiamonds - photo.price;
+            
+            // Update cache
+            const purchasedPhotos = getFromCache(CACHE_KEYS.PURCHASED) || {};
+            purchasedPhotos[btoa(photo.url)] = {
+                url: photo.url,
+                purchaseDate: Date.now()
+            };
+            saveToCache(CACHE_KEYS.PURCHASED, purchasedPhotos);
+            
+            await showAlert('✨ Profil fotoğrafı başarıyla satın alındı!');
+            
+            const activeCategory = document.querySelector('.category-button.active').dataset.category;
+            loadProfilePhotos(activeCategory);
+        } else {
+            await showAlert('💎 Yeterli elmasınız yok!');
+        }
+    } catch (error) {
+        console.error('Satın alma hatası:', error);
+        await showAlert('❌ Satın alma işlemi başarısız oldu: ' + error.message);
+    }
 }
 
 async function useProfilePhoto(photoUrl) {
-   try {
-       await database
-           .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
-           .set(photoUrl);
+    try {
+        await database
+            .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
+            .set(photoUrl);
 
-       const photoElements = ['student-photo'];
-       photoElements.forEach(id => {
-           const element = document.getElementById(id);
-           if (element) element.src = photoUrl;
-       });
+        ['student-photo', 'profile-icon'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.src = photoUrl;
+        });
 
-       await showAlert('✨ Profil fotoğrafı başarıyla değiştirildi!');
-   } catch (error) {
-       console.error('Fotoğraf değiştirme hatası:', error);
-       await showAlert('❌ Fotoğraf değiştirme işlemi başarısız oldu.');
-   }
+        saveToCache('currentUserPhoto', photoUrl);
+        await showAlert('✨ Profil fotoğrafı başarıyla değiştirildi!');
+    } catch (error) {
+        console.error('Fotoğraf değiştirme hatası:', error);
+        await showAlert('❌ Fotoğraf değiştirme işlemi başarısız oldu.');
+    }
 }
 
 async function loadProfilePhotos(category = 'acemi') {
-   const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-   const studentSnapshot = await studentRef.once('value');
-   const userData = studentSnapshot.val();
-   
-   document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
+    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    const studentSnapshot = await studentRef.once('value');
+    const userData = studentSnapshot.val();
+    
+    document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
 
-   if (category === 'duel') {
-       const duelStore = document.getElementById('duelCreditsStore');
-       duelStore.style.display = 'block';
-       document.getElementById('profilePhotosContainer').style.display = 'none';
+    if (category === 'duel') {
+        handleDuelStore(userData);
+        return;
+    }
 
-       const hasUnlimited = userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now();
+    const container = document.getElementById('profilePhotosContainer');
+    container.style.display = 'grid';
+    document.getElementById('duelCreditsStore').style.display = 'none';
+    container.innerHTML = '';
 
-       // Normal paketleri güncelle
-       const normalPackages = duelStore.querySelectorAll('.credit-package:not(.unlimited)');
-       normalPackages.forEach(package => {
-           const buyBtn = package.querySelector('.buy-button');
-           if (hasUnlimited) {
-               package.style.opacity = '0.5';
-               buyBtn.disabled = true;
-               buyBtn.style.cursor = 'not-allowed';
-               buyBtn.innerHTML = 'SINIRSIZ HAK AKTİF';
-               buyBtn.style.background = '#6B7280';
-               buyBtn.onclick = null;
-           } else {
-               package.style.opacity = '1';
-               buyBtn.disabled = false;
-               buyBtn.style.cursor = 'pointer';
-               buyBtn.innerHTML = 'Satın Al';
-               buyBtn.style.background = '';
-               const credits = parseInt(package.querySelector('.package-amount').textContent);
-               const cost = parseInt(package.querySelector('.diamond-amount').textContent);
-               buyBtn.onclick = () => purchaseCredits(credits, cost);
-           }
-       });
+    try {
+        // Try cache first for purchased photos
+        let purchasedPhotos = getFromCache(CACHE_KEYS.PURCHASED);
+        
+        if (!purchasedPhotos) {
+            const purchasedRef = database.ref(
+                `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
+            );
+            const purchasedSnapshot = await purchasedRef.once('value');
+            purchasedPhotos = purchasedSnapshot.val() || {};
+            saveToCache(CACHE_KEYS.PURCHASED, purchasedPhotos);
+        }
 
-       // Sınırsız paketi güncelle
-       const unlimitedPackage = duelStore.querySelector('.unlimited');
-       const unlimitedBtn = unlimitedPackage.querySelector('.buy-button');
+        if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
+            container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
+            return;
+        }
 
-       if (hasUnlimited) {
-           const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
-           unlimitedBtn.innerHTML = `${daysLeft} GÜN KALDI`;
-           unlimitedBtn.style.backgroundColor = '#6B7280';
-           unlimitedBtn.style.cursor = 'not-allowed';
-           unlimitedBtn.disabled = true;
-           unlimitedPackage.classList.add('active');
-           unlimitedBtn.classList.add('disabled-button');
-       } else {
-           unlimitedBtn.innerHTML = 'Satın Al';
-           unlimitedBtn.style.backgroundColor = '';
-           unlimitedBtn.style.cursor = 'pointer';
-           unlimitedBtn.disabled = false;
-           unlimitedBtn.onclick = () => purchaseUnlimited(1000);
-           unlimitedPackage.classList.remove('active');
-           unlimitedBtn.classList.remove('disabled-button');
-       }
-       return;
-   }
+        photoCategories[category].forEach((photo, index) => {
+            createPhotoCard(photo, purchasedPhotos, category, container, index);
+        });
 
-   // Profil fotoğrafları için normal akış devam eder...
-   const container = document.getElementById('profilePhotosContainer');
-   container.style.display = 'grid';
-   document.getElementById('duelCreditsStore').style.display = 'none';
-   container.innerHTML = '';
-
-   try {
-       const purchasedRef = database.ref(
-           `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
-       );
-       const purchasedSnapshot = await purchasedRef.once('value');
-       const purchasedPhotos = purchasedSnapshot.val() || {};
-
-       if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
-           container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
-           return;
-       }
-
-       photoCategories[category].forEach((photo, index) => {
-           const div = document.createElement('div');
-           div.className = 'profile-photo-item';
-           div.style.animationDelay = `${index * 0.1}s`;
-
-           const img = document.createElement('img');
-           img.src = photo.url;
-           img.className = 'profile-photo';
-
-           const categoryBadge = document.createElement('div');
-           categoryBadge.className = `category-badge ${category}`;
-           categoryBadge.textContent = category.toUpperCase();
-
-           const price = document.createElement('div');
-           price.className = 'profile-photo-price';
-
-           const button = document.createElement('button');
-           button.className = 'profile-photo-button';
-
-           const encodedUrl = btoa(photo.url);
-           if (purchasedPhotos[encodedUrl]) {
-               price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
-               button.textContent = 'Kullan';
-               button.className = 'profile-photo-button use-button';
-               button.onclick = () => useProfilePhoto(photo.url);
-           } else {
-               price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
-               button.textContent = 'Satın Al';
-               button.className = 'profile-photo-button buy-button';
-               button.onclick = () => buyProfilePhoto(photo);
-           }
-
-           div.appendChild(categoryBadge);
-           div.appendChild(img);
-           div.appendChild(price);
-           div.appendChild(button);
-           container.appendChild(div);
-       });
-   } catch (error) {
-       console.error('Fotoğraf listesi yükleme hatası:', error);
-       container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
-   }
+    } catch (error) {
+        console.error('Fotoğraf listesi yükleme hatası:', error);
+        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
+    }
 }
 
+function createPhotoCard(photo, purchasedPhotos, category, container, index) {
+    const div = document.createElement('div');
+    div.className = 'profile-photo-item';
+    div.style.animationDelay = `${index * 0.1}s`;
 
+    const encodedUrl = btoa(photo.url);
+    const isPurchased = purchasedPhotos[encodedUrl];
 
-// Stil ekleme
-const style = document.createElement('style');
-style.textContent = `
-.no-champion {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-    font-style: italic;
+    div.innerHTML = `
+        <div class="category-badge ${category}">${category.toUpperCase()}</div>
+        <img src="${photo.url}" class="profile-photo" alt="Avatar">
+        <div class="profile-photo-price">
+            ${isPurchased 
+                ? '<span class="purchased-badge">✓ Satın Alındı</span>'
+                : `${photo.price} <span class="diamond-icon">💎</span>`
+            }
+        </div>
+        <button class="profile-photo-button ${isPurchased ? 'use-button' : 'buy-button'}">
+            ${isPurchased ? 'Kullan' : 'Satın Al'}
+        </button>
+    `;
+
+    const button = div.querySelector('.profile-photo-button');
+    button.onclick = () => isPurchased 
+        ? useProfilePhoto(photo.url) 
+        : buyProfilePhoto(photo);
+
+    container.appendChild(div);
 }
-
-[data-category="sampiyon"] {
-    background: linear-gradient(135deg, #ffd700, #ff8c00);
-    color: white;
-    font-weight: bold;
-    position: relative;
-    overflow: hidden;
-}
-
-[data-category="sampiyon"]::after {
-    content: "👑";
-    margin-left: 5px;
-}
-`;
-document.head.appendChild(style);
-
-
 
 document.getElementById('profileCloseButton').addEventListener('click', () => {
-   document.getElementById('profileChangeOverlay').style.display = 'none';
+    document.getElementById('profileChangeOverlay').style.display = 'none';
 });
-
 
 
 
