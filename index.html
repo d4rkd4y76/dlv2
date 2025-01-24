@@ -3111,106 +3111,143 @@ option {
 
 
 
+/* Ana mağaza kabı */
 .duel-credits-store {
-    background: linear-gradient(135deg, #1a1c2b, #2d324d);
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, #1a1c2b, #2d324d);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 1200px; /* Daha geniş ekranlarda ortalamak için isterseniz width verebilirsiniz */
+  margin: 0 auto;
 }
 
+/* Paketlerin bulunduğu konteyner - grid yapısı */
 .credits-packages-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 15px;
 }
 
+/* Paket Kartları */
 .credit-package {
-    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 15px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .credit-package:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
+/* Paket İçerikleri */
 .package-header {
-    text-align: center;
-    margin-bottom: 15px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
 .package-amount {
-    font-size: 1.4em;
-    font-weight: bold;
-    background: linear-gradient(45deg, #f5d020, #ff9933);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 5px;
+  font-size: 1.4em;
+  font-weight: bold;
+  background: linear-gradient(45deg, #f5d020, #ff9933);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 5px;
 }
 
 .package-subtitle {
-    color: #a0aec0;
-    font-size: 0.9em;
+  color: #a0aec0;
+  font-size: 0.9em;
 }
 
 .package-price {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 15px 0;
-    font-size: 1.2em;
-    color: #4fd1c5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+  font-size: 1.2em;
+  color: #4fd1c5;
 }
 
+/* Satın Al Butonu */
 .buy-button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #4c1d95, #6d28d9);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4c1d95, #6d28d9);
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .buy-button:hover {
-    background: linear-gradient(135deg, #6d28d9, #4c1d95);
-    transform: scale(1.05);
+  background: linear-gradient(135deg, #6d28d9, #4c1d95);
+  transform: scale(1.05);
 }
 
+/* Unlimited Paketi Özel Görünüm */
 .credit-package.unlimited {
-    background: linear-gradient(145deg, #4f46e5, #4338ca);
-    color: white;
-    position: relative;
-    overflow: hidden;
+  background: linear-gradient(145deg, #4f46e5, #4338ca);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
 }
 
 .credit-package.unlimited::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-        45deg,
-        transparent,
-        rgba(255,255,255,0.1),
-        transparent
-    );
-    animation: shine 3s infinite linear;
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shine 3s infinite linear;
 }
 
+/* Parlaklık Animasyonu */
 @keyframes shine {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) rotate(45deg); }
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+/* Mobil uyumlu tasarım için medya sorgusu */
+@media (max-width: 768px) {
+  .credits-packages-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .duel-credits-store {
+    padding: 20px;
+  }
+
+  .credit-package {
+    padding: 15px;
+  }
+
+  .package-amount {
+    font-size: 1.2em;
+  }
+
+  .package-price {
+    font-size: 1.1em;
+  }
 }
 
 
