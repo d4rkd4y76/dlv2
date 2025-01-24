@@ -3051,7 +3051,7 @@ option {
 
 
 .credits-stats {
-    background: linear-gradient(145deg, #fc8403, #fc8403);
+    background: linear-gradient(145deg, #ff9900, #db6204);
     position: relative;
 }
 
@@ -3111,13 +3111,9 @@ option {
 
 .duel-credits-store {
     padding: 20px;
-    border-radius: 15px;
-    /* Gelişmiş glass effect */
     background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    border-radius: 15px;
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .credits-packages-container {
@@ -3128,50 +3124,25 @@ option {
 }
 
 .credit-package {
-    /* Neumorphism tarzı bir arka plan */
-    background: linear-gradient(145deg, #f5f5f5, #e8e8e8);
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
     border-radius: 15px;
     padding: 20px;
     text-align: center;
-    box-shadow: 8px 8px 16px rgba(0,0,0,0.1),
-                -8px -8px 16px rgba(255,255,255,0.5);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    position: relative;
-    overflow: hidden;
-}
-
-.credit-package::before {
-    /* Üstte hafif bir parlama efekti */
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at top left, rgba(255,255,255,0.3), transparent 70%);
-    opacity: 0.7;
-    pointer-events: none;
 }
 
 .credit-package:hover {
     transform: translateY(-5px);
-    box-shadow: 8px 12px 20px rgba(0,0,0,0.15),
-                -8px -12px 20px rgba(255,255,255,0.4);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
 }
 
 .credit-package.unlimited {
-    /* Unlimited paket için daha canlı bir degrade */
     background: linear-gradient(145deg, #4f46e5, #4338ca);
-    color: #ffffff;
-    box-shadow: 8px 8px 16px rgba(79,70,229,0.3),
-                -8px -8px 16px rgba(67,56,202,0.5);
-}
-
-.credit-package.unlimited::before {
-    background: radial-gradient(circle at top left, rgba(255,255,255,0.2), transparent 70%);
+    color: white;
 }
 
 .package-header {
@@ -3181,7 +3152,7 @@ option {
 }
 
 .package-amount {
-    font-size: 1.1em;
+    font-size: 0.9em;
     font-weight: bold;
 }
 
@@ -3203,27 +3174,68 @@ option {
     background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px;
     border-radius: 8px;
     font-size: 0.9em;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .buy-button:hover {
-    transform: translateY(-2px) scale(1.02);
     opacity: 0.9;
+    transform: scale(1.02);
 }
 
 .credit-package.unlimited .buy-button {
     background: linear-gradient(135deg, #ffffff20, #ffffff40);
-    border: 1px solid #ffffff;
-    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+    border: 1px solid white;
 }
 
 
 
+
+
+
+
+
+.credits-stats.unlimited {
+    background: linear-gradient(145deg, #6ddb0d, #11f0d6);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.credits-stats.unlimited::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: shimmerEffect 2s infinite;
+}
+
+.credits-stats.unlimited .stats-value {
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    animation: pulseText 2s infinite;
+}
+
+@keyframes shimmerEffect {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+}
+
+@keyframes pulseText {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
 
 
 
@@ -3281,31 +3293,27 @@ option {
     <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
     <div class="student-name" id="student-name"></div>
     <div class="student-stats-container">
-        <div class="student-stats-container">
-    <!-- Düello kredisi göstergesi -->
-    <div class="student-stats single-stat" id="duel-credits">
-        <div class="stats-item credits-stats" id="credits-stats">
-            <div class="stats-glow credits-glow"></div>
-            <span class="stats-icon">🎮</span>
-            <span class="stats-value credits-value" id="duel-credits-value">0</span>
-        </div>
-    </div>
-
-    <!-- Ana istatistikler -->
-    <div class="student-stats">
-        <div class="stats-item trophy-stats">
-            <div class="stats-glow trophy-glow"></div>
-            <span class="stats-icon">🏆</span>
-            <span class="stats-value trophy-value" id="game-cup-score">0</span>
-        </div>
-        <div class="stats-item diamond-stats">
-            <div class="stats-glow diamond-glow"></div>
-            <span class="stats-icon">💎</span>
-            <span class="stats-value diamond-value" id="diamond-value">0</span>
-        </div>
-    </div>
+        <div class="student-stats">
+            <div class="stats-item trophy-stats">
+                <div class="stats-glow trophy-glow"></div>
+                <span class="stats-icon">🏆</span>
+                <span class="stats-value trophy-value" id="game-cup-score">0</span>
+            </div>
+            <div class="stats-item diamond-stats">
+                <div class="stats-glow diamond-glow"></div>
+                <span class="stats-icon">💎</span>
+                <span class="stats-value diamond-value" id="diamond-value">0</span>
 </div>
 
+<div class="stats-item credits-stats" id="credits-stats">
+        <div class="stats-glow credits-glow"></div>
+        <span class="stats-icon">⚔️</span>
+        <span class="stats-value credits-value" id="duel-credits-value">0</span>
+        <div class="tip-title" style="display: none;">Düello Hakkı</div>
+
+            </div>
+        </div>
+    </div>
 </div>
         <div class="buttons">
             <button class="single-player">Tek Kişilik Oyun</button>
@@ -4297,23 +4305,21 @@ function onMainScreenLoad() {
         const creditsStats = document.getElementById('credits-stats');
         const creditsValue = document.getElementById('duel-credits-value');
         
+        // Sınırsız hak kontrolü
         if (userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now()) {
             creditsStats.classList.add('unlimited');
+            // Kalan süreyi hesapla
             const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
-            creditsValue.innerHTML = `
-                <span class="unlimited-text">
-                    SINIRSIZ 
-                    <span class="days-left">${daysLeft} GÜN</span>
-                </span>
-            `;
+            creditsValue.innerHTML = `♾️ <span class="unlimited-badge">${daysLeft} Gün</span>`;
         } else {
             creditsStats.classList.remove('unlimited');
             creditsValue.textContent = userData.duelCredits || 0;
         }
     });
-
+    
     setInterval(updateDiamondCount, 1000 * 60 * 60);
 }
+
 
 // Yeni input elementi için referans
 const selectionNameInput = document.getElementById('selection-name-input');
@@ -7214,135 +7220,127 @@ async function useProfilePhoto(photoUrl) {
 }
 
 async function loadProfilePhotos(category = 'acemi') {
-    // Mevcut kodlar...
-    if (category === 'duel') {
-        const duelStore = document.getElementById('duelCreditsStore');
-        const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-        const userData = (await studentRef.once('value')).val();
-        
-        // Elmas değerini güncelle
-        document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
-        
-        // Tüm düello paketlerini seç
-        const allPackages = duelStore.querySelectorAll('.credit-package');
-        
-        if (userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now()) {
-            // Sınırsız düello varsa tüm paketleri devre dışı bırak
-            allPackages.forEach(package => {
-                const buyButton = package.querySelector('.buy-button');
-                const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
-                
-                buyButton.innerHTML = `${daysLeft} GÜN KALDI`;
-                buyButton.style.backgroundColor = '#6B7280';
-                buyButton.style.cursor = 'not-allowed';
-                buyButton.disabled = true;
-                buyButton.classList.add('disabled-button');
-            });
-        } else {
-            // Sınırsız düello yoksa normal görünüm
-            allPackages.forEach(package => {
-                const buyButton = package.querySelector('.buy-button');
-                if (!package.classList.contains('unlimited')) {
-                    buyButton.disabled = false;
-                    buyButton.classList.remove('disabled-button');
-                    buyButton.style.cursor = 'pointer';
-                    buyButton.style.backgroundColor = '';
-                    buyButton.innerHTML = 'Satın Al';
-                }
-            });
-        }
-        
-        duelStore.style.display = 'block';
-        document.getElementById('profilePhotosContainer').style.display = 'none';
-        return;
-    }
+   const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+   const studentSnapshot = await studentRef.once('value');
+   const userData = studentSnapshot.val();
+   
+   document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
 
-    // Profil fotoğrafları için normal akış
-    const container = document.getElementById('profilePhotosContainer');
-    container.style.display = 'grid';
-    document.getElementById('duelCreditsStore').style.display = 'none';
-    container.innerHTML = '';
+   if (category === 'duel') {
+       const duelStore = document.getElementById('duelCreditsStore');
+       duelStore.style.display = 'block';
+       document.getElementById('profilePhotosContainer').style.display = 'none';
 
-    try {
-        const purchasedRef = database.ref(
-            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
-        );
-        const purchasedSnapshot = await purchasedRef.once('value');
-        const purchasedPhotos = purchasedSnapshot.val() || {};
+       const hasUnlimited = userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now();
 
-        if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
-            container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
-            return;
-        }
+       // Normal paketleri güncelle
+       const normalPackages = duelStore.querySelectorAll('.credit-package:not(.unlimited)');
+       normalPackages.forEach(package => {
+           const buyBtn = package.querySelector('.buy-button');
+           if (hasUnlimited) {
+               package.style.opacity = '0.5';
+               buyBtn.disabled = true;
+               buyBtn.style.cursor = 'not-allowed';
+               buyBtn.innerHTML = 'SINIRSIZ HAK AKTİF';
+               buyBtn.style.background = '#6B7280';
+               buyBtn.onclick = null;
+           } else {
+               package.style.opacity = '1';
+               buyBtn.disabled = false;
+               buyBtn.style.cursor = 'pointer';
+               buyBtn.innerHTML = 'Satın Al';
+               buyBtn.style.background = '';
+               const credits = parseInt(package.querySelector('.package-amount').textContent);
+               const cost = parseInt(package.querySelector('.diamond-amount').textContent);
+               buyBtn.onclick = () => purchaseCredits(credits, cost);
+           }
+       });
 
-        photoCategories[category].forEach((photo, index) => {
-            const div = document.createElement('div');
-            div.className = 'profile-photo-item';
-            div.style.animationDelay = `${index * 0.1}s`;
+       // Sınırsız paketi güncelle
+       const unlimitedPackage = duelStore.querySelector('.unlimited');
+       const unlimitedBtn = unlimitedPackage.querySelector('.buy-button');
 
-            const img = document.createElement('img');
-            img.src = photo.url;
-            img.className = 'profile-photo';
+       if (hasUnlimited) {
+           const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
+           unlimitedBtn.innerHTML = `${daysLeft} GÜN KALDI`;
+           unlimitedBtn.style.backgroundColor = '#6B7280';
+           unlimitedBtn.style.cursor = 'not-allowed';
+           unlimitedBtn.disabled = true;
+           unlimitedPackage.classList.add('active');
+           unlimitedBtn.classList.add('disabled-button');
+       } else {
+           unlimitedBtn.innerHTML = 'Satın Al';
+           unlimitedBtn.style.backgroundColor = '';
+           unlimitedBtn.style.cursor = 'pointer';
+           unlimitedBtn.disabled = false;
+           unlimitedBtn.onclick = () => purchaseUnlimited(1000);
+           unlimitedPackage.classList.remove('active');
+           unlimitedBtn.classList.remove('disabled-button');
+       }
+       return;
+   }
 
-            const categoryBadge = document.createElement('div');
-            categoryBadge.className = `category-badge ${category}`;
-            categoryBadge.textContent = category.toUpperCase();
+   // Profil fotoğrafları için normal akış devam eder...
+   const container = document.getElementById('profilePhotosContainer');
+   container.style.display = 'grid';
+   document.getElementById('duelCreditsStore').style.display = 'none';
+   container.innerHTML = '';
 
-            const price = document.createElement('div');
-            price.className = 'profile-photo-price';
+   try {
+       const purchasedRef = database.ref(
+           `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
+       );
+       const purchasedSnapshot = await purchasedRef.once('value');
+       const purchasedPhotos = purchasedSnapshot.val() || {};
 
-            const button = document.createElement('button');
-            button.className = 'profile-photo-button';
+       if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
+           container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
+           return;
+       }
 
-            const encodedUrl = btoa(photo.url);
-            if (purchasedPhotos[encodedUrl]) {
-                price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
-                button.textContent = 'Kullan';
-                button.className = 'profile-photo-button use-button';
-                button.onclick = () => useProfilePhoto(photo.url);
-            } else {
-                price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
-                button.textContent = 'Satın Al';
-                button.className = 'profile-photo-button buy-button';
-                button.onclick = () => buyProfilePhoto(photo);
-            }
+       photoCategories[category].forEach((photo, index) => {
+           const div = document.createElement('div');
+           div.className = 'profile-photo-item';
+           div.style.animationDelay = `${index * 0.1}s`;
 
-            div.appendChild(categoryBadge);
-            div.appendChild(img);
-            div.appendChild(price);
-            div.appendChild(button);
-            container.appendChild(div);
-        });
-    } catch (error) {
-        console.error('Fotoğraf listesi yükleme hatası:', error);
-        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
-    }
+           const img = document.createElement('img');
+           img.src = photo.url;
+           img.className = 'profile-photo';
+
+           const categoryBadge = document.createElement('div');
+           categoryBadge.className = `category-badge ${category}`;
+           categoryBadge.textContent = category.toUpperCase();
+
+           const price = document.createElement('div');
+           price.className = 'profile-photo-price';
+
+           const button = document.createElement('button');
+           button.className = 'profile-photo-button';
+
+           const encodedUrl = btoa(photo.url);
+           if (purchasedPhotos[encodedUrl]) {
+               price.innerHTML = `<span style="color: #28a745">✓ Satın Alındı</span>`;
+               button.textContent = 'Kullan';
+               button.className = 'profile-photo-button use-button';
+               button.onclick = () => useProfilePhoto(photo.url);
+           } else {
+               price.innerHTML = `${photo.price} <span class="diamond-icon">💎</span>`;
+               button.textContent = 'Satın Al';
+               button.className = 'profile-photo-button buy-button';
+               button.onclick = () => buyProfilePhoto(photo);
+           }
+
+           div.appendChild(categoryBadge);
+           div.appendChild(img);
+           div.appendChild(price);
+           div.appendChild(button);
+           container.appendChild(div);
+       });
+   } catch (error) {
+       console.error('Fotoğraf listesi yükleme hatası:', error);
+       container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
+   }
 }
-
-
-
-
-
-const storeStyle = document.createElement('style');
-storeStyle.textContent = `
-    .disabled-button {
-        opacity: 0.8 !important;
-        pointer-events: none !important;
-        filter: grayscale(30%) !important;
-    }
-
-    .disabled-button:hover {
-        transform: none !important;
-        box-shadow: none !important;
-    }
-`;
-document.head.appendChild(storeStyle);
-
-
-
-
-
-
 
 
 
@@ -7621,6 +7619,7 @@ async function purchaseCredits(amount, cost) {
     }
 }
 
+
 // Sınırsız düello hakkı satın alma fonksiyonu
 async function purchaseUnlimited(cost) {
     try {
@@ -7655,15 +7654,6 @@ async function purchaseUnlimited(cost) {
         await showAlert('Satın alma işlemi başarısız oldu!');
     }
 }
-
-
-
-
-
-
-
-
-
 
 
 
