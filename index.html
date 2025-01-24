@@ -4313,7 +4313,7 @@ function onMainScreenLoad() {
             creditsStats.classList.add('unlimited');
             // Kalan süreyi hesapla
             const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
-            creditsValue.innerHTML = `♾️ <span class="unlimited-badge">${daysLeft} Gün</span>`;
+            creditsValue.innerHTML = `<span class="unlimited-badge">${daysLeft} Gün</span>`;
         } else {
             creditsStats.classList.remove('unlimited');
             creditsValue.textContent = userData.duelCredits || 0;
