@@ -3117,8 +3117,10 @@ option {
   padding: 25px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  max-width: 1200px; /* Daha geniş ekranlarda ortalamak için isterseniz width verebilirsiniz */
-  margin: 0 auto;
+  max-width: 1200px; /* Daha geniş ekranlarda ortalamak için */
+  margin: 0 auto;    /* Ortalamak için */
+  height: auto;      /* Sabit yükseklikten kaçın */
+  overflow-y: auto;  /* İçerik uzadığında dikeyde kaydırma yapabilmek için */
 }
 
 /* Paketlerin bulunduğu konteyner - grid yapısı */
@@ -3127,6 +3129,7 @@ option {
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   padding: 15px;
+  height: auto;      /* Sabit yükseklikten kaçın */
 }
 
 /* Paket Kartları */
@@ -3197,7 +3200,7 @@ option {
   background: linear-gradient(145deg, #4f46e5, #4338ca);
   color: #ffffff;
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* Parlama efektini göstermek için parent'ta kalabilir */
 }
 
 .credit-package.unlimited::before {
@@ -3235,6 +3238,7 @@ option {
 
   .duel-credits-store {
     padding: 20px;
+    /* Yine height: auto ve overflow-y: auto burada da geçerli kalmalı */
   }
 
   .credit-package {
