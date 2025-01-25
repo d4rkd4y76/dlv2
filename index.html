@@ -4977,23 +4977,46 @@ function showConfirmation(message) {
 
 
         function fetchChampionData() {
-            database.ref('championData/headings').once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const classId = childSnapshot.key;
-                        const className = childSnapshot.val().name ? childSnapshot.val().name : 'No name';
-                        const option = document.createElement('option');
-                        option.value = classId;
-                        option.textContent = className;
-                        classSelect.appendChild(option);
-                    });
-                } else {
-                    console.warn("championData/headings boş.");
-                }
-            }).catch(error => {
-                console.error("Sınıf bilgileri hata:", error);
+    // LocalStorage kontrolü
+    const cachedChampionData = localStorage.getItem('cachedChampionData');
+    if (cachedChampionData) {
+        const parsedData = JSON.parse(cachedChampionData);
+        populateChampionSelect(parsedData);
+        return;
+    }
+
+    // Yoksa Firebase'den çek
+    database.ref('championData/headings').once('value')
+        .then(snapshot => {
+            if (!snapshot.exists()) {
+                console.warn("championData/headings boş.");
+                return;
+            }
+            const result = [];
+            snapshot.forEach(childSnapshot => {
+                result.push({
+                    id: childSnapshot.key,
+                    name: childSnapshot.val().name || "No name"
+                });
             });
-        }
+
+            localStorage.setItem('cachedChampionData', JSON.stringify(result));
+            populateChampionSelect(result);
+        })
+        .catch(error => {
+            console.error("Sınıf bilgileri hata:", error);
+        });
+}
+
+function populateChampionSelect(data) {
+    data.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = item.name;
+        classSelect.appendChild(option);
+    });
+}
+
 
 async function fetchLessons(classId, subjectSelectElement) {
     // Önce select elementini temizle
@@ -5447,27 +5470,50 @@ logoutButton.addEventListener('click', async () => {
         }
 
         function fetchClassesForSelection() {
-            database.ref('classes').once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const classId = childSnapshot.key;
-                        const className = childSnapshot.val().name ? childSnapshot.val().name : classId; // Sınıf adını alıyoruz
+    // 1) LocalStorage'da var mı, kontrol et
+    const cachedClasses = localStorage.getItem('cachedClasses');
+    if (cachedClasses) {
+        // Varsa parse edip doğrudan dropdown’a bas
+        const parsedClasses = JSON.parse(cachedClasses);
+        populateClassSelect(parsedClasses);
+        return; // Firebase'e gitmeye gerek yok
+    }
 
-                        console.log(`Class ID: ${classId}, Class Name: ${className}`);
+    // 2) Yoksa veya süresi dolmuşsa Firebase'den çek
+    database.ref('classes').once('value')
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                const classesData = [];
+                snapshot.forEach(childSnapshot => {
+                    const classId = childSnapshot.key;
+                    const className = childSnapshot.val().name || classId;
+                    classesData.push({ id: classId, name: className });
+                });
 
-                        // Sınıf adı mevcut olduğu için doğrudan ekleyebiliriz
-                        const option = document.createElement('option');
-                        option.value = classId;
-                        option.textContent = className;
-                        selectionClassSelect.appendChild(option);
-                    });
-                } else {
-                    console.warn("Seçim için sınıf yok.");
-                }
-            }).catch(error => {
-                console.error("Seçim için sınıf çekme hata:", error);
-            });
-        }
+                // LocalStorage'a kaydet
+                localStorage.setItem('cachedClasses', JSON.stringify(classesData));
+
+                // Seçime aktar
+                populateClassSelect(classesData);
+            } else {
+                console.warn("Seçim için sınıf yok.");
+            }
+        })
+        .catch(error => {
+            console.error("Seçim için sınıf çekme hata:", error);
+        });
+}
+
+// Doldurma fonksiyonu
+function populateClassSelect(classesData) {
+    classesData.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls.id;
+        option.textContent = cls.name;
+        selectionClassSelect.appendChild(option);
+    });
+}
+
 
         // Alert fonksiyonu
         const alertOverlay = document.getElementById('alertOverlay');
@@ -7043,18 +7089,13 @@ async function createPlayerItem(player) {
      .once('value');
    const photoUrl = photoSnapshot.exists() ? photoSnapshot.val() : 'https://via.placeholder.com/50';
    
-div.innerHTML = `
-    <img src="${photo.url}" class="profile-photo" alt="Avatar">
-    <div class="profile-photo-price">
-        ${isPurchased 
-            ? '<span class="purchased-badge">✓ Satın Alındı</span>'
-            : `${photo.price} <span class="diamond-icon">💎</span>`
-        }
-    </div>
-    <button class="profile-photo-button ${isPurchased ? 'use-button' : 'buy-button'}">
-        ${isPurchased ? 'Kullan' : 'Satın Al'}
-    </button>
-`;
+   div.innerHTML = `
+       <img src="${photoUrl}" alt="${player.name}" class="player-photo">
+       <span class="player-name">${player.name} / ${classNameMap[player.classId]}</span>
+       <button class="duel-request-button">
+           <i class="duel-icon">⚔️</i>
+       </button>
+   `;
    
    const duelButton = div.querySelector('.duel-request-button');
    duelButton.addEventListener('click', async () => {
@@ -7122,7 +7163,6 @@ window.addEventListener('beforeunload', () => {
        database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`).remove();
    }
 });
-
 
 
 
