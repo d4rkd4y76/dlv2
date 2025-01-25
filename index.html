@@ -5267,34 +5267,42 @@ const logoutButton = document.getElementById('logout-button');
 
 // "Çıkış Yap" Butonuna Event Listener Ekleme
 logoutButton.addEventListener('click', async () => {
-    try {
-        // Önce seçili öğrencinin inDuel durumunu false yap
-        if (selectedStudent && selectedStudent.classId && selectedStudent.studentId) {
-            await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).set(false);
-        }
+   try {
+       // Önce seçili öğrencinin inDuel durumunu false yap
+       if (selectedStudent && selectedStudent.classId && selectedStudent.studentId) {
+           await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/inDuel`).set(false);
+       }
 
-        // Düello referansını temizle
-        if (currentDuelRef) {
-            await currentDuelRef.remove();
-            currentDuelRef = null;
-        }
+       // Düello referansını temizle
+       if (currentDuelRef) {
+           await currentDuelRef.remove();
+           currentDuelRef = null;
+       }
 
-        // localStorage'ı temizle
-        localStorage.removeItem('selectedStudent');
+       // Kullanıcıya özel tüm cache'leri temizle
+       if (selectedStudent?.studentId) {
+           Object.values(CACHE_KEYS).forEach(key => {
+               const userKey = getUserSpecificCacheKey(key);
+               localStorage.removeItem(userKey);
+           });
+       }
 
-        // Loggedin player'ı kaldır
-        if (loggedinPlayerRef) {
-            await loggedinPlayerRef.remove();
-            console.log("Kullanıcı Firebase'den başarıyla kaldırıldı.");
-        }
+       // localStorage'ı temizle
+       localStorage.removeItem('selectedStudent');
 
-        // Sayfayı yenile
-        window.location.reload();
+       // Loggedin player'ı kaldır
+       if (loggedinPlayerRef) {
+           await loggedinPlayerRef.remove();
+           console.log("Kullanıcı Firebase'den başarıyla kaldırıldı.");
+       }
 
-    } catch (error) {
-        console.error("Çıkış yaparken hata oluştu:", error);
-        showAlert('Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.');
-    }
+       // Sayfayı yenile
+       window.location.reload();
+
+   } catch (error) {
+       console.error("Çıkış yaparken hata oluştu:", error);
+       showAlert('Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.');
+   }
 });
 
 
@@ -7313,6 +7321,43 @@ const CACHE_KEYS = {
     PURCHASED: 'purchasedPhotos'
 };
 
+function getUserSpecificCacheKey(key) {
+    return `${key}_${selectedStudent.studentId}`;
+}
+
+function saveToCache(key, data) {
+    try {
+        const userKey = getUserSpecificCacheKey(key);
+        localStorage.setItem(userKey, JSON.stringify({
+            userId: selectedStudent.studentId,
+            data: data,
+            timestamp: Date.now()
+        }));
+    } catch (error) {
+        console.error('Cache save error:', error);
+    }
+}
+
+function getFromCache(key) {
+    try {
+        const userKey = getUserSpecificCacheKey(key);
+        const cached = localStorage.getItem(userKey);
+        if (!cached) return null;
+
+        const parsedCache = JSON.parse(cached);
+        if (parsedCache.userId !== selectedStudent.studentId) {
+            localStorage.removeItem(userKey);
+            return null;
+        }
+        return parsedCache.data;
+    } catch (error) {
+        console.error('Cache read error:', error);
+        return null;
+    }
+}
+
+
+
 // Main photo categories with added cache handling
 const photoCategories = {
    acemi: [
@@ -7374,63 +7419,55 @@ const photoCategories = {
    sampiyon: []
 };
 
-// Cache management functions
-function saveToCache(key, data) {
-    try {
-        localStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-        console.error('Cache save error:', error);
-    }
-}
-
-function getFromCache(key) {
-    try {
-        const cached = localStorage.getItem(key);
-        return cached ? JSON.parse(cached) : null;
-    } catch (error) {
-        console.error('Cache read error:', error);
-        return null;
-    }
-}
 
 async function loadChampionPhotos() {
-    try {
-        // Try cache first
-        const cached = getFromCache(CACHE_KEYS.CHAMPION);
-        if (cached) {
-            photoCategories.sampiyon = cached;
-            updateChampionButton(cached.length > 0);
-            return;
-        }
+   try {
+       // Firebase'den şampiyon fotoğraflarını çek
+       const championPhotoRef = database.ref(
+           `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/championPhoto`
+       );
+       const snapshot = await championPhotoRef.once('value');
+       const championPhoto = snapshot.val();
 
-        const championPhotoRef = database.ref(
-            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/championPhoto`
-        );
-        const snapshot = await championPhotoRef.once('value');
-        const championPhoto = snapshot.val();
+       // Şampiyon butonunu seç
+       const championButton = document.querySelector('[data-category="sampiyon"]');
+       
+       if (championPhoto) {
+           // Butonu göster
+           championButton.style.display = 'block';
+           
+           // Fotoğrafları yapılandır
+           const photos = Array.isArray(championPhoto) 
+               ? championPhoto.map((url, index) => ({
+                   url: url,
+                   price: 5,
+                   id: 'championSpecial' + index
+               }))
+               : [{
+                   url: championPhoto,
+                   price: 5,
+                   id: 'championSpecial'
+               }];
 
-        if (championPhoto) {
-            const photos = Array.isArray(championPhoto) 
-                ? championPhoto.map((url, index) => ({
-                    url: url,
-                    price: 5,
-                    id: 'championSpecial' + index
-                }))
-                : [{
-                    url: championPhoto,
-                    price: 5,
-                    id: 'championSpecial'
-                }];
-
-            photoCategories.sampiyon = photos;
-            saveToCache(CACHE_KEYS.CHAMPION, photos);
-            updateChampionButton(true);
-        } else {
-            updateChampionButton(false);
-        }
-    } catch (error) {
-        console.error('Champion photo load error:', error);
-    }
+           // photoCategories'e ekle
+           photoCategories.sampiyon = photos;
+           
+           // Cache'e kaydet
+           const userCacheKey = `${CACHE_KEYS.CHAMPION}_${selectedStudent.studentId}`;
+           localStorage.setItem(userCacheKey, JSON.stringify(photos));
+       } else {
+           // Şampiyon fotoğrafı yoksa butonu gizle
+           championButton.style.display = 'none';
+           photoCategories.sampiyon = [];
+           
+           const userCacheKey = `${CACHE_KEYS.CHAMPION}_${selectedStudent.studentId}`;
+           localStorage.setItem(userCacheKey, '[]');
+       }
+   } catch (error) {
+       console.error('Champion photo load error:', error);
+       const championButton = document.querySelector('[data-category="sampiyon"]');
+       championButton.style.display = 'none';
+   }
 }
 
 function updateChampionButton(show) {
@@ -7537,48 +7574,69 @@ async function useProfilePhoto(photoUrl) {
 }
 
 async function loadProfilePhotos(category = 'acemi') {
-    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-    const studentSnapshot = await studentRef.once('value');
-    const userData = studentSnapshot.val();
-    
-    document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
+   const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+   const studentSnapshot = await studentRef.once('value');
+   const userData = studentSnapshot.val();
+   
+   document.getElementById('currentDiamonds').textContent = userData.diamond || 0;
 
-    if (category === 'duel') {
-        handleDuelStore(userData);
-        return;
-    }
+   if (category === 'duel') {
+       const duelStore = document.getElementById('duelCreditsStore');
+       const container = document.getElementById('profilePhotosContainer');
+       duelStore.style.display = 'block';
+       container.style.display = 'none';
 
-    const container = document.getElementById('profilePhotosContainer');
-    container.style.display = 'grid';
-    document.getElementById('duelCreditsStore').style.display = 'none';
-    container.innerHTML = '';
+       // Sınırsız hak kontrolü
+       if (userData.unlimitedCreditsUntil && userData.unlimitedCreditsUntil > Date.now()) {
+           // Tüm butonları devre dışı bırak
+           document.querySelectorAll('.credit-package .buy-button').forEach(button => {
+               button.disabled = true;
+               button.style.opacity = '0.5';
+               button.style.cursor = 'not-allowed';
+               button.textContent = 'Sınırsız Hak Aktif';
+               button.onclick = null;
+           });
 
-    try {
-        // Try cache first for purchased photos
-        let purchasedPhotos = getFromCache(CACHE_KEYS.PURCHASED);
-        
-        if (!purchasedPhotos) {
-            const purchasedRef = database.ref(
-                `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
-            );
-            const purchasedSnapshot = await purchasedRef.once('value');
-            purchasedPhotos = purchasedSnapshot.val() || {};
-            saveToCache(CACHE_KEYS.PURCHASED, purchasedPhotos);
-        }
+           // Stats güncelle
+           const creditsStats = document.getElementById('credits-stats');
+           const creditsValue = document.getElementById('duel-credits-value');
+           const daysLeft = Math.ceil((userData.unlimitedCreditsUntil - Date.now()) / (1000 * 60 * 60 * 24));
+           
+           creditsStats.classList.add('unlimited');
+           creditsValue.innerHTML = `<span class="unlimited-badge">${daysLeft}GÜN</span>`;
+       }
+       return;
+   }
 
-        if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
-            container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
-            return;
-        }
+   const container = document.getElementById('profilePhotosContainer');
+   container.style.display = 'grid';
+   document.getElementById('duelCreditsStore').style.display = 'none';
+   container.innerHTML = '';
 
-        photoCategories[category].forEach((photo, index) => {
-            createPhotoCard(photo, purchasedPhotos, category, container, index);
-        });
+   try {
+       let purchasedPhotos = getFromCache(CACHE_KEYS.PURCHASED);
+       
+       if (!purchasedPhotos) {
+           const purchasedRef = database.ref(
+               `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos`
+           );
+           const purchasedSnapshot = await purchasedRef.once('value');
+           purchasedPhotos = purchasedSnapshot.val() || {};
+           saveToCache(CACHE_KEYS.PURCHASED, purchasedPhotos);
+       }
 
-    } catch (error) {
-        console.error('Fotoğraf listesi yükleme hatası:', error);
-        container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
-    }
+       if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
+           container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
+           return;
+       }
+
+       photoCategories[category].forEach((photo, index) => {
+           createPhotoCard(photo, purchasedPhotos, category, container, index);
+       });
+   } catch (error) {
+       console.error('Fotoğraf listesi yükleme hatası:', error);
+       container.innerHTML = '<div class="error">Fotoğraflar yüklenirken bir hata oluştu</div>';
+   }
 }
 
 function createPhotoCard(photo, purchasedPhotos, category, container, index) {
@@ -7858,39 +7916,47 @@ async function purchaseCredits(amount, cost) {
 }
 
 
-// Sınırsız düello hakkı satın alma fonksiyonu
 async function purchaseUnlimited(cost) {
-    try {
-        const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-        const snapshot = await studentRef.once('value');
-        const userData = snapshot.val();
-        const currentDiamonds = userData.diamond || 0;
+   try {
+       const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+       const snapshot = await studentRef.once('value');
+       const userData = snapshot.val();
+       const currentDiamonds = userData.diamond || 0;
 
-        if (currentDiamonds < cost) {
-            await showAlert('Yeterli elmasınız yok!');
-            return;
-        }
+       if (currentDiamonds < cost) {
+           await showAlert('Yeterli elmasınız yok!');
+           return;
+       }
 
-        const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-        await studentRef.update({
-            diamond: currentDiamonds - cost,
-            unlimitedCreditsUntil: Date.now() + thirtyDaysInMs
-        });
+       const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+       await studentRef.update({
+           diamond: currentDiamonds - cost,
+           unlimitedCreditsUntil: Date.now() + thirtyDaysInMs
+       });
 
-        // Ana ekrandaki değerleri güncelle
-        document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
-        const creditsStats = document.getElementById('credits-stats');
-        const creditsValue = document.getElementById('duel-credits-value');
-        
-        creditsStats.classList.add('unlimited');
-        creditsValue.innerHTML = `<span class="unlimited-badge">30GÜN</span>`;
+       document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
+       const creditsStats = document.getElementById('credits-stats');
+       const creditsValue = document.getElementById('duel-credits-value');
+       
+       creditsStats.classList.add('unlimited');
+       creditsValue.innerHTML = `<span class="unlimited-badge"></span>`;
 
-        await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
-        
-    } catch (error) {
-        console.error('Satın alma hatası:', error);
-        await showAlert('Satın alma işlemi başarısız oldu!');
-    }
+       // Tüm düello paketi butonlarını devre dışı bırak
+       const allPackageButtons = document.querySelectorAll('.credit-package .buy-button');
+       allPackageButtons.forEach(button => {
+           button.disabled = true;
+           button.style.opacity = '0.5';
+           button.style.cursor = 'not-allowed';
+           button.textContent = 'Sınırsız Hak Aktif';
+           button.onclick = null;
+       });
+
+       await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
+       
+   } catch (error) {
+       console.error('Satın alma hatası:', error);
+       await showAlert('Satın alma işlemi başarısız oldu!');
+   }
 }
 
 
