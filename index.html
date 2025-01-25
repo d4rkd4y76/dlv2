@@ -609,12 +609,10 @@ option {
 }
 
 .trophy-container {
-    background: linear-gradient(135deg, #ffd700, #ffa500);
-    border-radius: 15px;
-    padding: 5px;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    margin: 15px 0;
-    animation: trophyGlow 2s infinite alternate;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
 }
 
 .trophy-inner {
@@ -626,6 +624,24 @@ option {
     align-items: center;
     gap: 10px;
 }
+
+.trophy {
+    font-size: 2.5em;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+@keyframes trophyEntry {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.5);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 
         @keyframes rotateCup {
             from { transform: rotate(0deg); }
@@ -1554,18 +1570,37 @@ option {
         }
 
 .winner-message {
-    font-size: 1.5em; /* Yazı boyutu başlangıç değeri */
-    font-weight: bold; /* Yazı kalınlığı */
-    color: #11b819; /* Yazı rengi */
-    text-align: center; /* Yazıyı ortala */
-    animation: glowMukemmel 1.5s infinite alternate; /* Animasyon */
-    margin-bottom: 25px; /* Alt boşluk */
-    text-shadow: 3px 4px #8cd900; /* Yazı gölgesi */
-    word-wrap: break-word; /* Uzun kelimeleri kaydır */
-    overflow-wrap: break-word; /* Modern tarayıcılar için kelime kaydırma */
-    white-space: normal; /* Satır kaydırmayı etkinleştir */
-    padding: 10px; /* Çerçeve kenar boşluğu */
-    line-height: 1.2; /* Satır aralığını sıkılaştır */
+    font-size: 3em;
+    font-weight: 900;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: scale(0.5);
+    animation: winnerEntry 1s forwards, winnerGlow 2s infinite alternate;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+@keyframes winnerEntry {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(-50px);
+    }
+    80% {
+        transform: scale(1.1) translateY(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+
+@keyframes winnerGlow {
+    from { text-shadow: 0 0 10px gold, 0 0 20px gold; }
+    to { text-shadow: 0 0 20px gold, 0 0 40px gold; }
 }
 
         .score-flash {
@@ -6917,67 +6952,85 @@ function updateDuelSelection(field, value) {
 function endDuelGame() {
     currentDuelRef.off('value');
     currentDuelRef.child('responses').off('value');
-
-    let message = '';
-    let winnerId = null;
-    let loserId = null;
-    let winnerClassId = null;
-    let loserClassId = null;
+    
+    duelQuestionNumber.style.display = 'none';
+    document.querySelector('#duel-game-screen .progress-container').style.display = 'none';
+    document.querySelector('#duel-game-screen .timer-container').style.display = 'none';
+    document.querySelector('#duel-game-screen .question-container').style.display = 'none';
+    duelOptionsContainer.style.display = 'none';
+    duelFinalContainer.style.display = 'flex';
 
     currentDuelRef.once('value').then(async (dSnap) => {
         const ddata = dSnap.val();
+        let winnerName = '';
+        let winnerId = null;
+        let loserId = null;
+        let winnerClassId = null;
+        let loserClassId = null;
 
         if (duelInviterScore > duelInvitedScore) {
-            message = `Kazanan: ${ddata.inviter.name}`;
+            winnerName = ddata.inviter.name;
             winnerId = ddata.inviter.studentId;
             winnerClassId = ddata.inviter.classId;
             loserId = ddata.invited.studentId;
             loserClassId = ddata.invited.classId;
         } else if (duelInvitedScore > duelInviterScore) {
-            message = `Kazanan: ${ddata.invited.name}`;
+            winnerName = ddata.invited.name;
             winnerId = ddata.invited.studentId;
             winnerClassId = ddata.invited.classId;
             loserId = ddata.inviter.studentId;
             loserClassId = ddata.inviter.classId;
-        } else {
-            message = "Berabere Kaldınız!";
         }
 
-        if (winnerId && loserId) {
-            // Kazananın puanını +6, kaybedenin puanını -2
-            const winnerRef = database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`);
-            await winnerRef.transaction(current => {
-                return (current || 0) + 3;
-            });
+        // Winner message animation
+        const finalMessage = winnerId ? `👑 ${winnerName} 👑` : "🤝 Berabere! 🤝";
+        winnerMessage.textContent = finalMessage;
 
-            const loserRef = database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`);
-            await loserRef.transaction(current => {
-                return Math.max((current || 0) - 1, 0);
-            });
+        // Trophy container
+        const trophyContainer = document.createElement('div');
+        trophyContainer.className = 'trophy-container';
+        
+        // Add trophies with animation
+        if (winnerId) {
+            for(let i = 0; i < 6; i++) {
+                const trophy = document.createElement('div');
+                trophy.className = 'trophy';
+                trophy.textContent = '🏆';
+                trophy.style.animation = `trophyEntry 0.5s ${i * 0.2}s forwards`;
+                trophyContainer.appendChild(trophy);
+            }
+        }
+
+        // Update scores
+        if (winnerId && loserId) {
+            await database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`)
+                .transaction(current => (current || 0) + 3);
+            
+            await database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`)
+                .transaction(current => Math.max((current || 0) - 1, 0));
 
             if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
                 fetchAndDisplayGameCup();
             }
         }
 
-        duelQuestionNumber.style.display = 'none';
-        document.querySelector('#duel-game-screen .progress-container').style.display = 'none';
-        document.querySelector('#duel-game-screen .timer-container').style.display = 'none';
-        document.querySelector('#duel-game-screen .question-container').style.display = 'none';
-        duelOptionsContainer.style.display = 'none';
+        // Remove old trophies if exist
+        const oldTrophies = duelFinalContainer.querySelector('.trophy-container');
+        if(oldTrophies) oldTrophies.remove();
+        
+        // Add new trophies
+        duelFinalContainer.appendChild(trophyContainer);
 
-        winnerMessage.textContent = message;
-        duelFinalContainer.style.display = 'flex';
+        // Handle music
+        duelMusic.pause();
+        duelMusic.currentTime = 0;
 
-        if (message.startsWith('Kazanan') || message === "Berabere Kaldınız!") {
+        if (winnerId || finalMessage.includes("Berabere")) {
             winnerMusic.currentTime = 0;
             winnerMusic.play().catch(error => {
                 console.error("Kazanan müziği çalınamadı:", error);
             });
         }
-
-        duelMusic.pause();
-        duelMusic.currentTime = 0;
 
         duelEnded = true;
     });
