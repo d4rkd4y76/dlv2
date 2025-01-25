@@ -1724,28 +1724,31 @@ option {
         }
 
         /* Yeni Eklenen Stil: Ranking Panel (Yan Panel) */
-        .ranking-panel {
-            position: fixed;
-            top: 0;
-            right: -100%; /* Başlangıçta görünmez */
-            width: 450px;
-            max-width: 90%;
-            height: 100%;
-            background-color: #fffbea;
-            box-shadow: -3px 0 10px rgba(0,0,0,0.3);
-            transition: right 0.3s ease;
-            z-index: 1000000;
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            overflow-y: auto;
-            animation: slideInPanel 0.3s forwards;
-        }
+.ranking-panel {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(135deg, #ffffff, #f0f0f0);
+   z-index: 9999;
+   padding: 20px;
+   animation: slideIn 0.3s ease-out;
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;
+}
 
-        @keyframes slideInPanel {
-            from { right: -100%; }
-            to { right: 0; }
-        }
+@keyframes slideIn {
+   0% {
+       transform: translateX(100%);
+       opacity: 0;
+   }
+   100% {
+       transform: translateX(0);
+       opacity: 1;
+   }
+}
 
                 /* Açma Butonu */
         .open-ranking-button {
@@ -1807,14 +1810,37 @@ option {
         }
 
         /* Ranking Panel Header */
-        .ranking-panel h2 {
-            font-size: 2em;
-            color: #ff8a00;
-            margin-bottom: 25px;
-            text-align: center;
-            text-shadow: 1px 1px #f7786b;
-            animation: fadeInDown 0.8s ease forwards;
-        }
+.ranking-panel h2 {
+   text-align: center;
+   color: #333;
+   margin: 0 0 20px 0;
+   font-size: 1.8rem;
+   animation: fadeIn 0.3s ease-out;
+}
+
+
+@keyframes fadeIn {
+   from { opacity: 0; }
+   to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+   .ranking-panel {
+       padding: 15px;
+   }
+   
+   .ranking-table th,
+   .ranking-table td {
+       padding: 10px;
+       font-size: 0.9rem;
+   }
+   
+   .user-ranking-stats {
+       padding: 12px;
+       font-size: 0.9rem;
+   }
+}
+
 
         /* Geri Dön Butonu */
         .ranking-back-button {
@@ -1840,26 +1866,22 @@ option {
         }
 
         /* Ranking Table Container */
-        .ranking-table-container {
-            max-height: 80%;
-            overflow-y: auto;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, #e0eafc, #cfdef3);
-            animation: fadeInUp 1s 0.5s forwards;
-        }
+.ranking-table-container {
+   flex: 1;
+   overflow-y: auto;
+   margin: 15px 0;
+   padding: 10px;
+   border-radius: 15px;
+   background: rgba(255,255,255,0.9);
+   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
 
         /* Ranking Table */
-        .ranking-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            overflow: hidden;
-            animation: float 3s ease-in-out infinite;
-        }
+.ranking-table {
+   width: 100%;
+   border-collapse: separate;
+   border-spacing: 0 8px;
+}
 
         /* Float Animation */
         @keyframes float {
@@ -2014,10 +2036,25 @@ option {
                 border-radius: 0;
             }
 
-            .ranking-table th, .ranking-table td {
-                padding: 10px;
-                font-size: 0.9rem;
-            }
+.ranking-table th,
+.ranking-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+
+.ranking-table tr {
+   background: white;
+   border-radius: 10px;
+   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+   transition: all 0.2s ease;
+}
+
+.ranking-table tr:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 
             .ranking-player-photo {
                 width: 40px;
@@ -3080,15 +3117,23 @@ animation: floatButton 1s ease infinite;
 
 
 .user-ranking-stats {
-   background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-   margin: 15px auto;
-   padding: 15px 20px;
-   border-radius: 20px;
+   margin-top: auto;
+   padding: 15px;
+   background: linear-gradient(135deg, #4338ca, #6366f1);
+   border-radius: 15px;
    color: white;
-   box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
-   max-width: 420px;
-   width: 95%;
-   transition: transform 0.3s ease;
+   animation: slideUp 0.3s ease-out 0.2s backwards;
+}
+
+@keyframes slideUp {
+   0% {
+       transform: translateY(30px);
+       opacity: 0;
+   }
+   100% {
+       transform: translateY(0);
+       opacity: 1;
+   }
 }
 
 .user-ranking-stats:hover {
@@ -3579,7 +3624,7 @@ animation: floatButton 1s ease infinite;
                         <th>Fotoğraf</th>
                         <th>İsim</th>
                         <th>Sınıf</th>
-                        <th>Kupa Skoru</th>
+                        <th>KupaSayısı</th>
                     </tr>
                 </thead>
                 <tbody id="ranking-table-body">
@@ -7069,82 +7114,134 @@ function endDuelGame() {
         }
 
         async function loadRanking() {
-    rankingTableBody.innerHTML = '';
-    
-    try {
-        const snapshot = await database.ref('classes').once('value');
-        let players = [];
-        let currentUserRank = 0;
-        let totalPlayers = 0;
-        let userTrophyCount = 0;
+   // Check cache first
+   const cachedData = localStorage.getItem('rankingCache');
+   const cachedTimestamp = localStorage.getItem('rankingCacheTimestamp');
+   
+   if (cachedData && cachedTimestamp) {
+       const age = Date.now() - parseInt(cachedTimestamp);
+       if (age < 3600000) { // 1 hour
+           const data = JSON.parse(cachedData);
+           displayRankingData(data);
+           return;
+       }
+   }
 
-        if (snapshot.exists()) {
-            snapshot.forEach(classSnapshot => {
-                const classId = classSnapshot.key;
-                const className = classSnapshot.val().name;
-                const studentsSnapshot = classSnapshot.child('students');
-                
-                if (studentsSnapshot.exists()) {
-                    studentsSnapshot.forEach(studentSnapshot => {
-                        const studentId = studentSnapshot.key;
-                        const studentData = studentSnapshot.val();
-                        const gameCup = studentData.gameCup || 0;
-                        
-                        if (studentId === selectedStudent.studentId) {
-                            userTrophyCount = gameCup;
-                        }
-                        
-                        players.push({
-                            id: studentId,
-                            name: studentData.name || 'Anonim',
-                            className: className,
-                            gameCup: gameCup,
-                            photo: studentData.photo || 'https://via.placeholder.com/50'
-                        });
-                    });
-                }
-            });
+   rankingTableBody.innerHTML = '';
+   
+   try {
+       const snapshot = await database.ref('classes').once('value');
+       let players = [];
+       let currentUserRank = 0;
+       let totalPlayers = 0;
+       let userTrophyCount = 0;
 
-            // Kupa sayısına göre sırala
-            players.sort((a, b) => b.gameCup - a.gameCup);
-            totalPlayers = players.length;
+       if (snapshot.exists()) {
+           snapshot.forEach(classSnapshot => {
+               const classId = classSnapshot.key;
+               const className = classSnapshot.val().name;
+               const studentsSnapshot = classSnapshot.child('students');
+               
+               if (studentsSnapshot.exists()) {
+                   studentsSnapshot.forEach(studentSnapshot => {
+                       const studentId = studentSnapshot.key;
+                       const studentData = studentSnapshot.val();
+                       const gameCup = studentData.gameCup || 0;
+                       
+                       if (studentId === selectedStudent.studentId) {
+                           userTrophyCount = gameCup;
+                       }
+                       
+                       players.push({
+                           id: studentId,
+                           name: studentData.name || 'Anonim',
+                           className: className,
+                           gameCup: gameCup,
+                           photo: studentData.photo || 'https://via.placeholder.com/50'
+                       });
+                   });
+               }
+           });
 
-            // Kullanıcının sıralamasını bul
-            currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
+           players.sort((a, b) => b.gameCup - a.gameCup);
+           totalPlayers = players.length;
+           currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
 
-            // İlk 25 oyuncuyu tabloda göster
-            const topPlayers = players.slice(0, 25);
-            topPlayers.forEach((player, index) => {
-                const tr = document.createElement('tr');
-                
-                // İlk 3 için özel sınıf ekle
-                if (index < 3) {
-                    tr.classList.add(`top-${index + 1}`);
-                }
+           // Cache the data
+           localStorage.setItem('rankingCache', JSON.stringify(players));
+           localStorage.setItem('rankingCacheTimestamp', Date.now().toString());
 
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><img src="${player.photo}" alt="${player.name}" class="ranking-player-photo"></td>
-                    <td>${player.name}</td>
-                    <td>${player.className}</td>
-                    <td>${player.gameCup}</td>
-                `;
-                
-                rankingTableBody.appendChild(tr);
-            });
+           displayRankingData(players);
 
-            // Kullanıcı istatistiklerini güncelle
-            document.querySelector('#userRankNumber .rank-value').textContent = 
-                currentUserRank > 0 ? `#${currentUserRank}` : '-';
-            document.querySelector('#totalPlayers .total-value').textContent = totalPlayers;
-            document.querySelector('#userTrophyCount').textContent = userTrophyCount;
-        } else {
-            rankingTableBody.innerHTML = '<tr><td colspan="5">Henüz sıralama yapılmadı.</td></tr>';
-        }
-    } catch (error) {
-        console.error("Sıralama yüklenirken hata:", error);
-        rankingTableBody.innerHTML = '<tr><td colspan="5">Sıralama yüklenirken bir hata oluştu.</td></tr>';
-    }
+       } else {
+           rankingTableBody.innerHTML = '<tr><td colspan="5">Henüz sıralama yapılmadı.</td></tr>';
+       }
+   } catch (error) {
+       console.error("Sıralama yüklenirken hata:", error);
+       rankingTableBody.innerHTML = '<tr><td colspan="5">Sıralama yüklenirken bir hata oluştu.</td></tr>';
+   }
+}
+
+function displayRankingData(players) {
+   rankingTableBody.innerHTML = '';
+   const topPlayers = players.slice(0, 25);
+   const currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
+   const userTrophyCount = players.find(p => p.id === selectedStudent.studentId)?.gameCup || 0;
+
+   topPlayers.forEach((player, index) => {
+       const tr = document.createElement('tr');
+       
+       if (index < 3) {
+           tr.classList.add(`top-${index + 1}`);
+       }
+
+       // Highlight current user's row
+       if (player.id === selectedStudent.studentId) {
+           tr.classList.add('current-user-row');
+       }
+
+       tr.innerHTML = `
+           <td class="rank-column">${index + 1}</td>
+           <td><img src="${player.photo}" alt="${player.name}" class="ranking-player-photo" 
+               onerror="this.src='https://via.placeholder.com/50'"></td>
+           <td class="player-name-column">${player.name}</td>
+           <td class="class-name-column">${player.className}</td>
+           <td class="trophy-column">
+               <div class="trophy-wrapper">
+                   <span class="trophy-icon">🏆</span>
+                   <span class="trophy-count">${player.gameCup}</span>
+               </div>
+           </td>
+       `;
+       
+       rankingTableBody.appendChild(tr);
+   });
+
+   // Update user stats with animation
+   updateUserStats(currentUserRank, players.length, userTrophyCount);
+}
+
+function updateUserStats(rank, total, trophies) {
+   const rankValue = document.querySelector('#userRankNumber .rank-value');
+   const totalValue = document.querySelector('#totalPlayers .total-value');
+   const trophyValue = document.querySelector('#userTrophyCount');
+
+   // Add animation classes
+   rankValue.classList.add('stat-update');
+   totalValue.classList.add('stat-update');
+   trophyValue.classList.add('stat-update');
+
+   // Update values
+   rankValue.textContent = rank > 0 ? `#${rank}` : '-';
+   totalValue.textContent = total;
+   trophyValue.textContent = trophies;
+
+   // Remove animation classes after animation completes
+   setTimeout(() => {
+       rankValue.classList.remove('stat-update');
+       totalValue.classList.remove('stat-update');
+       trophyValue.classList.remove('stat-update');
+   }, 500);
 }
 
     </script>
