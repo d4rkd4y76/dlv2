@@ -611,8 +611,11 @@ option {
 .trophy-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px auto;
+    padding: 0 15px;
+    max-width: 300px;
 }
 
 .trophy-inner {
@@ -626,9 +629,9 @@ option {
 }
 
 .trophy {
-    font-size: 2.5em;
+    font-size: 1.5em;
     opacity: 0;
-    transform: translateY(50px);
+    transform: translateY(20px);
 }
 
 @keyframes trophyEntry {
@@ -1570,26 +1573,23 @@ option {
         }
 
 .winner-message {
-    font-size: 3em;
+    font-size: 1.2em;
     font-weight: 900;
     background: linear-gradient(45deg, #FFD700, #FFA500);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
-    opacity: 0;
-    transform: scale(0.5);
     animation: winnerEntry 1s forwards, winnerGlow 2s infinite alternate;
     text-align: center;
-    margin-bottom: 40px;
+    margin: 15px 0;
+    padding: 0 10px;
+    max-width: 100%;
+    word-wrap: break-word;
 }
 
 @keyframes winnerEntry {
     0% {
         opacity: 0;
-        transform: scale(0.5) translateY(-50px);
-    }
-    80% {
-        transform: scale(1.1) translateY(0);
+        transform: scale(0.5) translateY(-20px);
     }
     100% {
         opacity: 1;
@@ -1599,9 +1599,25 @@ option {
 
 
 @keyframes winnerGlow {
-    from { text-shadow: 0 0 10px gold, 0 0 20px gold; }
-    to { text-shadow: 0 0 20px gold, 0 0 40px gold; }
+    from { text-shadow: 0 0 5px gold; }
+    to { text-shadow: 0 0 10px gold; }
 }
+
+@media (max-width: 480px) {
+    .winner-message {
+        font-size: 1.2em;
+    }
+    
+    .trophy {
+        font-size: 1.1em;
+    }
+    
+    .trophy-container {
+        gap: 8px;
+        max-width: 250px;
+    }
+}
+
 
         .score-flash {
             animation: scoreFlash 0.8s ease;
