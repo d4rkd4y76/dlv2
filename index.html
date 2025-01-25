@@ -4976,16 +4976,31 @@ function showConfirmation(message) {
 
 
 
-        function fetchChampionData() {
-    // LocalStorage kontrolü
-    const cachedChampionData = localStorage.getItem('cachedChampionData');
-    if (cachedChampionData) {
-        const parsedData = JSON.parse(cachedChampionData);
-        populateChampionSelect(parsedData);
-        return;
+       // GÜNCELLENMİŞ HAL
+function fetchChampionData() {
+    const CACHE_KEY = 'cachedChampionData';
+    const CACHE_TIMESTAMP_KEY = 'cachedChampionDataTimestamp';
+    const CACHE_DURATION = 15 * 60 * 1000; // 15 dakika
+
+    const cachedChampionData = localStorage.getItem(CACHE_KEY);
+    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    const now = Date.now();
+
+    if (cachedChampionData && cachedTimestamp) {
+        const age = now - parseInt(cachedTimestamp, 10);
+        if (age < CACHE_DURATION) {
+            // Cache süresi dolmamış, veriyi kullan
+            const parsedData = JSON.parse(cachedChampionData);
+            populateChampionSelect(parsedData);
+            return;
+        } else {
+            // Cache süresi dolmuş, temizle
+            localStorage.removeItem(CACHE_KEY);
+            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        }
     }
 
-    // Yoksa Firebase'den çek
+    // Cache yok veya süresi dolmuş, Firebase'den çek
     database.ref('championData/headings').once('value')
         .then(snapshot => {
             if (!snapshot.exists()) {
@@ -5000,7 +5015,11 @@ function showConfirmation(message) {
                 });
             });
 
-            localStorage.setItem('cachedChampionData', JSON.stringify(result));
+            // localStorage’a kaydet
+            localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+            localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+
+            // Seçime aktar
             populateChampionSelect(result);
         })
         .catch(error => {
@@ -5009,6 +5028,9 @@ function showConfirmation(message) {
 }
 
 function populateChampionSelect(data) {
+    // Önce mevcut seçenekleri temizleyin
+    classSelect.innerHTML = '<option value="">Seçiniz</option>';
+
     data.forEach(item => {
         const option = document.createElement('option');
         option.value = item.id;
@@ -5018,24 +5040,53 @@ function populateChampionSelect(data) {
 }
 
 
+
+// GÜNCELLENMİŞ HAL
 async function fetchLessons(classId, subjectSelectElement) {
+    const CACHE_KEY = `cachedLessons_${classId}`;
+    const CACHE_TIMESTAMP_KEY = `cachedLessonsTimestamp_${classId}`;
+    const CACHE_DURATION = 15 * 60 * 1000; // 15 dakika
+
     // Önce select elementini temizle
     subjectSelectElement.innerHTML = '<option value="">Seçiniz</option>';
-    
+
     if (!classId) return;
 
+    const cachedLessons = localStorage.getItem(CACHE_KEY);
+    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    const now = Date.now();
+
+    if (cachedLessons && cachedTimestamp) {
+        const age = now - parseInt(cachedTimestamp, 10);
+        if (age < CACHE_DURATION) {
+            // Cache süresi dolmamış, veriyi kullan
+            const parsedLessons = JSON.parse(cachedLessons);
+            populateLessonsSelect(parsedLessons, subjectSelectElement);
+            return true;
+        } else {
+            // Cache süresi dolmuş, temizle
+            localStorage.removeItem(CACHE_KEY);
+            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        }
+    }
+
+    // Cache yok veya süresi dolmuş, Firebase'den çek
     try {
         const snapshot = await database.ref(`championData/headings/${classId}/lessons`).once('value');
         if (snapshot.exists()) {
+            const lessonsData = [];
             snapshot.forEach(childSnapshot => {
                 const lessonId = childSnapshot.key;
                 const lessonName = childSnapshot.val().name || 'No name';
-                const option = document.createElement('option');
-                option.value = lessonId;
-                option.textContent = lessonName;
-                subjectSelectElement.appendChild(option);
+                lessonsData.push({ id: lessonId, name: lessonName });
             });
-            // Select elementinin içeriği dolduktan sonra true döndür
+
+            // LocalStorage'a kaydet
+            localStorage.setItem(CACHE_KEY, JSON.stringify(lessonsData));
+            localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+
+            // Seçime aktar
+            populateLessonsSelect(lessonsData, subjectSelectElement);
             return true;
         }
     } catch (error) {
@@ -5044,24 +5095,60 @@ async function fetchLessons(classId, subjectSelectElement) {
     return false;
 }
 
+function populateLessonsSelect(lessonsData, subjectSelectElement) {
+    lessonsData.forEach(lesson => {
+        const option = document.createElement('option');
+        option.value = lesson.id;
+        option.textContent = lesson.name;
+        subjectSelectElement.appendChild(option);
+    });
+}
+
 async function fetchTopics(classId, lessonId, topicSelectElement) {
+    const CACHE_KEY = `cachedTopics_${classId}_${lessonId}`;
+    const CACHE_TIMESTAMP_KEY = `cachedTopicsTimestamp_${classId}_${lessonId}`;
+    const CACHE_DURATION = 15 * 60 * 1000; // 15 dakika
+
     // Önce select elementini temizle
     topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
-    
+
     if (!classId || !lessonId) return;
 
+    const cachedTopics = localStorage.getItem(CACHE_KEY);
+    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    const now = Date.now();
+
+    if (cachedTopics && cachedTimestamp) {
+        const age = now - parseInt(cachedTimestamp, 10);
+        if (age < CACHE_DURATION) {
+            // Cache süresi dolmamış, veriyi kullan
+            const parsedTopics = JSON.parse(cachedTopics);
+            populateTopicsSelect(parsedTopics, topicSelectElement);
+            return true;
+        } else {
+            // Cache süresi dolmuş, temizle
+            localStorage.removeItem(CACHE_KEY);
+            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        }
+    }
+
+    // Cache yok veya süresi dolmuş, Firebase'den çek
     try {
         const snapshot = await database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value');
         if (snapshot.exists()) {
+            const topicsData = [];
             snapshot.forEach(childSnapshot => {
                 const topicId = childSnapshot.key;
                 const topicName = childSnapshot.val().name || 'No name';
-                const option = document.createElement('option');
-                option.value = topicId;
-                option.textContent = topicName;
-                topicSelectElement.appendChild(option);
+                topicsData.push({ id: topicId, name: topicName });
             });
-            // Select elementinin içeriği dolduktan sonra true döndür
+
+            // LocalStorage'a kaydet
+            localStorage.setItem(CACHE_KEY, JSON.stringify(topicsData));
+            localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+
+            // Seçime aktar
+            populateTopicsSelect(topicsData, topicSelectElement);
             return true;
         }
     } catch (error) {
@@ -5069,6 +5156,17 @@ async function fetchTopics(classId, lessonId, topicSelectElement) {
     }
     return false;
 }
+
+function populateTopicsSelect(topicsData, topicSelectElement) {
+    topicsData.forEach(topic => {
+        const option = document.createElement('option');
+        option.value = topic.id;
+        option.textContent = topic.name;
+        topicSelectElement.appendChild(option);
+    });
+}
+
+
 
         const singlePlayerSelects = singlePlayerScreen.querySelectorAll('select');
         singlePlayerSelects.forEach(select => {
@@ -5469,17 +5567,31 @@ logoutButton.addEventListener('click', async () => {
             });
         }
 
-        function fetchClassesForSelection() {
-    // 1) LocalStorage'da var mı, kontrol et
-    const cachedClasses = localStorage.getItem('cachedClasses');
-    if (cachedClasses) {
-        // Varsa parse edip doğrudan dropdown’a bas
-        const parsedClasses = JSON.parse(cachedClasses);
-        populateClassSelect(parsedClasses);
-        return; // Firebase'e gitmeye gerek yok
+        // GÜNCELLENMİŞ HAL
+function fetchClassesForSelection() {
+    const CACHE_KEY = 'cachedClasses';
+    const CACHE_TIMESTAMP_KEY = 'cachedClassesTimestamp';
+    const CACHE_DURATION = 15 * 60 * 1000; // 15 dakika
+
+    const cachedClasses = localStorage.getItem(CACHE_KEY);
+    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    const now = Date.now();
+
+    if (cachedClasses && cachedTimestamp) {
+        const age = now - parseInt(cachedTimestamp, 10);
+        if (age < CACHE_DURATION) {
+            // Cache süresi dolmamış, veriyi kullan
+            const parsedClasses = JSON.parse(cachedClasses);
+            populateClassSelect(parsedClasses);
+            return;
+        } else {
+            // Cache süresi dolmuş, temizle
+            localStorage.removeItem(CACHE_KEY);
+            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        }
     }
 
-    // 2) Yoksa veya süresi dolmuşsa Firebase'den çek
+    // Cache yok veya süresi dolmuş, Firebase'den çek
     database.ref('classes').once('value')
         .then(snapshot => {
             if (snapshot.exists()) {
@@ -5491,7 +5603,8 @@ logoutButton.addEventListener('click', async () => {
                 });
 
                 // LocalStorage'a kaydet
-                localStorage.setItem('cachedClasses', JSON.stringify(classesData));
+                localStorage.setItem(CACHE_KEY, JSON.stringify(classesData));
+                localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
 
                 // Seçime aktar
                 populateClassSelect(classesData);
@@ -5506,6 +5619,9 @@ logoutButton.addEventListener('click', async () => {
 
 // Doldurma fonksiyonu
 function populateClassSelect(classesData) {
+    // Önce mevcut seçenekleri temizleyin
+    selectionClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+    
     classesData.forEach(cls => {
         const option = document.createElement('option');
         option.value = cls.id;
@@ -5513,6 +5629,7 @@ function populateClassSelect(classesData) {
         selectionClassSelect.appendChild(option);
     });
 }
+
 
 
         // Alert fonksiyonu
