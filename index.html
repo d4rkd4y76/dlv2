@@ -2645,27 +2645,36 @@ option {
 
 .profile-categories {
     display: flex;
-    flex-wrap: wrap; /* Allow wrapping on mobile */
-    justify-content: center;
-    gap: 10px;
-    margin: 15px 0;
-    padding: 10px;
+    overflow-x: auto;
+    padding: 15px;
+    gap: 15px;
     background: linear-gradient(145deg, #f6f7f9, #ffffff);
     border-radius: 15px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+}
+
+.profile-categories::-webkit-scrollbar {
+    display: none;
 }
 
 .category-button {
-    padding: 10px 15px; /* Reduced padding */
+    min-width: 200px;
+    height: 50px;
+    padding: 0 20px;
     border: none;
     border-radius: 12px;
-    font-size: 0.9em; /* Smaller font size */
-    min-width: 80px; /* Minimum width */
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    box-shadow: 3px 3px 6px #d1d1d1, -3px -3px 6px #ffffff;
-    white-space: nowrap; /* Prevent text wrapping within button */
+    box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Add responsive breakpoint */
@@ -2687,8 +2696,40 @@ option {
 .category-button.active {
     background: linear-gradient(145deg, #4f46e5, #4338ca);
     color: white;
-    transform: scale(1.05);
+    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+}
+
+.category-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+animation: floatButton 1s ease infinite;
+}
+
+@keyframes floatButton {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .category-button {
+        min-width: 160px;
+        font-size: 0.9rem;
+        padding: 0 15px;
+    }
+}
+
+
+.profile-categories::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+    pointer-events: none;
 }
 
 .profile-photo-item {
