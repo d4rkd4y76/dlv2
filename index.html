@@ -1812,12 +1812,56 @@ option {
         /* Ranking Panel Header */
 .ranking-panel h2 {
    text-align: center;
-   color: #333;
-   margin: 0 0 20px 0;
-   font-size: 1.8rem;
-   animation: fadeIn 0.3s ease-out;
+   font-size: 2.2rem;
+   font-weight: bold;
+   margin: 0 0 25px 0;
+   background: linear-gradient(45deg, #4338ca, #6366f1, #4338ca);
+   background-size: 200% auto;
+   color: transparent;
+   -webkit-background-clip: text;
+   background-clip: text;
+   animation: titleGradient 3s ease infinite,
+              titlePulse 2s ease infinite;
+   padding: 10px;
+   position: relative;
+   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
+.ranking-panel h2::after {
+   content: '';
+   position: absolute;
+   bottom: 0;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 150px;
+   height: 3px;
+   background: linear-gradient(90deg, transparent, #4338ca, transparent);
+   animation: underlineAnim 2s ease infinite;
+}
+
+
+@keyframes titleGradient {
+   0% { background-position: 0% 50%; }
+   50% { background-position: 100% 50%; }
+   100% { background-position: 0% 50%; }
+}
+
+@keyframes titlePulse {
+   0%, 100% { transform: scale(1); }
+   50% { transform: scale(1.02); }
+}
+
+@keyframes underlineAnim {
+   0%, 100% { width: 150px; opacity: 0.5; }
+   50% { width: 200px; opacity: 1; }
+}
+
+
+@media (max-width: 768px) {
+   .ranking-panel h2 {
+       font-size: 1.8rem;
+   }
+}
 
 @keyframes fadeIn {
    from { opacity: 0; }
@@ -2732,15 +2776,16 @@ option {
 }
 
 .profile-categories {
-    display: flex;
-    overflow-x: auto;
-    padding: 15px;
-    gap: 15px;
-    background: linear-gradient(145deg, #f6f7f9, #ffffff);
-    border-radius: 15px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    white-space: nowrap;
+   display: flex;
+   overflow-x: auto;
+   padding: 15px;
+   gap: 15px;
+   background: linear-gradient(145deg, #f6f7f9, #ffffff);
+   border-radius: 15px;
+   -webkit-overflow-scrolling: touch;
+   scrollbar-width: none;
+   white-space: nowrap;
+   margin-bottom: 20px;
 }
 
 .profile-categories::-webkit-scrollbar {
@@ -2748,37 +2793,79 @@ option {
 }
 
 .category-button {
-    min-width: 200px;
-    height: 50px;
-    padding: 0 20px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    box-shadow: 5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+   min-width: 200px;
+   height: 50px;
+   padding: 0 20px;
+   border: none;
+   border-radius: 12px;
+   font-size: 1rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.3s ease;
+   background: linear-gradient(45deg, #4e54c8, #8f94fb);
+   color: white;
+   box-shadow: 0 4px 15px rgba(78, 84, 200, 0.2);
+   flex-shrink: 0;
+   position: relative;
+   overflow: hidden;
 }
 
-/* Add responsive breakpoint */
-@media (max-width: 480px) {
-    .profile-categories {
-        gap: 8px;
-        padding: 8px;
-    }
-
-    .category-button {
-        padding: 8px 12px;
-        font-size: 0.8em;
-        min-width: 70px;
-    }
+.category-button::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: -100%;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+   transition: 0.5s;
 }
 
+.category-button:hover::before {
+   left: 100%;
+}
+
+.category-button:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
+}
+
+.category-button.active {
+   background: linear-gradient(45deg, #2d32b8, #5c61f9);
+   box-shadow: 0 4px 20px rgba(45, 50, 184, 0.4);
+   animation: activeButtonPulse 2s infinite;
+}
+
+[data-category="duel"] {
+   background: linear-gradient(45deg, #f12711, #f5af19);
+}
+
+[data-category="lider"] {
+   background: linear-gradient(45deg, #11998e, #38ef7d);
+}
+
+[data-category="sampiyon"] {
+   background: linear-gradient(45deg, #FFD700, #FFA500);
+}
+
+@keyframes activeButtonPulse {
+   0% { transform: scale(1); }
+   50% { transform: scale(1.02); }
+   100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+   .profile-categories {
+       gap: 10px;
+       padding: 10px;
+   }
+
+   .category-button {
+       min-width: 160px;
+       height: 45px;
+       font-size: 0.9rem;
+   }
+}
 
 
 .category-button.active {
