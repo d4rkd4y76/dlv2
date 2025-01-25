@@ -3171,7 +3171,7 @@ option {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 1200px; /* Daha geniş ekranlarda ortalamak için */
   margin: 0 auto;    /* Ortalamak için */
-  max-height: 400px;      /* Sabit yükseklikten kaçın */
+  max-height: 600px;      /* Sabit yükseklikten kaçın */
   overflow-y: auto;  /* İçerik uzadığında dikeyde kaydırma yapabilmek için */
 }
 
@@ -7725,7 +7725,7 @@ async function purchaseUnlimited(cost) {
         const creditsValue = document.getElementById('duel-credits-value');
         
         creditsStats.classList.add('unlimited');
-        creditsValue.innerHTML = `SINIRSIZ <span class="unlimited-badge">30 GÜN</span>`;
+        creditsValue.innerHTML = `<span class="unlimited-badge">30GÜN</span>`;
 
         await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
         
