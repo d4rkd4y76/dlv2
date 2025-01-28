@@ -3735,7 +3735,7 @@ animation: floatButton 1s ease infinite;
                 <thead>
                     <tr>
                         <th>Sıra</th>
-                        <th>Fotoğraf</th>
+                        <th>Foto</th>
                         <th>İsim</th>
                         <th>Sınıf</th>
                         <th>KupaSayısı</th>
@@ -4821,6 +4821,84 @@ async function searchFriends() {
     }
 }
 
+
+
+
+
+
+
+
+// Merkezi puanlama fonksiyonu
+async function updateDuelScore(type, data) {
+    const {inviterId, inviterClassId, invitedId, invitedClassId} = data;
+    
+    try {
+        switch(type) {
+            case 'TIME_OUT':
+                // Süre dolduğunda davet eden -3, misafir +6
+                await Promise.all([
+                    database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
+                        .transaction(current => Math.max((current || 0) - 3, 0)),
+                    database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
+                        .transaction(current => (current || 0) + 6)
+                ]);
+                await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
+                break;
+
+            case 'DISCONNECTED':
+                // Ayrılan oyuncu -3, kalan oyuncu +6
+                const disconnectedId = data.disconnectedId;
+                const disconnectedClassId = data.disconnectedClassId;
+                const remainingId = disconnectedId === inviterId ? invitedId : inviterId;
+                const remainingClassId = disconnectedId === inviterId ? invitedClassId : inviterClassId;
+                
+                await Promise.all([
+                    database.ref(`classes/${disconnectedClassId}/students/${disconnectedId}/gameCup`)
+                        .transaction(current => Math.max((current || 0) - 3, 0)),
+                    database.ref(`classes/${remainingClassId}/students/${remainingId}/gameCup`)
+                        .transaction(current => (current || 0) + 6)
+                ]);
+                await showAlert('👋 Rakip ayrıldı! (+6 🏆)');
+                break;
+
+            case 'GAME_END':
+                // Normal oyun sonu: Kazanan +6, Kaybeden -3
+                const {winnerId, winnerClassId, loserId, loserClassId} = data;
+                await Promise.all([
+                    database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`)
+                        .transaction(current => (current || 0) + 3),
+                    database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`)
+                        .transaction(current => Math.max((current || 0) - 1.5, 0))
+                ]);
+                const message = winnerId === selectedStudent.studentId ? 
+                    '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
+                    '😔 Maalesef kaybettiniz. (-3 🏆)';
+                await showAlert(message);
+                break;
+        }
+        return true;
+    } catch (error) {
+        console.error('Puan güncelleme hatası:', error);
+        await showAlert('❌ Puan güncellenirken bir hata oluştu!');
+        return false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async function displaySearchResults(results) {
     searchResults.innerHTML = '';
     if (!results.length) {
@@ -4962,7 +5040,22 @@ async function addFriend(student) {
 // Arkadaş listesini yükleme fonksiyonunu güncelle
 async function loadFriendsList() {
     try {
+        // Cache key oluştur
+        const CACHE_KEY = `friendsList_${selectedStudent.studentId}`;
+        const CACHE_DURATION = 30000; // 30 saniye
+
         friendsList.innerHTML = '<div class="loading">Yükleniyor...</div>';
+
+        // Cache kontrolü
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        const cachedTime = localStorage.getItem(`${CACHE_KEY}_time`);
+        
+        if (cachedData && cachedTime && (Date.now() - parseInt(cachedTime)) < CACHE_DURATION) {
+            friendsList.innerHTML = '';
+            const friends = JSON.parse(cachedData);
+            await displayCachedFriends(friends);
+            return;
+        }
 
         const friendshipsRef = database.ref(`friendships/${selectedStudent.studentId}`);
         const snapshot = await friendshipsRef.once('value');
@@ -4977,9 +5070,18 @@ async function loadFriendsList() {
 
         // Arkadaşları topla
         for (const [friendId, friendData] of Object.entries(snapshot.val())) {
-            // Güncel fotoğrafı çek
-            const currentPhotoSnap = await database.ref(`classes/${friendData.friendClassId}/students/${friendId}/photo`).once('value');
-            const currentPhoto = currentPhotoSnap.exists() ? currentPhotoSnap.val() : (friendData.friendPhoto || 'https://via.placeholder.com/50');
+            // Batch sorgu için referansları hazırla
+            const photoRef = database.ref(`classes/${friendData.friendClassId}/students/${friendId}/photo`);
+            const inDuelRef = database.ref(`classes/${friendData.friendClassId}/students/${friendId}/inDuel`);
+            
+            // Paralel sorgu yap
+            const [photoSnap, inDuelSnap] = await Promise.all([
+                photoRef.once('value'),
+                inDuelRef.once('value')
+            ]);
+
+            const currentPhoto = photoSnap.exists() ? photoSnap.val() : (friendData.friendPhoto || 'https://via.placeholder.com/50');
+            const inDuel = inDuelSnap.val() || false;
 
             friends.push({
                 studentId: friendId,
@@ -4987,22 +5089,56 @@ async function loadFriendsList() {
                 classId: friendData.friendClassId,
                 className: friendData.friendClassName,
                 photo: currentPhoto,
-                inDuel: false,
+                inDuel: inDuel,
                 isOnline: false
             });
         }
 
-        for (const friend of friends) {
-            // inDuel durumunu kontrol et
-            const inDuelRef = database.ref(`classes/${friend.classId}/students/${friend.studentId}/inDuel`);
-            const inDuelSnapshot = await inDuelRef.once('value');
-            friend.inDuel = inDuelSnapshot.val() || false;
+        // Tüm online durumları tek sorguda al
+        const loggedInRef = database.ref('loggedinPlayers');
+        const loggedInSnapshot = await loggedInRef.once('value');
+        const onlinePlayers = loggedInSnapshot.val() || {};
 
-            // Online durumunu kontrol et
-            const loggedInRef = database.ref('loggedinPlayers').orderByChild('studentId').equalTo(friend.studentId);
-            const loggedInSnapshot = await loggedInRef.once('value');
-            friend.isOnline = loggedInSnapshot.exists();
+        // Online durumlarını güncelle
+        friends.forEach(friend => {
+            friend.isOnline = Object.values(onlinePlayers).some(
+                player => player.studentId === friend.studentId
+            );
+        });
 
+        // Stil tanımlaması
+        const style = document.createElement('style');
+        style.textContent = `
+            .remove-friend-button {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 25px;
+                height: 25px;
+                line-height: 25px;
+                text-align: center;
+                cursor: pointer;
+                margin-left: 10px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+            
+            .remove-friend-button:hover {
+                background-color: #c82333;
+                transform: scale(1.1);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Cache'e kaydet
+        localStorage.setItem(CACHE_KEY, JSON.stringify(friends));
+        localStorage.setItem(`${CACHE_KEY}_time`, Date.now().toString());
+
+        // Arkadaş listesini göster
+        friends.forEach(friend => {
             const li = document.createElement('li');
             li.className = 'player-item';
 
@@ -5020,33 +5156,6 @@ async function loadFriendsList() {
                 isDisabled = true;
             }
 
-            // Silme butonu için stil ekle
-            const style = document.createElement('style');
-            style.textContent = `
-                .remove-friend-button {
-                    background-color: #dc3545;
-                    color: white;
-                    border: none;
-                    border-radius: 50%;
-                    width: 25px;
-                    height: 25px;
-                    line-height: 25px;
-                    text-align: center;
-                    cursor: pointer;
-                    margin-left: 10px;
-                    font-size: 14px;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                }
-                
-                .remove-friend-button:hover {
-                    background-color: #c82333;
-                    transform: scale(1.1);
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                }
-            `;
-            document.head.appendChild(style);
-
             li.innerHTML = `
                 <img src="${friend.photo}" alt="${friend.name}" class="player-photo">
                 <span class="player-name">${friend.name} / (${friend.className})</span>
@@ -5061,22 +5170,68 @@ async function loadFriendsList() {
                 davetButton.onclick = () => sendInvitation(friend);
             }
 
-            // Silme butonu için event listener
             const removeButton = li.querySelector('.remove-friend-button');
             removeButton.onclick = async (e) => {
                 e.stopPropagation();
                 if (await showConfirmation(`${friend.name} arkadaşlıktan çıkarılacak. Emin misiniz?`)) {
                     await removeFriend(friend.studentId);
-                    await loadFriendsList(); // Listeyi yenile
+                    await loadFriendsList();
                 }
             };
 
             friendsList.appendChild(li);
-        }
+        });
 
     } catch (error) {
         console.error('Arkadaş listesi yükleme hatası:', error);
         friendsList.innerHTML = '<div class="error">Liste yüklenirken bir hata oluştu</div>';
+    }
+}
+
+// Cache'den arkadaş listesini gösterme fonksiyonu
+async function displayCachedFriends(friends) {
+    for (const friend of friends) {
+        const li = document.createElement('li');
+        li.className = 'player-item';
+
+        let buttonClass = 'davet-et-button';
+        let buttonText = 'Davet Et';
+        let isDisabled = false;
+
+        if (friend.inDuel) {
+            buttonClass = 'oyunda-button';
+            buttonText = 'Oyunda';
+            isDisabled = true;
+        } else if (!friend.isOnline) {
+            buttonClass = 'offline-button';
+            buttonText = 'Çevrimdışı';
+            isDisabled = true;
+        }
+
+        li.innerHTML = `
+            <img src="${friend.photo}" alt="${friend.name}" class="player-photo">
+            <span class="player-name">${friend.name} / (${friend.className})</span>
+            <div style="display: flex; align-items: center;">
+                <button class="${buttonClass}" ${isDisabled ? 'disabled' : ''}>${buttonText}</button>
+                <button class="remove-friend-button" title="Arkadaşı Sil">✖</button>
+            </div>
+        `;
+
+        if (!isDisabled) {
+            const davetButton = li.querySelector(`.${buttonClass}`);
+            davetButton.onclick = () => sendInvitation(friend);
+        }
+
+        const removeButton = li.querySelector('.remove-friend-button');
+        removeButton.onclick = async (e) => {
+            e.stopPropagation();
+            if (await showConfirmation(`${friend.name} arkadaşlıktan çıkarılacak. Emin misiniz?`)) {
+                await removeFriend(friend.studentId);
+                await loadFriendsList();
+            }
+        };
+
+        friendsList.appendChild(li);
     }
 }
 
@@ -6532,41 +6687,52 @@ database.ref(`classes/${selectedStudent.classId}`).once('value').then(classSnaps
         }
     });
 
+
+
+// Ana countdown kodunu güncelleyelim
 const countdownEl = document.getElementById('duelCountdown');
-            let timeLeft = 60;
-            
-            countdownInterval = setInterval(() => {
-                timeLeft--;
-                countdownEl.textContent = timeLeft;
+let timeLeft = 60;
+
+countdownInterval = setInterval(async () => {
+    timeLeft--;
+    countdownEl.textContent = timeLeft;
+    
+    // Renk değişimleri aynı kalıyor
+    if (timeLeft > 30) {
+        countdownEl.className = 'countdown green';
+    } else if (timeLeft > 15) {
+        countdownEl.className = 'countdown orange';
+    } else {
+        countdownEl.className = 'countdown red';
+    }
+    
+    // Süre bittiğinde
+    if (timeLeft <= 0) {
+        clearInterval(countdownInterval);
+        
+        // Eğer davet eden kişiysek ve oyun başlatılmamışsa
+        if (selectedStudent.studentId === inviterId && !initialData.gameStarted) {
+            try {
+                // Yeni puanlama sistemini kullan
+                await updateDuelScore('TIME_OUT', {
+                    inviterId,
+                    inviterClassId,
+                    invitedId,
+                    invitedClassId
+                });
                 
-                // Renk değişimleri
-                if (timeLeft > 30) {
-                    countdownEl.className = 'countdown green';
-                } else if (timeLeft > 15) {
-                    countdownEl.className = 'countdown orange';
-                } else {
-                    countdownEl.className = 'countdown red';
-                }
-                
-                // Süre bittiğinde
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    
-                    // Eğer davet eden kişiysek ve oyun başlatılmamışsa
-                    if (selectedStudent.studentId === inviterId && !initialData.gameStarted) {
-                        // Puanları güncelle
-                        database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
-                            .transaction(current => Math.max((current || 0) - 3, 0));
-                        database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
-                            .transaction(current => (current || 0) + 0);
-                            
-                        // Düello referansını kaldır
-                        duelRef.remove().then(() => {
-                            window.location.reload();
-                        });
-                    }
-                }
-            }, 1000);
+                // Düello referansını kaldır
+                await duelRef.remove();
+                window.location.reload();
+            } catch (error) {
+                console.error('Süre sonu işlemi hatası:', error);
+                await showAlert('Bir hata oluştu, lütfen sayfayı yenileyin.');
+            }
+        }
+    }
+}, 1000);
+
+
 
 duelRef.child('gameStarted').on('value', snapshot => {
     if (snapshot.val() === true && countdownInterval) {
@@ -6638,7 +6804,7 @@ duelRef.child('gameStarted').on('value', snapshot => {
        `;
        invitedInfo.appendChild(invitedCup);
 
-       // Seçimleri senkronize şekilde yükle ve güncelle
+ // Seçimleri senkronize şekilde yükle ve güncelle
        if (data.selections) {
            try {
                // Sınıf seçimi ve dersleri yükle
@@ -6707,20 +6873,22 @@ duelRef.child('gameStarted').on('value', snapshot => {
            try {
                const currentPlayerId = selectedStudent.studentId;
                
-               if (currentPlayerId === inviterId) {
-                   await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => (current || 0) + 3);
-                   await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
-                   await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
-               } else {
-                   await database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).transaction(current => (current || 0) + 3);
-                   await database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).transaction(current => Math.max((current || 0) - 1, 0));
-                   await showAlert('Rakibiniz ayrıldı! KAZANDINIZ. (+6 🏆)');
-               }
+            await updateDuelScore('DISCONNECTED', {
+                inviterId,
+                inviterClassId,
+                invitedId,
+                invitedClassId,
+                disconnectedId: currentPlayerId === inviterId ? invitedId : inviterId,
+                disconnectedClassId: currentPlayerId === inviterId ? invitedClassId : inviterClassId
+            });
 
-               await database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false);
-               await database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false);
+            // inDuel durumlarını güncelle
+            await Promise.all([
+                database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false),
+                database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false)
+            ]);
 
-               window.location.reload();
+            window.location.reload();
 
            } catch (error) {
                console.error("Oyun sonlandırma hatası:", error);
@@ -6730,6 +6898,8 @@ duelRef.child('gameStarted').on('value', snapshot => {
        }
    }
 });
+
+
 
 // Select elementleri için yardımcı fonksiyonlar
 async function getClassOptions() {
@@ -7176,18 +7346,25 @@ function endDuelGame() {
             }
         }
 
-        // Update scores
-        if (winnerId && loserId) {
-            await database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`)
-                .transaction(current => (current || 0) + 3);
-            
-            await database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`)
-                .transaction(current => Math.max((current || 0) - 1, 0));
+      // Update scores
+if (winnerId && loserId) {
+    try {
+        await updateDuelScore('GAME_END', {
+            winnerId,
+            winnerClassId,
+            loserId,
+            loserClassId
+        });
 
-            if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
-                fetchAndDisplayGameCup();
-            }
+        // Puanları görsel olarak güncelle
+        if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
+            fetchAndDisplayGameCup();
         }
+    } catch (error) {
+        console.error("Puan güncelleme hatası:", error);
+        await showAlert('❌ Puan güncellenirken bir hata oluştu!');
+    }
+}
 
         // Remove old trophies if exist
         const oldTrophies = duelFinalContainer.querySelector('.trophy-container');
@@ -7228,13 +7405,16 @@ function endDuelGame() {
         }
 
         async function loadRanking() {
+   const CACHE_DURATION = 3600000; // 1 saat
+   const PLAYER_LIMIT = 50; // İlk 50 oyuncu
+
    // Check cache first
    const cachedData = localStorage.getItem('rankingCache');
    const cachedTimestamp = localStorage.getItem('rankingCacheTimestamp');
    
    if (cachedData && cachedTimestamp) {
        const age = Date.now() - parseInt(cachedTimestamp);
-       if (age < 3600000) { // 1 hour
+       if (age < CACHE_DURATION) {
            const data = JSON.parse(cachedData);
            displayRankingData(data);
            return;
@@ -7244,48 +7424,44 @@ function endDuelGame() {
    rankingTableBody.innerHTML = '';
    
    try {
-       const snapshot = await database.ref('classes').once('value');
+       const classesSnapshot = await database.ref('classes').once('value');
        let players = [];
        let currentUserRank = 0;
        let totalPlayers = 0;
        let userTrophyCount = 0;
 
-       if (snapshot.exists()) {
-           snapshot.forEach(classSnapshot => {
-               const classId = classSnapshot.key;
-               const className = classSnapshot.val().name;
-               const studentsSnapshot = classSnapshot.child('students');
-               
-               if (studentsSnapshot.exists()) {
-                   studentsSnapshot.forEach(studentSnapshot => {
-                       const studentId = studentSnapshot.key;
-                       const studentData = studentSnapshot.val();
-                       const gameCup = studentData.gameCup || 0;
-                       
-                       if (studentId === selectedStudent.studentId) {
-                           userTrophyCount = gameCup;
-                       }
-                       
+       if (classesSnapshot.exists()) {
+           for (const classSnap of Object.values(classesSnapshot.val())) {
+               if (classSnap.students) {
+                   for (const [studentId, student] of Object.entries(classSnap.students)) {
+                       // Sadece gerekli alanları al
                        players.push({
                            id: studentId,
-                           name: studentData.name || 'Anonim',
-                           className: className,
-                           gameCup: gameCup,
-                           photo: studentData.photo || 'https://via.placeholder.com/50'
+                           name: student.name || 'Anonim',
+                           className: classSnap.name,
+                           gameCup: student.gameCup || 0,
+                           photo: student.photo || 'https://via.placeholder.com/50'
                        });
-                   });
-               }
-           });
 
+                       if (studentId === selectedStudent.studentId) {
+                           userTrophyCount = student.gameCup || 0;
+                       }
+                   }
+               }
+           }
+
+           // Sıralama ve limit uygula
            players.sort((a, b) => b.gameCup - a.gameCup);
            totalPlayers = players.length;
            currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
+           players = players.slice(0, PLAYER_LIMIT);
 
-           // Cache the data
+           // Cache'e kaydet
            localStorage.setItem('rankingCache', JSON.stringify(players));
            localStorage.setItem('rankingCacheTimestamp', Date.now().toString());
 
            displayRankingData(players);
+           updateUserStats(currentUserRank, totalPlayers, userTrophyCount);
 
        } else {
            rankingTableBody.innerHTML = '<tr><td colspan="5">Henüz sıralama yapılmadı.</td></tr>';
