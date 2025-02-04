@@ -1410,6 +1410,20 @@ option {
     z-index: 1000;
 }
 
+@media (max-width: 480px) {
+  .duel-selection-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    margin: 0;
+    padding: 10px; /* Mobilde daha az padding */
+    border-radius: 0; /* Köşeleri düzleştir */
+    box-shadow: none; /* Gölgeyi kaldırabilirsiniz */
+    overflow-y: auto; /* İçerik ekranı aşarsa kaydırma ekler */
+  }
+}
+
+
         /* İki oyuncuyu eşit orantıda yerleştirmek için space-evenly kullandık */
 .duel-bottom-info {
     display: flex;
