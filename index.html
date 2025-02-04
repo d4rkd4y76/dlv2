@@ -40,7 +40,7 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 1500px;
+            max-width: 1200px;
             text-align: left;
             transform: scale(0.95);
             transition: transform 0.3s ease, opacity 0.3s ease;
@@ -1400,7 +1400,7 @@ option {
     flex-direction: column;
     gap: 15px;
     width: 100%;
-    max-width: 1500px;
+    max-width: 1200px;
     background: white;
     padding: 30px 40px;
     border-radius: 20px;
@@ -3861,7 +3861,7 @@ animation: floatButton 1s ease infinite;
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 1000000;
   animation: fadeInModal 0.3s ease;
 }
 
@@ -8666,11 +8666,14 @@ document.querySelectorAll('.category-button').forEach(button => {
 });
 
 async function buyProfilePhoto(photo) {
+    // Satın almaya başlamadan önce onay sorusu ekliyoruz
+    const confirmed = await showConfirmation("Bu profil fotoğrafını satın almak istediğinizden emin misiniz?");
+    if (!confirmed) return;
+    
     try {
         const studentRef = database.ref(
             `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`
         );
-
         const diamondSnapshot = await studentRef.child('diamond').once('value');
         const currentDiamonds = diamondSnapshot.val() || 0;
 
@@ -8684,9 +8687,10 @@ async function buyProfilePhoto(photo) {
             };
 
             await studentRef.update(updates);
+            // Elmas miktarını hemen güncelle
             document.getElementById('diamond-value').textContent = currentDiamonds - photo.price;
             
-            // Update cache
+            // Cache güncellemesi
             const purchasedPhotos = getFromCache(CACHE_KEYS.PURCHASED) || {};
             purchasedPhotos[btoa(photo.url)] = {
                 url: photo.url,
@@ -8696,6 +8700,7 @@ async function buyProfilePhoto(photo) {
             
             await showAlert('✨ Profil fotoğrafı başarıyla satın alındı!');
             
+            // Mağaza ekranı yeniden yükleniyor; böylece ilgili fotoğrafın kartı "Satın Al" yerine "Kullan" butonu gösterecek
             const activeCategory = document.querySelector('.category-button.active').dataset.category;
             loadProfilePhotos(activeCategory);
         } else {
@@ -8706,6 +8711,7 @@ async function buyProfilePhoto(photo) {
         await showAlert('❌ Satın alma işlemi başarısız oldu: ' + error.message);
     }
 }
+
 
 async function useProfilePhoto(photoUrl) {
     try {
@@ -9039,6 +9045,10 @@ document.querySelectorAll('.category-button').forEach(button => {
 
 // Düello kredisi satın alma fonksiyonu
 async function purchaseCredits(amount, cost) {
+    // Satın almaya başlamadan önce onay soruyoruz
+    const confirmed = await showConfirmation("Bu düello biletini satın almak istediğinizden emin misiniz?");
+    if (!confirmed) return;
+    
     try {
         const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
         const snapshot = await studentRef.once('value');
@@ -9056,7 +9066,7 @@ async function purchaseCredits(amount, cost) {
             duelCredits: currentCredits + amount
         });
 
-        // Ana ekrandaki değerleri güncelle
+        // Ana ekrandaki değerleri hemen güncelleyelim
         document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
         document.getElementById('duel-credits-value').textContent = currentCredits + amount;
         
@@ -9070,48 +9080,57 @@ async function purchaseCredits(amount, cost) {
 
 
 async function purchaseUnlimited(cost) {
-   try {
-       const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-       const snapshot = await studentRef.once('value');
-       const userData = snapshot.val();
-       const currentDiamonds = userData.diamond || 0;
+    // Satın almaya başlamadan önce kullanıcıdan onay alalım.
+    const confirmed = await showConfirmation("Bu ürünü satın almak istediğinizden emin misiniz?");
+    if (!confirmed) {
+        return;
+    }
+    
+    try {
+        const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+        const snapshot = await studentRef.once('value');
+        const userData = snapshot.val();
+        const currentDiamonds = userData.diamond || 0;
 
-       if (currentDiamonds < cost) {
-           await showAlert('Yeterli elmasınız yok!');
-           return;
-       }
+        if (currentDiamonds < cost) {
+            await showAlert('Yeterli elmasınız yok!');
+            return;
+        }
 
-       const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-       await studentRef.update({
-           diamond: currentDiamonds - cost,
-           unlimitedCreditsUntil: Date.now() + thirtyDaysInMs
-       });
+        const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+        // Yeni sürenin bitiş tarihini hesaplıyoruz.
+        const newUnlimitedUntil = Date.now() + thirtyDaysInMs;
+        
+        await studentRef.update({
+            diamond: currentDiamonds - cost,
+            unlimitedCreditsUntil: newUnlimitedUntil
+        });
 
-       document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
-       const creditsStats = document.getElementById('credits-stats');
-       const creditsValue = document.getElementById('duel-credits-value');
+        document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
+        const creditsStats = document.getElementById('credits-stats');
+        const creditsValue = document.getElementById('duel-credits-value');
        
-       creditsStats.classList.add('unlimited');
-       creditsValue.innerHTML = `<span class="unlimited-badge"></span>`;
+        creditsStats.classList.add('unlimited');
+        // Yeni süreye göre kaç gün kalacağını hesaplayıp görüntülüyoruz.
+        creditsValue.innerHTML = `<span class="unlimited-badge">${Math.ceil((newUnlimitedUntil - Date.now())/(1000*60*60*24))}GÜN</span>`;
 
-       // Tüm düello paketi butonlarını devre dışı bırak
-       const allPackageButtons = document.querySelectorAll('.credit-package .buy-button');
-       allPackageButtons.forEach(button => {
-           button.disabled = true;
-           button.style.opacity = '0.5';
-           button.style.cursor = 'not-allowed';
-           button.textContent = 'Sınırsız Hak Aktif';
-           button.onclick = null;
-       });
+        // Tüm düello paketi butonlarını devre dışı bırakıyoruz.
+        const allPackageButtons = document.querySelectorAll('.credit-package .buy-button');
+        allPackageButtons.forEach(button => {
+            button.disabled = true;
+            button.style.opacity = '0.5';
+            button.style.cursor = 'not-allowed';
+            button.textContent = 'Sınırsız Hak Aktif';
+            button.onclick = null;
+        });
 
-       await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
+        await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
        
-   } catch (error) {
-       console.error('Satın alma hatası:', error);
-       await showAlert('Satın alma işlemi başarısız oldu!');
-   }
+    } catch (error) {
+        console.error('Satın alma hatası:', error);
+        await showAlert('Satın alma işlemi başarısız oldu!');
+    }
 }
-
 
 
 
