@@ -3673,16 +3673,18 @@ animation: floatButton 1s ease infinite;
 }
 
 @media (max-width: 480px) {
-  /* Mobilde düello seçim ekranı tam genişlik ve yükseklik kaplasın */
   #duel-selection-screen {
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 100vh !important;
+    min-height: 100vh; /* Sabit yükseklik yerine minimum yükseklik verin */
     margin: 0;
-    padding: 10px; /* İsteğe bağlı: iç boşluğu azaltabilirsiniz */
-    border-radius: 0; /* Köşeleri yuvarlamayı kaldırın */
-    box-shadow: none; /* Gölgeyi kaldırabilirsiniz */
-    overflow-y: auto; /* İçerik taşarsa kaydırma ekler */
+    padding: 10px;
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Üst, orta ve alt bölümler arasında alan paylaştırır */
   }
 }
 
@@ -3711,23 +3713,17 @@ animation: floatButton 1s ease infinite;
 
 /* Başlık animasyonu ve stil düzenlemesi */
 #duel-selection-screen h2 {
-  font-size: 1.4em;
-  color: #fff;
+  font-size: 1.8em; /* Mobilde okunaklı olsun */
+  color: #ffffff;
   text-align: center;
-  text-shadow: 0 0 10px rgba(0,0,0,0.7);
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
   animation: headerPulse 2s ease-in-out infinite alternate;
 }
 
 @keyframes headerPulse {
-  0% {
-    transform: scale(1);
-    text-shadow: 0 0 10px rgba(0,0,0,0.7);
-  }
-  100% {
-    transform: scale(1.05);
-    text-shadow: 0 0 20px rgba(0,0,0,0.9);
-  }
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
 }
 
 /* Seçim banner (selecting-student-banner) – animasyonlu parıltı efekti */
@@ -3736,32 +3732,46 @@ animation: floatButton 1s ease infinite;
   font-weight: bold;
   color: #ffeb3b;
   text-align: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  border-radius: 10px;
-  background: rgba(0,0,0,0.3);
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
   box-shadow: 0 0 10px rgba(255,235,59,0.7);
   animation: glowBanner 1.5s infinite alternate;
 }
 
 @keyframes glowBanner {
-  from {
-    box-shadow: 0 0 10px rgba(255,235,59,0.5);
-  }
-  to {
-    box-shadow: 0 0 20px rgba(255,235,59,1);
-  }
+  from { box-shadow: 0 0 10px rgba(255,235,59,0.5); }
+  to { box-shadow: 0 0 20px rgba(255,235,59,1); }
 }
 
 /* Table-section (konu belirleme) kutusu: hafif transparan, yuvarlatılmış */
 #duel-selection-screen .table-section {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  animation: slideInFromLeft 0.6s ease-out;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+#duel-selection-screen .table-section h3 {
+  color: #ffeb3b;
+  margin-bottom: 10px;
+  text-align: center;
+}
+#duel-selection-screen .table-section label {
+  font-size: 1em;
+  color: #ffffff;
+  margin-top: 8px;
+}
+#duel-selection-screen .table-section select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
 }
 
 @keyframes slideInFromLeft {
@@ -3774,6 +3784,68 @@ animation: floatButton 1s ease infinite;
     opacity: 1;
   }
 }
+
+
+#duel-selection-screen .duel-bottom-info {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;  /* Eğer ekran daralırsa alt satıra geçsin */
+  gap: 15px;
+  margin-top: 15px;
+}
+#duel-selection-screen .duel-player-info {
+  text-align: center;
+  flex: 1;
+}
+#duel-selection-screen .duel-player-photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffeb3b;
+  margin-bottom: 5px;
+}
+#duel-selection-screen .duel-player-name {
+  font-size: 1em;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+
+#duel-start-button {
+  background: linear-gradient(45deg, #ff5722, #e91e63);
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+#duel-start-button.active:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 480px) {
+  #duel-selection-screen h2 {
+    font-size: 2em;
+  }
+  #duel-selection-screen .table-section label,
+  #duel-selection-screen .table-section select {
+    font-size: 1.1em;
+  }
+  #duel-selection-screen .duel-player-name {
+    font-size: 1.1em;
+  }
+  #duel-selection-screen .duel-start-button {
+    font-size: 1.2em;
+    padding: 15px 30px;
+  }
+}
+
+
 
 /* Label ve select elementleri */
 #duel-selection-screen label {
