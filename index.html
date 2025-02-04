@@ -34,7 +34,7 @@
             }
         }
 
-        .container, .game-container, .student-selection-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
+        .container, .game-container, .student-selection-container, .single-player-game-container, .duel-game-container {
             background: white;
             padding: 30px 40px;
             border-radius: 20px;
@@ -847,7 +847,7 @@ option {
             }
         }
 
-        .game-container, .student-selection-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
+        .game-container, .student-selection-container, .single-player-game-container, .duel-game-container {
             display: none;
             flex-direction: column;
             gap: 25px;
@@ -3961,15 +3961,15 @@ animation: floatButton 1s ease infinite;
 @media only screen and (max-width: 480px) {
   /* Düello Seçim Ekranı */
   .duel-selection-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100vh !important;
-    margin: 0 !important;
-    padding: 10px !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;      /* Tam ekran yüksekliği */
+    margin: 0;          /* Kenarlarda boşluk kalmasın */
+    padding: 5px;      /* İsteğe bağlı: çok fazla boşluk bırakmayacak şekilde */
+    border-radius: 0;   /* Köşeleri tamamen köşeli yap (veya daha küçük bir değer) */
+    box-shadow: none;   /* Gölgeyi kaldır */
+    overflow-y: auto;   /* İçerik taşması durumunda kaydırma */
   }
-}
   
   /* İçerideki bölümlerin de daha dar ekranlara uyum sağlaması için */
   .duel-selection-container .table-section,
@@ -3985,6 +3985,7 @@ animation: floatButton 1s ease infinite;
     text-align: center;
   }
 }
+
 
 
 
