@@ -3585,34 +3585,6 @@ animation: floatButton 1s ease infinite;
 
 
 
-.selecting-student-banner {
-    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
-    color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 1.2em;
-    font-weight: bold;
-    text-align: center;
-    margin: 15px 0;
-    box-shadow: 0 4px 15px rgba(255, 78, 80, 0.4);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    animation: glow 2s infinite alternate;
-}
-
-@keyframes glow {
-    from {
-        box-shadow: 0 0 10px #ff6b6b;
-    }
-    to {
-        box-shadow: 0 0 20px #ffd93d;
-    }
-}
-
-
-
-
-
-
 
 /* Seçim animasyonu: Slide-in efekti */
 .animate-slideIn {
@@ -3701,19 +3673,20 @@ animation: floatButton 1s ease infinite;
   }
 }
 
-/* Seçim banner (selecting-student-banner) – animasyonlu parıltı efekti */
 .selecting-student-banner {
-  font-size: 1.4em;
+  font-size: 1.2em;
   font-weight: bold;
   color: #ffeb3b;
   text-align: center;
-  margin-bottom: 10px;
+  /* Örneğin, üst, sağ, alt, sol için sırasıyla 20px, 15px, 10px, 15px boşluk */
+  margin: 20px 15px 10px 15px;
   padding: 10px;
   border-radius: 20px;
   background: rgba(0,0,0,0.3);
   box-shadow: 0 0 10px rgba(255,235,59,0.7);
   animation: glowBanner 1.5s infinite alternate;
 }
+
 
 @keyframes glowBanner {
   from {
