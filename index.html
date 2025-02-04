@@ -2206,28 +2206,7 @@ option {
     100% { transform: rotate(360deg); }
 }
 
-.selecting-student-banner {
-    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
-    color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 1.2em;
-    font-weight: bold;
-    text-align: center;
-    margin: 15px 0;
-    box-shadow: 0 4px 15px rgba(255, 78, 80, 0.4);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    animation: glow 2s infinite alternate;
-}
 
-@keyframes glow {
-    from {
-        box-shadow: 0 0 10px #ff6b6b;
-    }
-    to {
-        box-shadow: 0 0 20px #ffd93d;
-    }
-}
 
 
 
@@ -3606,6 +3585,374 @@ animation: floatButton 1s ease infinite;
 
 
 
+.selecting-student-banner {
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0;
+    box-shadow: 0 4px 15px rgba(255, 78, 80, 0.4);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px #ff6b6b;
+    }
+    to {
+        box-shadow: 0 0 20px #ffd93d;
+    }
+}
+
+
+
+
+
+
+
+/* Seçim animasyonu: Slide-in efekti */
+.animate-slideIn {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* İsteğe bağlı: Seçim alanı (duel-selection-banner) için ekstra stil */
+.duel-selection-banner {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.selection-item {
+  font-size: 1.2em;
+  margin: 5px 0;
+}
+
+
+
+/* === Düello Seçim Ekranı için Yenilenmiş Stil === */
+#duel-selection-screen {
+  /* Dinamik ve derin bir arka plan */
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  animation: duelBgAnimation 8s ease-in-out infinite alternate;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  max-width: 900px;
+  margin: 40px auto;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: fadeInUp 0.8s forwards, duelBgAnimation 8s ease-in-out infinite alternate;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Arka plan animasyonu */
+@keyframes duelBgAnimation {
+  0% {
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+  }
+  100% {
+    background: linear-gradient(135deg, #232526, #414345);
+  }
+}
+
+/* Fade in yukarı animasyonu */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Başlık animasyonu ve stil düzenlemesi */
+#duel-selection-screen h2 {
+  font-size: 2.2em;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0,0,0,0.7);
+  margin-bottom: 20px;
+  animation: headerPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes headerPulse {
+  0% {
+    transform: scale(1);
+    text-shadow: 0 0 10px rgba(0,0,0,0.7);
+  }
+  100% {
+    transform: scale(1.05);
+    text-shadow: 0 0 20px rgba(0,0,0,0.9);
+  }
+}
+
+/* Seçim banner (selecting-student-banner) – animasyonlu parıltı efekti */
+.selecting-student-banner {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #ffeb3b;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(255,235,59,0.7);
+  animation: glowBanner 1.5s infinite alternate;
+}
+
+@keyframes glowBanner {
+  from {
+    box-shadow: 0 0 10px rgba(255,235,59,0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(255,235,59,1);
+  }
+}
+
+/* Table-section (konu belirleme) kutusu: hafif transparan, yuvarlatılmış */
+#duel-selection-screen .table-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  animation: slideInFromLeft 0.6s ease-out;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Label ve select elementleri */
+#duel-selection-screen label {
+  display: block;
+  margin: 10px 0 5px;
+  color: #fff;
+  font-weight: 600;
+}
+#duel-selection-screen select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 1em;
+  outline: none;
+  transition: background 0.3s, border-color 0.3s;
+}
+#duel-selection-screen select:focus {
+  background: rgba(255,255,255,0.3);
+  border-color: #ffeb3b;
+}
+
+/* Duel start butonu */
+.duel-start-button {
+  background: linear-gradient(45deg, #ff5722, #e91e63);
+  color: #fff;
+  padding: 14px 30px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.3s;
+  opacity: 0.8;
+}
+.duel-start-button.active,
+.duel-start-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  opacity: 1;
+}
+
+/* Duel bottom info (oyuncu bilgileri) – dinamik hover ve animasyon */
+.duel-bottom-info {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 30px;
+  animation: fadeInUp 0.8s ease;
+}
+.duel-player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.duel-player-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ffeb3b;
+  transition: transform 0.4s ease;
+}
+.duel-player-photo:hover {
+  transform: rotate(360deg);
+}
+.duel-player-name {
+  margin-top: 10px;
+  color: #fff;
+  font-size: 1em;
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+}
+
+/* Countdown container – modern ve net görünüm */
+.countdown-container {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+}
+.countdown {
+  font-size: 2em;
+  color: #ff5722;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  animation: pulseCountdown 1.5s infinite;
+}
+
+@keyframes pulseCountdown {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Option butonları (soru seçiminde kullanılanlar) – isteğe bağlı */
+#duel-selection-screen .option-button {
+  transition: transform 0.2s, background-color 0.2s;
+}
+#duel-selection-screen .option-button:hover {
+  transform: scale(1.05);
+}
+
+/* Genel responsive ayarlamaları (isteğe bağlı) */
+@media (max-width: 480px) {
+  #duel-selection-screen {
+    padding: 20px;
+    margin: 20px;
+  }
+  #duel-selection-screen h2 {
+    font-size: 1.8em;
+  }
+  .duel-player-photo {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+
+
+
+
+
+
+
+/* ========== Gelişmiş Alert Modal Tasarımı ========== */
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeInModal 0.3s ease;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.alert-content {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-align: center;
+  position: relative;
+  animation: slideDownModal 0.4s ease;
+}
+
+@keyframes slideDownModal {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.alert-message {
+  font-size: 1.2em;
+  color: #333;
+  margin-bottom: 20px;
+  /* Hafif parıltı efekti */
+  animation: textGlow 1.5s infinite alternate;
+}
+
+@keyframes textGlow {
+  from { text-shadow: 0 0 5px rgba(0,123,255,0.5); }
+  to { text-shadow: 0 0 10px rgba(0,123,255,1); }
+}
+
+.alert-ok-button {
+  background: linear-gradient(45deg, #007BFF, #00BFFF);
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.alert-ok-button:hover {
+  background: linear-gradient(45deg, #0056b3, #009acd);
+  transform: scale(1.05);
+}
+
+
+
+
+
+
+
+
+
 
 </style>
 </head>
@@ -3821,29 +4168,26 @@ animation: floatButton 1s ease infinite;
     <!-- Düello Seçim Ekranı -->
     <div class="duel-selection-container" id="duel-selection-screen">
 <div class="countdown-container">
-    <div class="countdown" id="duelCountdown">60</div>
+    <div class="countdown" id="duelCountdown">10</div>
 </div>
         <h2>Seçim Ekranı</h2>
 <div id="selecting-student-banner" class="selecting-student-banner"></div>
         <div class="table-section">
             <h3>Konu Belirleme</h3>
-            <label for="duel-class-select">Sınıf Seç:</label>
+            <label for="duel-class-select">Sınıfınız:</label>
             <select id="duel-class-select">
                 <option value="">Seçiniz</option>
             </select>
 
-            <label for="duel-subject-select">Ders Seç:</label>
+            <label for="duel-subject-select">Düello Dersi:</label>
             <select id="duel-subject-select">
                 <option value="">Seçiniz</option>
             </select>
 
-            <label for="duel-topic-select">Konu Seç:</label>
+            <label for="duel-topic-select">Düello Konusu:</label>
             <select id="duel-topic-select">
                 <option value="">Seçiniz</option>
             </select>
-        </div>
-        <div class="duel-controls">
-            <button class="duel-start-button" id="duel-start-button" disabled>Düelloya Başla</button>
         </div>
 
         <div class="duel-bottom-info">
@@ -3855,6 +4199,10 @@ animation: floatButton 1s ease infinite;
                 <img src="" class="duel-player-photo" id="duel-invited-photo">
                 <div class="duel-player-name" id="duel-invited-name"></div>
             </div>
+        <div class="duel-controls">
+            <button class="duel-start-button" id="duel-start-button" style="display:none;" disabled>Düelloya Başla</button>
+
+        </div>
         </div>
     </div>
 
@@ -4067,9 +4415,8 @@ animation: floatButton 1s ease infinite;
         
         <div class="profile-categories">
             <button class="category-button" data-category="duel">⚔️ Düello Bileti Satın Al</button>
-            <button class="category-button active" data-category="acemi">Ücretsiz Nişanlar</button>
-            <button class="category-button" data-category="cesur">⭐Koleksiyoner Nişancı⭐</button>
-            <button class="category-button" data-category="lider">🚀Pro Nişancı🚀</button>
+            <button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
+            <button class="category-button" data-category="cesur">⭐Koleksiyoner Nişanlar⭐</button>         
             <button class="category-button" data-category="sampiyon">👑Şampiyon👑</button>
      
         </div>
@@ -5448,37 +5795,38 @@ function populateChampionSelect(data) {
 
 
 
-// GÜNCELLENMİŞ HAL
 async function fetchLessons(classId, subjectSelectElement) {
     const CACHE_KEY = `cachedLessons_${classId}`;
     const CACHE_TIMESTAMP_KEY = `cachedLessonsTimestamp_${classId}`;
-    const CACHE_DURATION = 15 * 60 * 1000; // 15 dakika
+    const CACHE_DURATION = 15 * 60 * 1000;
 
-    // Önce select elementini temizle
+    // Select elementini temizle
     subjectSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+    if (!classId) return false;
 
-    if (!classId) return;
-
-    const cachedLessons = localStorage.getItem(CACHE_KEY);
-    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-    const now = Date.now();
-
-    if (cachedLessons && cachedTimestamp) {
-        const age = now - parseInt(cachedTimestamp, 10);
-        if (age < CACHE_DURATION) {
-            // Cache süresi dolmamış, veriyi kullan
-            const parsedLessons = JSON.parse(cachedLessons);
-            populateLessonsSelect(parsedLessons, subjectSelectElement);
-            return true;
-        } else {
-            // Cache süresi dolmuş, temizle
-            localStorage.removeItem(CACHE_KEY);
-            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
-        }
-    }
-
-    // Cache yok veya süresi dolmuş, Firebase'den çek
     try {
+        // Önce seçimleri Firebase'den kontrol et (davet edilen için)
+        if (!isInviter && currentDuelRef) {
+            const selectionsSnapshot = await currentDuelRef.child('selections').once('value');
+            if (selectionsSnapshot.exists()) {
+                const selections = selectionsSnapshot.val();
+                if (selections.subject) {
+                    // Cache'i kontrol et
+                    const cachedLessons = localStorage.getItem(CACHE_KEY);
+                    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+                    const now = Date.now();
+
+                    if (cachedLessons && cachedTimestamp && (now - parseInt(cachedTimestamp, 10)) < CACHE_DURATION) {
+                        const parsedLessons = JSON.parse(cachedLessons);
+                        populateLessonsSelect(parsedLessons, subjectSelectElement);
+                        subjectSelectElement.value = selections.subject;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Firebase'den dersleri çek
         const snapshot = await database.ref(`championData/headings/${classId}/lessons`).once('value');
         if (snapshot.exists()) {
             const lessonsData = [];
@@ -5488,59 +5836,61 @@ async function fetchLessons(classId, subjectSelectElement) {
                 lessonsData.push({ id: lessonId, name: lessonName });
             });
 
-            // LocalStorage'a kaydet
+            // Cache'e kaydet
             localStorage.setItem(CACHE_KEY, JSON.stringify(lessonsData));
-            localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+            localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
 
-            // Seçime aktar
+            // Select'i doldur
             populateLessonsSelect(lessonsData, subjectSelectElement);
+
+            // Davet edilen için seçili dersi ayarla
+            if (!isInviter && currentDuelRef) {
+                const selections = (await currentDuelRef.child('selections').once('value')).val();
+                if (selections && selections.subject) {
+                    subjectSelectElement.value = selections.subject;
+                }
+            }
+
             return true;
         }
+        return false;
     } catch (error) {
         console.error("Dersler yüklenirken hata:", error);
+        return false;
     }
-    return false;
-}
-
-function populateLessonsSelect(lessonsData, subjectSelectElement) {
-    lessonsData.forEach(lesson => {
-        const option = document.createElement('option');
-        option.value = lesson.id;
-        option.textContent = lesson.name;
-        subjectSelectElement.appendChild(option);
-    });
 }
 
 async function fetchTopics(classId, lessonId, topicSelectElement) {
     const CACHE_KEY = `cachedTopics_${classId}_${lessonId}`;
     const CACHE_TIMESTAMP_KEY = `cachedTopicsTimestamp_${classId}_${lessonId}`;
-    const CACHE_DURATION = 15 * 60 * 1000; // 15 dakika
+    const CACHE_DURATION = 15 * 60 * 1000;
 
-    // Önce select elementini temizle
     topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+    if (!classId || !lessonId) return false;
 
-    if (!classId || !lessonId) return;
-
-    const cachedTopics = localStorage.getItem(CACHE_KEY);
-    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-    const now = Date.now();
-
-    if (cachedTopics && cachedTimestamp) {
-        const age = now - parseInt(cachedTimestamp, 10);
-        if (age < CACHE_DURATION) {
-            // Cache süresi dolmamış, veriyi kullan
-            const parsedTopics = JSON.parse(cachedTopics);
-            populateTopicsSelect(parsedTopics, topicSelectElement);
-            return true;
-        } else {
-            // Cache süresi dolmuş, temizle
-            localStorage.removeItem(CACHE_KEY);
-            localStorage.removeItem(CACHE_TIMESTAMP_KEY);
-        }
-    }
-
-    // Cache yok veya süresi dolmuş, Firebase'den çek
     try {
+        // Önce seçimleri Firebase'den kontrol et (davet edilen için)
+        if (!isInviter && currentDuelRef) {
+            const selectionsSnapshot = await currentDuelRef.child('selections').once('value');
+            if (selectionsSnapshot.exists()) {
+                const selections = selectionsSnapshot.val();
+                if (selections.topic) {
+                    // Cache'i kontrol et
+                    const cachedTopics = localStorage.getItem(CACHE_KEY);
+                    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+                    const now = Date.now();
+
+                    if (cachedTopics && cachedTimestamp && (now - parseInt(cachedTimestamp, 10)) < CACHE_DURATION) {
+                        const parsedTopics = JSON.parse(cachedTopics);
+                        populateTopicsSelect(parsedTopics, topicSelectElement);
+                        topicSelectElement.value = selections.topic;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Firebase'den konuları çek
         const snapshot = await database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value');
         if (snapshot.exists()) {
             const topicsData = [];
@@ -5550,18 +5900,38 @@ async function fetchTopics(classId, lessonId, topicSelectElement) {
                 topicsData.push({ id: topicId, name: topicName });
             });
 
-            // LocalStorage'a kaydet
+            // Cache'e kaydet
             localStorage.setItem(CACHE_KEY, JSON.stringify(topicsData));
-            localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+            localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
 
-            // Seçime aktar
+            // Select'i doldur
             populateTopicsSelect(topicsData, topicSelectElement);
+
+            // Davet edilen için seçili konuyu ayarla
+            if (!isInviter && currentDuelRef) {
+                const selections = (await currentDuelRef.child('selections').once('value')).val();
+                if (selections && selections.topic) {
+                    topicSelectElement.value = selections.topic;
+                }
+            }
+
             return true;
         }
+        return false;
     } catch (error) {
         console.error("Konular yüklenirken hata:", error);
+        return false;
     }
-    return false;
+}
+
+// populateSelect fonksiyonları aynı kalabilir
+function populateLessonsSelect(lessonsData, subjectSelectElement) {
+    lessonsData.forEach(lesson => {
+        const option = document.createElement('option');
+        option.value = lesson.id;
+        option.textContent = lesson.name;
+        subjectSelectElement.appendChild(option);
+    });
 }
 
 function populateTopicsSelect(topicsData, topicSelectElement) {
@@ -6099,6 +6469,24 @@ async function sendInvitation(player) {
     try {
         console.log("Davet gönderilmeye çalışılıyor, oyuncu:", player);
 
+        // --- 1. Kredi Kontrolleri ---
+        // Davet edenin kredi kontrolü
+        const inviterCreditsSnap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/duelCredits`).once('value');
+        const inviterCredits = inviterCreditsSnap.exists() ? inviterCreditsSnap.val() : 0;
+        if (inviterCredits < 3) {
+            await showAlert('Düello başlatmak için en az 3 düello kredisine sahip olmalısınız.');
+            return;
+        }
+
+        // Davet edilecek oyuncunun kredi kontrolü
+        const invitedCreditsSnap = await database.ref(`classes/${player.classId}/students/${player.studentId}/duelCredits`).once('value');
+        const invitedCredits = invitedCreditsSnap.exists() ? invitedCreditsSnap.val() : 0;
+        if (invitedCredits < 3) {
+            await showAlert(`${player.name} yeterli düello kredisine sahip değil.`);
+            return;
+        }
+        // --- Kredi Kontrolleri Bitiş ---
+
         const inviterSnapshot = await database.ref('loggedinPlayers')
             .orderByChild('studentId')
             .equalTo(selectedStudent.studentId)
@@ -6121,7 +6509,7 @@ async function sendInvitation(player) {
             return;
         }
 
-        // Geliştirilmiş reddedilen davet kontrolü
+        // --- 2. Reddedilen Davet Kontrolü ---
         const rejectedInviteRef = database.ref('rejectedInvites')
             .orderByChild('inviterId')
             .equalTo(selectedStudent.studentId);
@@ -6148,7 +6536,6 @@ async function sendInvitation(player) {
                 }
             });
 
-            // Eğer silinecek kayıt varsa hepsini tek seferde sil
             if (needsUpdate) {
                 await database.ref('rejectedInvites').update(updates);
                 // Kayıtlar silindiyse, daveti göndermeye izin ver
@@ -6160,6 +6547,7 @@ async function sendInvitation(player) {
             showAlert(`Bu kişi davetinizi reddetti. ${remainingTime} sn sonra tekrar deneyiniz.`);
             return;
         }
+        // --- Reddedilen Davet Kontrolü Bitiş ---
 
         const inDuelSnapshot = await database.ref(`classes/${player.classId}/students/${player.studentId}/inDuel`).once('value');
         const isInDuel = inDuelSnapshot.exists() ? inDuelSnapshot.val() : false;
@@ -6181,10 +6569,12 @@ async function sendInvitation(player) {
         await invitationRef.set(inviteData);
         console.log("Davet veritabanına yazıldı");
 
+        // --- 3. Davet Gönderildikten Sonra Geri Sayım ---
         let timeLeft = 10;
         const alertOverlay = document.getElementById('alertOverlay');
         const countdownInterval = setInterval(() => {
             if (timeLeft > 0) {
+                // İsteğe bağlı: İkinci parametre false verildiğinde showAlert buton olmadan sadece mesaj gösterir
                 showAlert(`Davet gönderildi! ${timeLeft} saniye sonra kapanacak...`, false);
                 timeLeft--;
             } else {
@@ -6203,7 +6593,7 @@ async function sendInvitation(player) {
                 invitationRef.off('value', unsubscribe);
             }
         });
-
+        // --- Geri Sayım Bitiş ---
     } catch (error) {
         console.error("Davet gönderme hatası:", error);
         showAlert('Davet gönderilirken bir hata oluştu.');
@@ -6621,7 +7011,98 @@ async function createDuelSession(inviterId, inviterClassId, inviterName, inviter
 }
 
 
+
+
+
+
+// ----- 1. Otomatik seçim fonksiyonu -----
+function autoSelectDuelSelections() {
+  // Öncelikle mevcut sınıf değerini alıyoruz
+  const classId = duelClassSelect.value;
+  if (!classId) {
+    console.error("duelClassSelect değeri boş!");
+    return;
+  }
+  
+  // Dersleri çekmek için fetchLessons fonksiyonunu kullanın
+  // fetchLessons(classId, subjectSelectElement) mevcut kodunuzda dersleri dolduruyor.
+  fetchLessons(classId, duelSubjectSelect).then(() => {
+    // "Seçiniz" hariç, ders seçeneklerini alalım
+    const lessonOptions = Array.from(duelSubjectSelect.options).filter(opt => opt.value !== "");
+    if (lessonOptions.length === 0) {
+      console.error("Hiç ders bulunamadı!");
+      return;
+    }
+    // Rastgele bir ders seçelim
+    const randomLesson = lessonOptions[Math.floor(Math.random() * lessonOptions.length)];
+    duelSubjectSelect.value = randomLesson.value;
+    
+    // Eğer davet eden taraf iseniz, seçimi veritabanına yansıtın
+    if (isInviter) {
+      updateDuelSelection('subject', randomLesson.value);
+    }
+    const selectedLessonName = randomLesson.textContent;
+    
+    // Şimdi, seçilen derse ait konuları çekelim
+    fetchTopics(classId, randomLesson.value, duelTopicSelect).then(() => {
+      const topicOptions = Array.from(duelTopicSelect.options).filter(opt => opt.value !== "");
+      if (topicOptions.length === 0) {
+        console.error("Hiç konu bulunamadı!");
+        return;
+      }
+      // Rastgele bir konu seçelim
+      const randomTopic = topicOptions[Math.floor(Math.random() * topicOptions.length)];
+      duelTopicSelect.value = randomTopic.value;
+      
+      if (isInviter) {
+        updateDuelSelection('topic', randomTopic.value);
+      }
+      const selectedTopicName = randomTopic.textContent;
+      
+      // Seçilen ders ve konuyu animasyonlu şekilde göster
+      animateDuelSelection(selectedLessonName, selectedTopicName);
+      
+      // 10 saniyelik geri sayım başlat
+      startDuelAutoCountdown();
+    });
+  });
+}
+
+// ----- 2. Seçimi animasyonlu gösterme fonksiyonu -----
+function animateDuelSelection(lessonName, topicName) {
+
+}
+
+// ----- 3. 10 Saniyelik geri sayım ve otomatik düello başlatma fonksiyonu -----
+function startDuelAutoCountdown() {
+  const countdownEl = document.getElementById('duelCountdown');
+  let timeLeft = 10; // Geri sayım süresi: 10 saniye
+  countdownEl.textContent = timeLeft;
+  
+  const autoTimer = setInterval(() => {
+    timeLeft--;
+    countdownEl.textContent = timeLeft;
+    
+    // (İsteğe bağlı: Geri sayım sırasında renk veya başka efektler ekleyebilirsiniz)
+    if (timeLeft <= 0) {
+      clearInterval(autoTimer);
+      // Geri sayım bittiğinde, otomatik olarak düello başlatmak için:
+      duelStartButton.click();
+    }
+  }, 1000);
+}
+
+
+
+
+
+
+
+
+
+
 function switchToDuelScreen(duelKey) {
+    // Diğer ekranları gizle
     mainScreen.style.display = 'none';
     singlePlayerScreen.style.display = 'none';
     singlePlayerGameScreen.style.display = 'none';
@@ -6629,11 +7110,13 @@ function switchToDuelScreen(duelKey) {
     rankingPanel.classList.remove('open');
     playersOverlay.style.display = 'none';
     
+    // Body genel ayarları
     document.body.style.display = 'flex';
     document.body.style.justifyContent = 'center';
     document.body.style.alignItems = 'center';
     document.body.style.minHeight = '100vh';
     
+    // Duel seçim ekranı stil ayarları
     duelSelectionScreen.style.display = 'flex';
     duelSelectionScreen.style.flexDirection = 'column';
     duelSelectionScreen.style.width = '100%';
@@ -6648,90 +7131,124 @@ function switchToDuelScreen(duelKey) {
     let inviterId, inviterClassId, invitedId, invitedClassId;
     let countdownInterval;
     
-duelRef.once('value').then(initialSnap => {
-    if (initialSnap.exists()) {
-        const initialData = initialSnap.val();
-        inviterId = initialData.inviter.studentId;
-        inviterClassId = initialData.inviter.classId;
-        invitedId = initialData.invited.studentId;
-        invitedClassId = initialData.invited.classId;
+    duelRef.once('value').then(initialSnap => {
+        if (initialSnap.exists()) {
+            const initialData = initialSnap.val();
+            inviterId = initialData.inviter.studentId;
+            inviterClassId = initialData.inviter.classId;
+            invitedId = initialData.invited.studentId;
+            invitedClassId = initialData.invited.classId;
+            
+            // --- Kredilerin Düşürülmesi İşlemi ---
+            // Eğer henüz kredi düşülmemişse (creditsDeducted yoksa)
+            if (!initialData.creditsDeducted) {
+                Promise.all([
+                    database.ref(`classes/${inviterClassId}/students/${inviterId}/duelCredits`).once('value'),
+                    database.ref(`classes/${invitedClassId}/students/${invitedId}/duelCredits`).once('value')
+                ]).then(([inviterCreditsSnap, invitedCreditsSnap]) => {
+                    const inviterCredits = inviterCreditsSnap.exists() ? inviterCreditsSnap.val() : 0;
+                    const invitedCredits = invitedCreditsSnap.exists() ? invitedCreditsSnap.val() : 0;
+                    
+                    if (inviterCredits < 3 || invitedCredits < 3) {
+                        showAlert('Düello başlatmak için her iki tarafın da en az 3 düello kredisine sahip olması gerekmektedir.')
+                            .then(() => {
+                                // Yetersiz kredi varsa duel oturumunu kaldırıp sayfayı yenile
+                                duelRef.remove();
+                                window.location.reload();
+                            });
+                        return;
+                    } else {
+                        // Kredileri 3 eksiltelim
+                        database.ref(`classes/${inviterClassId}/students/${inviterId}/duelCredits`)
+                            .set(inviterCredits - 3);
+                        database.ref(`classes/${invitedClassId}/students/${invitedId}/duelCredits`)
+                            .set(invitedCredits - 3);
+                        // Tekrar kredi düşülmesini engellemek için bayrak ekleyelim
+                        duelRef.child('creditsDeducted').set(true);
+                    }
+                });
+            }
+            // --- Kredilerin Düşürülmesi Bitti ---
+            
+            // Sonrasında diğer seçim ekranı ayarlarını yapıyoruz
+            database.ref(`classes/${selectedStudent.classId}`).once('value').then(classSnapshot => {
+                if (classSnapshot.exists()) {
+                    const studentClassName = classSnapshot.val().name;
 
-database.ref(`classes/${selectedStudent.classId}`).once('value').then(classSnapshot => {
-        if (classSnapshot.exists()) {
-            const studentClassName = classSnapshot.val().name;
+                    // championData'dan sınıf verilerini çek ve eşleştir
+                    database.ref('championData/headings').once('value').then(async snapshot => {
+                        duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
+                        if (snapshot.exists()) {
+                            snapshot.forEach(childSnapshot => {
+                                const classId = childSnapshot.key;
+                                const championClassName = childSnapshot.val().name;
+                                
+                                // Eğer kullanıcının sınıf adı ile championData eşleşiyorsa
+                                if (championClassName === studentClassName) {
+                                    const option = document.createElement('option');
+                                    option.value = classId;
+                                    option.textContent = championClassName;
+                                    duelClassSelect.appendChild(option);
+                                    duelClassSelect.value = classId; // Otomatik seç
 
-            // championData'dan sınıfları çek ve eşleştir
-            database.ref('championData/headings').once('value').then(snapshot => {
-                duelClassSelect.innerHTML = '<option value="">Seçiniz</option>';
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const classId = childSnapshot.key;
-                        const championClassName = childSnapshot.val().name;
-                        
-                        // Eğer classes'daki sınıf adı championData'daki sınıf adıyla eşleşiyorsa
-                        if (championClassName === studentClassName) {
-                            const option = document.createElement('option');
-                            option.value = classId;
-                            option.textContent = championClassName;
-                            duelClassSelect.appendChild(option);
-                            duelClassSelect.value = classId; // Otomatik seç
-                            
-                            // Dersleri yükle
-                            if (isInviter) {
-                                fetchLessons(classId, duelSubjectSelect);
-                            }
+                                    if (isInviter) {
+                                        // Davet eden için: dersleri yükle ve otomatik seçim yap
+                                        fetchLessons(classId, duelSubjectSelect);
+                                        autoSelectDuelSelections();
+                                    } else {
+                                        // Davet edilen için: selections verisini sürekli dinle
+                                        currentDuelRef.child('selections').on('value', async selectionsSnapshot => {
+                                            console.log("Selections changed:", selectionsSnapshot.val());
+                                            if (selectionsSnapshot.exists() && selectionsSnapshot.val().subject) {
+                                                setTimeout(async () => {
+                                                    await fetchLessons(classId, duelSubjectSelect);
+                                                    duelSubjectSelect.value = selectionsSnapshot.val().subject;
+                                                    
+                                                    if (selectionsSnapshot.val().topic) {
+                                                        await fetchTopics(classId, selectionsSnapshot.val().subject, duelTopicSelect);
+                                                        duelTopicSelect.value = selectionsSnapshot.val().topic;
+                                                    } else {
+                                                        duelTopicSelect.value = "";
+                                                    }
+                                                }, 300);
+                                            } else {
+                                                duelSubjectSelect.value = "";
+                                                duelTopicSelect.value = "";
+                                            }
+                                        });
+                                    }
+                                }
+                            });
                         }
                     });
                 }
             });
-        }
-    });
 
 
 
 // Ana countdown kodunu güncelleyelim
 const countdownEl = document.getElementById('duelCountdown');
-let timeLeft = 60;
+let timeLeft = 10; // 10 saniyeye düşürüldü
 
-countdownInterval = setInterval(async () => {
+countdownInterval = setInterval(() => {
     timeLeft--;
     countdownEl.textContent = timeLeft;
     
-    // Renk değişimleri aynı kalıyor
-    if (timeLeft > 30) {
+    // Renk değişimleri güncellendi
+    if (timeLeft > 7) {
         countdownEl.className = 'countdown green';
-    } else if (timeLeft > 15) {
+    } else if (timeLeft > 3) {
         countdownEl.className = 'countdown orange';
     } else {
         countdownEl.className = 'countdown red';
     }
     
-    // Süre bittiğinde
+    // Süre bittiğinde sadece interval'i temizle
     if (timeLeft <= 0) {
         clearInterval(countdownInterval);
-        
-        // Eğer davet eden kişiysek ve oyun başlatılmamışsa
-        if (selectedStudent.studentId === inviterId && !initialData.gameStarted) {
-            try {
-                // Yeni puanlama sistemini kullan
-                await updateDuelScore('TIME_OUT', {
-                    inviterId,
-                    inviterClassId,
-                    invitedId,
-                    invitedClassId
-                });
-                
-                // Düello referansını kaldır
-                await duelRef.remove();
-                window.location.reload();
-            } catch (error) {
-                console.error('Süre sonu işlemi hatası:', error);
-                await showAlert('Bir hata oluştu, lütfen sayfayı yenileyin.');
-            }
-        }
+        countdownEl.textContent = '0';
     }
 }, 1000);
-
 
 
 duelRef.child('gameStarted').on('value', snapshot => {
@@ -6747,7 +7264,7 @@ duelRef.child('gameStarted').on('value', snapshot => {
         
         // Sadece davet eden kişinin ismini göster
         const selectingStudentBanner = document.getElementById('selecting-student-banner');
-        selectingStudentBanner.textContent = `${initialData.inviter.name} konuyu belirliyor.`;
+        selectingStudentBanner.textContent = `Düello Başlamak Üzere ! `;
         selectingStudentBanner.style.display = 'block';
     }
 });
@@ -6771,134 +7288,193 @@ duelRef.child('gameStarted').on('value', snapshot => {
         showAlert('Sınıf verileri yüklenirken bir hata oluştu.');
     });
 
-    duelRef.on('value', async (snap) => {
-   if (snap.exists()) {
-       const data = snap.val();
-       duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
-       duelInviterName.textContent = data.inviter.name;
-       duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
-       duelInvitedName.textContent = data.invited.name;
 
-       // Kupa değerlerini güncelle/ekle
-       const inviterInfo = document.getElementById('duel-inviter-info');
-       const invitedInfo = document.getElementById('duel-invited-info');
 
-       // Mevcut kupa elementlerini kaldır (varsa)
-       const existingCups = document.querySelectorAll('.duel-player-cup');
-       existingCups.forEach(cup => cup.remove());
 
-       // Yeni kupa elementlerini ekle
-       const inviterCup = document.createElement('div');
-       inviterCup.className = 'duel-player-cup';
-       inviterCup.innerHTML = `
-           <span class="cup-icon">🏆</span>
-           <span class="cup-value">${data.inviter.gameCup}</span>
-       `;
-       inviterInfo.appendChild(inviterCup);
 
-       const invitedCup = document.createElement('div');
-       invitedCup.className = 'duel-player-cup';
-       invitedCup.innerHTML = `
-           <span class="cup-icon">🏆</span>
-           <span class="cup-value">${data.invited.gameCup}</span>
-       `;
-       invitedInfo.appendChild(invitedCup);
 
- // Seçimleri senkronize şekilde yükle ve güncelle
-       if (data.selections) {
-           try {
-               // Sınıf seçimi ve dersleri yükle
-               if (data.selections.class) {
-                   duelClassSelect.value = data.selections.class;
-                   
-                   // Önce dersleri yükle
-                   const lessonsLoaded = await fetchLessons(data.selections.class, duelSubjectSelect);
-                   if (lessonsLoaded && data.selections.subject) {
-                       // Ders seçimini güncelle
-                       duelSubjectSelect.value = data.selections.subject;
-                       
-                       // Konuları yükle
-                       const topicsLoaded = await fetchTopics(data.selections.class, data.selections.subject, duelTopicSelect);
-                       if (topicsLoaded && data.selections.topic) {
-                           // Konu seçimini güncelle
-                           duelTopicSelect.value = data.selections.topic;
-                       }
-                   }
-               }
 
-               // Select elementlerini güncelle
-               if (!isInviter) {
-                   // Misafir oyuncu için select elementlerini doldur
-                   if (data.selections.class) {
-                       const classOptions = await getClassOptions();
-                       duelClassSelect.innerHTML = classOptions;
-                       duelClassSelect.value = data.selections.class;
-                   }
-                   
-                   if (data.selections.subject) {
-                       const subjectOptions = await getLessonOptions(data.selections.class);
-                       duelSubjectSelect.innerHTML = subjectOptions;
-                       duelSubjectSelect.value = data.selections.subject;
-                   }
-                   
-                   if (data.selections.topic) {
-                       const topicOptions = await getTopicOptions(data.selections.class, data.selections.subject);
-                       duelTopicSelect.innerHTML = topicOptions;
-                       duelTopicSelect.value = data.selections.topic;
-                   }
-               }
 
-           } catch (error) {
-               console.error("Seçimler güncellenirken hata:", error);
-           }
-       }
 
-       if (data.gameStarted && !duelGameStarted) {
-           duelGameStarted = true;
-           duelEnded = false;
-           startDuelGame(data);
-       }
 
-       // Misafir oyuncu kontrolleri
-       if (!isInviter) {
-           duelClassSelect.disabled = true;
-           duelSubjectSelect.disabled = true;
-           duelTopicSelect.disabled = true;
-           duelStartButton.disabled = true;
-       } else {
-           checkDuelSelections();
-       }
-   } else {
-       if (!duelEnded) {
-           try {
-               const currentPlayerId = selectedStudent.studentId;
-               
-            await updateDuelScore('DISCONNECTED', {
-                inviterId,
-                inviterClassId,
-                invitedId,
-                invitedClassId,
-                disconnectedId: currentPlayerId === inviterId ? invitedId : inviterId,
-                disconnectedClassId: currentPlayerId === inviterId ? invitedClassId : inviterClassId
-            });
 
-            // inDuel durumlarını güncelle
-            await Promise.all([
-                database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false),
-                database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false)
-            ]);
 
-            window.location.reload();
+async function syncDuelSelections(data) {
+    if (!data.selections) return;
+    
+    try {
+        // Sınıf seçimini güncelle
+        if (data.selections.class) {
+            duelClassSelect.value = data.selections.class;
+            
+            // Dersleri yükle
+            await fetchLessons(data.selections.class, duelSubjectSelect);
+            
+            // Ders seçimini güncelle
+            if (data.selections.subject) {
+                duelSubjectSelect.value = data.selections.subject;
+                
+                // Konuları yükle
+                await fetchTopics(data.selections.class, data.selections.subject, duelTopicSelect);
+                
+                // Konu seçimini güncelle
+                if (data.selections.topic) {
+                    duelTopicSelect.value = data.selections.topic;
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Seçimler senkronize edilirken hata:", error);
+    }
+}
 
-           } catch (error) {
-               console.error("Oyun sonlandırma hatası:", error);
-               await showAlert('Oyun sonlandırılırken bir hata oluştu');
-               window.location.reload();
-           }
-       }
-   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+duelRef.on('value', async (snap) => {
+    if (snap.exists()) {
+        const data = snap.val();
+        
+        // Oyuncu bilgilerini güncelle
+        duelInviterPhoto.src = data.inviter.photo || "https://via.placeholder.com/80";
+        duelInviterName.textContent = data.inviter.name;
+        duelInvitedPhoto.src = data.invited.photo || "https://via.placeholder.com/80";
+        duelInvitedName.textContent = data.invited.name;
+
+        // Kupa değerlerini güncelle
+        const inviterInfo = document.getElementById('duel-inviter-info');
+        const invitedInfo = document.getElementById('duel-invited-info');
+
+        // Mevcut kupaları temizle
+        const existingCups = document.querySelectorAll('.duel-player-cup');
+        existingCups.forEach(cup => cup.remove());
+
+        // Yeni kupa elementlerini ekle
+        const inviterCup = document.createElement('div');
+        inviterCup.className = 'duel-player-cup';
+        inviterCup.innerHTML = `
+            <span class="cup-icon">🏆</span>
+            <span class="cup-value">${data.inviter.gameCup}</span>
+        `;
+        inviterInfo.appendChild(inviterCup);
+
+        const invitedCup = document.createElement('div');
+        invitedCup.className = 'duel-player-cup';
+        invitedCup.innerHTML = `
+            <span class="cup-icon">🏆</span>
+            <span class="cup-value">${data.invited.gameCup}</span>
+        `;
+        invitedInfo.appendChild(invitedCup);
+
+        // Select elementlerini devre dışı bırak
+        [duelClassSelect, duelSubjectSelect, duelTopicSelect].forEach(select => {
+            select.disabled = true;
+            select.style.pointerEvents = 'none';
+            select.style.cursor = 'not-allowed';
+            select.style.opacity = '0.7';
+        });
+
+        // Seçimleri senkronize et
+        if (data.selections) {
+            try {
+                // Sınıf seçimini güncelle
+                if (data.selections.class) {
+                    duelClassSelect.value = data.selections.class;
+                    
+                    // Dersleri yükle ve senkronize et
+                    const lessonsLoaded = await fetchLessons(data.selections.class, duelSubjectSelect);
+                    if (lessonsLoaded && data.selections.subject) {
+                        duelSubjectSelect.value = data.selections.subject;
+                        
+                        // Konuları yükle ve senkronize et
+                        const topicsLoaded = await fetchTopics(data.selections.class, data.selections.subject, duelTopicSelect);
+                        if (topicsLoaded && data.selections.topic) {
+                            duelTopicSelect.value = data.selections.topic;
+                        }
+                    }
+                }
+
+                // Davet edilen oyuncu için seçenekleri doldur
+                if (!isInviter) {
+                    const [classOptions, subjectOptions, topicOptions] = await Promise.all([
+                        data.selections.class ? getClassOptions() : null,
+                        data.selections.subject ? getLessonOptions(data.selections.class) : null,
+                        data.selections.topic ? getTopicOptions(data.selections.class, data.selections.subject) : null
+                    ]);
+
+                    if (classOptions) {
+                        duelClassSelect.innerHTML = classOptions;
+                        duelClassSelect.value = data.selections.class;
+                    }
+                    if (subjectOptions) {
+                        duelSubjectSelect.innerHTML = subjectOptions;
+                        duelSubjectSelect.value = data.selections.subject;
+                    }
+                    if (topicOptions) {
+                        duelTopicSelect.innerHTML = topicOptions;
+                        duelTopicSelect.value = data.selections.topic;
+                    }
+                }
+
+            } catch (error) {
+                console.error("Seçimler senkronize edilirken hata:", error);
+            }
+        }
+
+        // Oyun durumu kontrolü
+        if (data.gameStarted && !duelGameStarted) {
+            duelGameStarted = true;
+            duelEnded = false;
+            startDuelGame(data);
+        }
+
+        // Düello başlatma butonu kontrolü
+        if (!isInviter) {
+            duelStartButton.disabled = true;
+        } else {
+            checkDuelSelections();
+        }
+
+    } else {
+        if (!duelEnded) {
+            try {
+                const currentPlayerId = selectedStudent.studentId;
+                
+                await updateDuelScore('DISCONNECTED', {
+                    inviterId,
+                    inviterClassId,
+                    invitedId,
+                    invitedClassId,
+                    disconnectedId: currentPlayerId === inviterId ? invitedId : inviterId,
+                    disconnectedClassId: currentPlayerId === inviterId ? invitedClassId : inviterClassId
+                });
+
+                // inDuel durumlarını güncelle
+                await Promise.all([
+                    database.ref(`classes/${inviterClassId}/students/${inviterId}/inDuel`).set(false),
+                    database.ref(`classes/${invitedClassId}/students/${invitedId}/inDuel`).set(false)
+                ]);
+
+                window.location.reload();
+
+            } catch (error) {
+                console.error("Oyun sonlandırma hatası:", error);
+                await showAlert('Oyun sonlandırılırken bir hata oluştu');
+                window.location.reload();
+            }
+        }
+    }
 });
-
 
 
 // Select elementleri için yardımcı fonksiyonlar
@@ -6997,14 +7573,46 @@ duelClassSelect.addEventListener('change', (e) => {
             }
         });
 
-function updateDuelSelection(field, value) {
+async function updateDuelSelection(field, value) {
+    // Eğer referans yoksa çık
+    if (!currentDuelRef) return;
+
     // Sınıf seçimini değiştirmeye çalışıyorsa engelle
     if (field === 'class' && value !== duelClassSelect.value) {
         return;
     }
     
-    currentDuelRef.child('selections').child(field).set(value);
-    checkDuelSelections();
+    try {
+        // Seçimi veritabanında güncelle
+        await currentDuelRef.child('selections').child(field).set(value);
+
+        // Seçime göre bağımlı alanları güncelle
+        if (field === 'subject') {
+            // Konu seçildiğinde alt konuları yükle
+            const topicsLoaded = await fetchTopics(duelClassSelect.value, value, duelTopicSelect);
+            if (!topicsLoaded) {
+                console.warn('Konular yüklenemedi');
+            }
+        }
+
+        // Her iki oyuncunun select elementlerini senkronize et
+        if (field === 'subject' || field === 'topic') {
+            const selections = (await currentDuelRef.child('selections').once('value')).val() || {};
+            
+            // Davet eden oyuncu için seçimleri güncelle
+            if (isInviter) {
+                duelSubjectSelect.value = selections.subject || '';
+                duelTopicSelect.value = selections.topic || '';
+            }
+        }
+
+        // Seçimlerin durumunu kontrol et
+        checkDuelSelections();
+
+    } catch (error) {
+        console.error('Seçim güncellenirken hata:', error);
+        showAlert('Seçim güncellenirken bir hata oluştu').catch(console.error);
+    }
 }
 
         function checkDuelSelections() {
@@ -7406,7 +8014,7 @@ if (winnerId && loserId) {
 
         async function loadRanking() {
    const CACHE_DURATION = 3600000; // 1 saat
-   const PLAYER_LIMIT = 50; // İlk 50 oyuncu
+   const PLAYER_LIMIT = 10; // İlk 10 oyuncu
 
    // Check cache first
    const cachedData = localStorage.getItem('rankingCache');
@@ -7474,7 +8082,7 @@ if (winnerId && loserId) {
 
 function displayRankingData(players) {
    rankingTableBody.innerHTML = '';
-   const topPlayers = players.slice(0, 25);
+   const topPlayers = players.slice(0, 5);
    const currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
    const userTrophyCount = players.find(p => p.id === selectedStudent.studentId)?.gameCup || 0;
 
@@ -7859,19 +8467,34 @@ function getFromCache(key) {
 const photoCategories = {
    acemi: [
        {
-           url: 'https://cdn.pixabay.com/animation/2022/08/02/19/43/19-43-44-141_512.gif',
-           price: 1111,
+           url: 'https://cdn.pixabay.com/photo/2013/07/13/13/14/tiger-160601_1280.png',
+           price: 50,
            id: 'photo1'
        },
        {
-           url: 'https://cdn.pixabay.com/animation/2022/07/31/06/04/06-04-32-13_512.gif', 
-           price: 500,
+           url: 'https://cdn.pixabay.com/photo/2016/05/12/23/03/lamb-1388937_1280.png', 
+           price: 50,
            id: 'photo2'
        },
        {
-           url: 'https://cdn.pixabay.com/animation/2024/02/23/15/15/15-15-50-56_512.gif',
-           price: 500,
+           url: 'https://cdn.pixabay.com/photo/2016/08/16/16/39/elephant-1598359_1280.png',
+           price: 50,
            id: 'photo3'
+       },
+       {
+           url: 'https://cdn.pixabay.com/photo/2012/04/12/22/04/goldfish-30837_1280.png',
+           price: 50,
+           id: 'photo103'
+       },
+       {
+           url: 'https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_400/ncom/software/switch/70010000062008/desc/bf8a722d69cb3e3816b77626537d9e1a97b197e75cbbbdb04275d826dd8a03cb',
+           price: 50,
+           id: 'photo104'
+       },
+       {
+           url: 'https://assets.vogue.com/photos/58920113186d7c1b6493ce40/master/pass/frozen-elsa-lesbian-girlfirend.jpg',
+           price: 50,
+           id: 'photo105'
        }
    ],
    cesur: [
@@ -7882,9 +8505,60 @@ const photoCategories = {
        },
        {
            url: 'https://media.tenor.com/Uoxot7sqtkkAAAAM/galatasaray-galatasaray-sk.gif',
-           price: 600,
+           price: 500,
            id: 'photo5'
+       },
+       {
+           url: 'https://steamuserimages-a.akamaihd.net/ugc/915786698278004854/E1D44978A7692A298883D6589A5098B1D55882C0/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false',
+           price: 500,
+           id: 'photo209'
+       },
+       {
+           url: 'https://giffiles.alphacoders.com/988/98813.gif',
+           price: 500,
+           id: 'photo204'
+       },
+       {
+           url: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExc250NzEycWR6bXR3YWFkZDExa2cxbzd4OWN3bGxmbTJ1Nmt2cWQ2dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OPYTbaVn5wTEJmfFCp/giphy.gif',
+           price: 500,
+           id: 'photo205'
+       },
+       {
+           url: 'https://img1.picmix.com/output/stamp/normal/3/8/7/0/1750783_abb57.gif',
+           price: 500,
+           id: 'photo206'
+       },
+       {
+           url: 'https://i.pinimg.com/originals/1d/b8/f3/1db8f34ba95f890d60bf529436045039.gif',
+           price: 500,
+           id: 'photo207'
+       },
+       {
+           url: 'https://i.gifer.com/BAL5.gif',
+           price: 500,
+           id: 'photo208'
+       },
+       {
+           url: 'https://www.icegif.com/wp-content/uploads/2024/04/roblox-icegif.gif',
+           price: 500,
+           id: 'photo7'
+       },
+       {
+           url: 'https://www.icegif.com/wp-content/uploads/2024/09/brawl-stars-icegif-11.gif',
+           price: 500,
+           id: 'photo8'
+       },
+       {
+           url: 'https://i.ibb.co/542sFk3/r123-1.gif',
+           price: 500,
+           id: 'photo9'
+       },
+       {
+           url: 'https://i.ibb.co/S5yRj84/muslera-1.gif',
+           price: 600,
+           id: 'photo10'
        }
+
    ],
    lider: [
        {
