@@ -1410,44 +1410,13 @@ option {
     z-index: 1000;
 }
 
-@media (max-width: 480px) {
-  .duel-selection-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    margin: 0;
-    padding: 10px;
-    border-radius: 0;
-    box-shadow: none;
-    overflow-y: auto;
-  }
-}
-
-
-
-@media (max-width: 480px) {
-  /* Mevcut duel-selection-container medya sorgusuna ekleyin */
-  .duel-selection-container h2,
-  .duel-selection-container h3,
-  .duel-selection-container label,
-  .duel-selection-container .question-text,
-  .duel-selection-container .option-button {
-    font-size: 1.0em;       /* Yazı boyutunu küçültebilirsiniz */
-    line-height: 1.4;       /* Satır yüksekliğini artırın */
-    word-wrap: break-word;  /* Uzun kelimeler taşarsa kırılmasını sağla */
-  }
-}
-
-
-
-
         /* İki oyuncuyu eşit orantıda yerleştirmek için space-evenly kullandık */
 .duel-bottom-info {
     display: flex;
     justify-content: space-evenly; /* Kartlar arasında eşit boşluk */
     align-items: center; /* Kartları yatayda ortala */
     width: 100%; /* Genişlik tüm alanı kaplasın */
-    padding: 5px 0; /* Üst ve alt boşluk */
+    padding: 10px 0; /* Üst ve alt boşluk */
 }
 
 
@@ -1467,7 +1436,7 @@ option {
     border-radius: 50%; /* Yuvarlak resim */
     object-fit: cover; /* Resmi çerçeveye sığdır */
     border: 3px solid #ff8a00; /* Çerçeve rengi */
-    margin-bottom: 3px; /* Resim ile isim arasındaki boşluk */
+    margin-bottom: 5px; /* Resim ile isim arasındaki boşluk */
 }
 
 
@@ -3677,32 +3646,17 @@ animation: floatButton 1s ease infinite;
   /* Dinamik ve derin bir arka plan */
   background: linear-gradient(135deg, #1f1c2c, #928dab);
   animation: duelBgAnimation 8s ease-in-out infinite alternate;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 40px;
+  border-radius: 20px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   max-width: 900px;
-  margin: 10px auto;
+  margin: 40px auto;
   transform: translateY(20px);
   opacity: 0;
   animation: fadeInUp 0.8s forwards, duelBgAnimation 8s ease-in-out infinite alternate;
   position: relative;
   overflow: hidden;
 }
-
-@media (max-width: 480px) {
-  /* Mobilde düello seçim ekranı tam genişlik ve yükseklik kaplasın */
-  #duel-selection-screen {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    height: 100vh !important;
-    margin: 0;
-    padding: 10px; /* İsteğe bağlı: iç boşluğu azaltabilirsiniz */
-    border-radius: 0; /* Köşeleri yuvarlamayı kaldırın */
-    box-shadow: none; /* Gölgeyi kaldırabilirsiniz */
-    overflow-y: auto; /* İçerik taşarsa kaydırma ekler */
-  }
-}
-
 
 /* Arka plan animasyonu */
 @keyframes duelBgAnimation {
@@ -3728,7 +3682,7 @@ animation: floatButton 1s ease infinite;
 
 /* Başlık animasyonu ve stil düzenlemesi */
 #duel-selection-screen h2 {
-  font-size: 1.4em;
+  font-size: 2.2em;
   color: #fff;
   text-align: center;
   text-shadow: 0 0 10px rgba(0,0,0,0.7);
@@ -3753,9 +3707,9 @@ animation: floatButton 1s ease infinite;
   font-weight: bold;
   color: #ffeb3b;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 20px;
   background: rgba(0,0,0,0.3);
   box-shadow: 0 0 10px rgba(255,235,59,0.7);
   animation: glowBanner 1.5s infinite alternate;
@@ -3775,7 +3729,7 @@ animation: floatButton 1s ease infinite;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.2);
-  padding: 20px;
+  padding: 7px;
   border-radius: 15px;
   margin-bottom: 20px;
   animation: slideInFromLeft 0.6s ease-out;
@@ -3871,13 +3825,15 @@ animation: floatButton 1s ease infinite;
 /* Countdown container – modern ve net görünüm */
 .countdown-container {
   position: absolute;
+  margin-bottom: 10px;
   top: 15px;
   right: 15px;
   z-index: 10;
 }
 .countdown {
-  font-size: 2em;
+  font-size: 1em;
   color: #ff5722;
+  margin-bottom: 10px;
   font-weight: bold;
   background: rgba(0, 0, 0, 0.4);
   padding: 8px 12px;
@@ -4216,10 +4172,9 @@ animation: floatButton 1s ease infinite;
 <div class="countdown-container">
     <div class="countdown" id="duelCountdown">10</div>
 </div>
-        <h2>Seçim Ekranı</h2>
 <div id="selecting-student-banner" class="selecting-student-banner"></div>
         <div class="table-section">
-            <h3>Konu Belirleme</h3>
+            <h3>Konu Belirlendi.</h3>
             <label for="duel-class-select">Sınıfınız:</label>
             <select id="duel-class-select">
                 <option value="">Seçiniz</option>
@@ -4235,6 +4190,7 @@ animation: floatButton 1s ease infinite;
                 <option value="">Seçiniz</option>
             </select>
         </div>
+
         <div class="duel-bottom-info">
             <div class="duel-player-info" id="duel-inviter-info">
                 <img src="" class="duel-player-photo" id="duel-inviter-photo">
