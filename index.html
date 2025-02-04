@@ -34,7 +34,7 @@
             }
         }
 
-        .container, .game-container, .student-selection-container, .single-player-game-container, .duel-game-container {
+        .container, .game-container, .student-selection-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
             background: white;
             padding: 30px 40px;
             border-radius: 20px;
@@ -847,7 +847,7 @@ option {
             }
         }
 
-        .game-container, .student-selection-container, .single-player-game-container,  .duel-game-container {
+        .game-container, .student-selection-container, .single-player-game-container, .duel-selection-container, .duel-game-container {
             display: none;
             flex-direction: column;
             gap: 25px;
@@ -1409,17 +1409,6 @@ option {
     position: relative;
     z-index: 1000;
 }
-
-@media only screen and (max-width: 480px) {
-  .duel-selection-container {
-    max-width: 100% !important;  /* Genişliği ekranın tamamına çıkar */
-    margin: 0 !important;          /* Sağ-sol boşlukları kaldır */
-    padding: 20px 10px !important; /* Üst-alt ve yan boşlukları ayarla */
-    border-radius: 0 !important;   /* Köşe yuvarlamasını kaldır (isteğe bağlı) */
-    box-shadow: none !important;   /* Gölgeyi kaldırarak sade görünüm elde edebilirsiniz */
-  }
-}
-
 
         /* İki oyuncuyu eşit orantıda yerleştirmek için space-evenly kullandık */
 .duel-bottom-info {
