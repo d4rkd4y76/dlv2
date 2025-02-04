@@ -1417,11 +1417,23 @@ option {
     height: 100vh !important;
     margin: 0;
     padding: 10px; /* Mobilde daha az padding */
-    border-radius: 0; /* Köşeleri düzleştir */
+    border-radius: 5; /* Köşeleri düzleştir */
     box-shadow: none; /* Gölgeyi kaldırabilirsiniz */
     overflow-y: auto; /* İçerik ekranı aşarsa kaydırma ekler */
   }
 }
+
+@media (max-width: 480px) {
+  .duel-selection-container h2,
+  .duel-selection-container h3,
+  .duel-selection-container label,
+  .duel-selection-container .question-text {
+      font-size: 1.2em;       /* Yazı boyutunu küçültebilirsiniz */
+      line-height: 1.4;       /* Satır yüksekliğini artırın */
+      word-wrap: break-word;  /* Uzun kelimeler taşarsa kırılması için */
+  }
+}
+
 
 
         /* İki oyuncuyu eşit orantıda yerleştirmek için space-evenly kullandık */
@@ -3976,186 +3988,6 @@ animation: floatButton 1s ease infinite;
 
 
 
-/* 1. Genel Kapsayıcı ve Arka Plan Animasyonu */
-.duel-container {
-  width: 100vw;
-  min-height: 100vh;
-  padding: 2vh 4vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #1a1a2e, #16213e, #1a1a2e);
-  animation: bgPulse 10s ease-in-out infinite alternate;
-}
-
-@keyframes bgPulse {
-  0% {
-    background: linear-gradient(135deg, #1a1a2e, #16213e, #1a1a2e);
-  }
-  100% {
-    background: linear-gradient(135deg, #0f3460, #53354a, #0f3460);
-  }
-}
-
-/* 2. Başlık Bölümü */
-.duel-header {
-  text-align: center;
-  margin-bottom: 4vh;
-}
-
-.duel-header h1 {
-  font-size: 8vw;
-  color: #ffea00;
-  text-shadow: 0 0 10px #ffea00, 0 0 20px #ffea00;
-  margin: 0;
-  animation: textGlow 2s ease-in-out infinite alternate;
-}
-
-.duel-header .subheader {
-  font-size: 4vw;
-  color: #ffffff;
-  opacity: 0.9;
-  margin-top: 1vh;
-}
-
-@keyframes textGlow {
-  from {
-    text-shadow: 0 0 10px #ffea00, 0 0 20px #ffea00;
-  }
-  to {
-    text-shadow: 0 0 20px #ffea00, 0 0 30px #ffea00;
-  }
-}
-
-/* 3. Seçim Banner */
-.selecting-student-banner {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #ffeb3b;
-  text-align: center;
-  margin: 2vh 0;
-  padding: 1vh 1vw;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(255,235,59,0.7);
-  animation: glowBanner 1.5s infinite alternate;
-}
-
-@keyframes glowBanner {
-  from { box-shadow: 0 0 10px rgba(255,235,59,0.5); }
-  to { box-shadow: 0 0 20px rgba(255,235,59,1); }
-}
-
-/* 4. Form Bölümü */
-.duel-form {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2vh;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2vh 2vw;
-  border-radius: 10px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  margin-bottom: 4vh;
-}
-
-.duel-form h3 {
-  text-align: center;
-  font-size: 6vw;
-  color: #ffea00;
-  margin-bottom: 2vh;
-}
-
-.duel-form .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5vh;
-}
-
-.duel-form label {
-  font-size: 4vw;
-  color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-
-.duel-form select {
-  font-size: 4vw;
-  padding: 1vh 1vw;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.8);
-}
-
-/* 5. Oyuncu Bilgileri Alanı */
-.duel-players {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 2vh;
-  margin-bottom: 4vh;
-}
-
-.player-info {
-  flex: 1;
-  max-width: 40vw;
-  text-align: center;
-  position: relative;
-}
-
-.player-info .player-photo {
-  width: 20vw;
-  height: 20vw;
-  max-width: 100px;
-  max-height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #ffea00;
-  margin: 0 auto;
-  display: block;
-  transition: transform 0.3s;
-}
-
-.player-info .player-photo:hover {
-  transform: rotate(360deg);
-}
-
-.player-info .player-name {
-  font-size: 4vw;
-  color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-  margin-top: 1vh;
-}
-
-/* 6. Footer (Buton Alanı) */
-.duel-footer {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 2vh;
-}
-
-.duel-start-button {
-  font-size: 5vw;
-  padding: 2vh 4vw;
-  background: linear-gradient(45deg, #ff5722, #e91e63);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.duel-start-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
-}
 
 
 
@@ -4375,65 +4207,44 @@ animation: floatButton 1s ease infinite;
     </div>
 
     <!-- Düello Seçim Ekranı -->
-   <div class="duel-container" id="duel-selection-screen" style="display:none;">
-  <!-- Geri Sayım -->
-  <div class="countdown-container">
+    <div class="duel-selection-container" id="duel-selection-screen">
+<div class="countdown-container">
     <div class="countdown" id="duelCountdown">10</div>
-  </div>
-
-  <!-- Başlık -->
-  <div class="duel-header">
-    <h1>Düello Arenası</h1>
-    <p class="subheader">Rakibinizi seçin ve meydan okuyun!</p>
-  </div>
-
-  <!-- Seçim Banner (Öğrenci Seçiliyor gibi bilgi verici) -->
-  <div id="selecting-student-banner" class="selecting-student-banner">Öğrenci Seçiliyor...</div>
-
-  <!-- Konu Belirleme Formu -->
-  <div class="duel-form">
-    <h3>Konu Belirleme</h3>
-    <div class="form-group">
-      <label for="duel-class-select">Sınıfınız:</label>
-      <select id="duel-class-select">
-        <option value="">Seçiniz</option>
-        <!-- Sınıf seçenekleri -->
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="duel-subject-select">Düello Dersi:</label>
-      <select id="duel-subject-select">
-        <option value="">Seçiniz</option>
-        <!-- Ders seçenekleri -->
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="duel-topic-select">Düello Konusu:</label>
-      <select id="duel-topic-select">
-        <option value="">Seçiniz</option>
-        <!-- Konu seçenekleri -->
-      </select>
-    </div>
-  </div>
-
-  <!-- Oyuncu Bilgileri Alanı -->
-  <div class="duel-players">
-    <div class="player-info" id="duel-inviter-info">
-      <img src="" alt="Davet Eden" class="player-photo" id="duel-inviter-photo">
-      <div class="player-name" id="duel-inviter-name">Davet Eden</div>
-    </div>
-    <div class="player-info" id="duel-invited-info">
-      <img src="" alt="Davet Edilen" class="player-photo" id="duel-invited-photo">
-      <div class="player-name" id="duel-invited-name">Davet Edilen</div>
-    </div>
-  </div>
-
-  <!-- Başlat Butonu -->
-  <div class="duel-footer">
-    <button class="duel-start-button" id="duel-start-button" disabled style="display:none;">Düelloya Başla</button>
-  </div>
 </div>
+        <h2>Seçim Ekranı</h2>
+<div id="selecting-student-banner" class="selecting-student-banner"></div>
+        <div class="table-section">
+            <h3>Konu Belirleme</h3>
+            <label for="duel-class-select">Sınıfınız:</label>
+            <select id="duel-class-select">
+                <option value="">Seçiniz</option>
+            </select>
 
+            <label for="duel-subject-select">Düello Dersi:</label>
+            <select id="duel-subject-select">
+                <option value="">Seçiniz</option>
+            </select>
+
+            <label for="duel-topic-select">Düello Konusu:</label>
+            <select id="duel-topic-select">
+                <option value="">Seçiniz</option>
+            </select>
+        </div>
+        <div class="duel-bottom-info">
+            <div class="duel-player-info" id="duel-inviter-info">
+                <img src="" class="duel-player-photo" id="duel-inviter-photo">
+                <div class="duel-player-name" id="duel-inviter-name"></div>
+            </div>
+            <div class="duel-player-info" id="duel-invited-info">
+                <img src="" class="duel-player-photo" id="duel-invited-photo">
+                <div class="duel-player-name" id="duel-invited-name"></div>
+            </div>
+        <div class="duel-controls">
+            <button class="duel-start-button" id="duel-start-button" style="display:none;" disabled>Düelloya Başla</button>
+
+        </div>
+        </div>
+    </div>
 
 
 
