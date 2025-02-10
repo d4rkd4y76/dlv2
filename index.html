@@ -2939,7 +2939,53 @@ animation: floatButton 1s ease infinite;
 
 
 
+.question-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 700px;
+    padding: 15px;
+    border: 2px solid #ff8a00;
+    border-radius: 10px;
+    background-color: #fffbea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    gap: 15px; /* İçerikler arası boşluk */
+}
 
+/* Metin Bölümü */
+.question-text-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+}
+
+/* Üst metin (bilgi metni) */
+.question-info-text {
+    font-size: 1.1em;
+    color: #333;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Ayırıcı çizgi */
+.question-divider {
+    width: 90%;
+    height: 1px;
+    background: #ff8a00;
+    margin: 0 auto;
+    opacity: 0.5;
+}
+
+/* Alt metin (soru metni) */
+.question-actual-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #000;
+    padding: 10px;
+    text-align: center;
+}
 
 
 
@@ -6104,42 +6150,71 @@ logoutButton.addEventListener('click', async () => {
             return array;
         }
 
-        function displayCurrentQuestion() {
-            if (currentQuestionIndex >= gameQuestions.length) {
-                endGame();
-                return;
-            }
+       function displayCurrentQuestion() {
+    if (currentQuestionIndex >= gameQuestions.length) {
+        endGame();
+        return;
+    }
 
-            const currentQuestion = gameQuestions[currentQuestionIndex];
-            questionNumber.textContent = `Soru ${currentQuestionIndex + 1}/10`;
-            const progressPercentage = ((currentQuestionIndex) / 10) * 100;
-            progressBarInner.style.width = `${progressPercentage}%`;
+    const currentQuestion = gameQuestions[currentQuestionIndex];
+    questionNumber.textContent = `Soru ${currentQuestionIndex + 1}/10`;
+    const progressPercentage = ((currentQuestionIndex) / 10) * 100;
+    progressBarInner.style.width = `${progressPercentage}%`;
 
-            if (currentQuestion.question.startsWith('http')) {
-                questionImage.src = currentQuestion.question;
-                questionImage.style.display = 'block';
-                questionText.textContent = '';
-            } else {
-                questionImage.style.display = 'none';
-                questionText.textContent = currentQuestion.question;
-            }
+    // Soru konteynerini temizle
+    const questionContainer = document.querySelector('.question-container');
+    questionContainer.innerHTML = '';
 
-            const options = [
-                { text: currentQuestion.correct, correct: true },
-                { text: currentQuestion.wrong1, correct: false },
-                { text: currentQuestion.wrong2, correct: false }
-            ];
-            const shuffledOptions = shuffleArray(options);
+    // Resim varsa ekle
+    if (currentQuestion.question.startsWith('http')) {
+        const questionImage = document.createElement('img');
+        questionImage.src = currentQuestion.question;
+        questionImage.className = 'question-image';
+        questionImage.style.display = 'block';
+        questionContainer.appendChild(questionImage);
+    }
 
-            optionsContainer.innerHTML = '';
-            shuffledOptions.forEach(option => {
-                const button = document.createElement('button');
-                button.classList.add('option-button');
-                button.textContent = option.text;
-                button.dataset.correct = option.correct;
-                button.addEventListener('click', selectOption);
-                optionsContainer.appendChild(button);
-            });
+    // Metin konteynerı oluştur
+    const textContainer = document.createElement('div');
+    textContainer.className = 'question-text-container';
+
+    // Bilgi metnini ekle
+    const infoText = document.createElement('div');
+    infoText.className = 'question-info-text';
+    infoText.textContent = currentQuestion.info || ''; // Info metni
+    textContainer.appendChild(infoText);
+
+    // Ayırıcı çizgi ekle
+    const divider = document.createElement('div');
+    divider.className = 'question-divider';
+    textContainer.appendChild(divider);
+
+    // Soru metnini ekle
+    const questionText = document.createElement('div');
+    questionText.className = 'question-actual-text';
+    questionText.textContent = currentQuestion.actualQuestion || currentQuestion.question;
+    textContainer.appendChild(questionText);
+
+    questionContainer.appendChild(textContainer);
+
+    // Seçenekleri oluştur
+    const options = [
+        { text: currentQuestion.correct, correct: true },
+        { text: currentQuestion.wrong1, correct: false },
+        { text: currentQuestion.wrong2, correct: false }
+    ];
+    
+    const shuffledOptions = shuffleArray(options);
+    optionsContainer.innerHTML = '';
+    
+    shuffledOptions.forEach(option => {
+        const button = document.createElement('button');
+        button.classList.add('option-button');
+        button.textContent = option.text;
+        button.dataset.correct = option.correct;
+        button.addEventListener('click', selectOption);
+        optionsContainer.appendChild(button);
+    });
 
             // Görünürlük ayarları
             questionNumber.style.display = 'block';
@@ -7693,102 +7768,126 @@ async function updateDuelSelection(field, value) {
         }
 
         function loadDuelQuestion() {
-            if (duelCurrentQuestionIndex >= 10) {
-                endDuelGame();
-                return;
-            }
-            duelQuestionLocked = false;
-            const currentQuestion = duelQuestions[duelCurrentQuestionIndex];
-            duelQuestionNumber.textContent = `Soru ${duelCurrentQuestionIndex + 1}/10`;
-            const progressPercentage = ((duelCurrentQuestionIndex) / 10) * 100;
-            duelProgressBarInner.style.width = `${progressPercentage}%`;
+    if (duelCurrentQuestionIndex >= 10) {
+        endDuelGame();
+        return;
+    }
+    duelQuestionLocked = false;
+    const currentQuestion = duelQuestions[duelCurrentQuestionIndex];
+    duelQuestionNumber.textContent = `Soru ${duelCurrentQuestionIndex + 1}/10`;
+    const progressPercentage = ((duelCurrentQuestionIndex) / 10) * 100;
+    duelProgressBarInner.style.width = `${progressPercentage}%`;
 
-            if (currentQuestion.question.startsWith('http')) {
-                duelQuestionImage.src = currentQuestion.question;
-                duelQuestionImage.style.display = 'block';
-                duelQuestionText.textContent = '';
-            } else {
-                duelQuestionImage.style.display = 'none';
-                duelQuestionText.textContent = currentQuestion.question;
-            }
+    // Soru konteynerini seç ve temizle
+    const questionContainer = document.querySelector('.question-container');
+    questionContainer.innerHTML = '';
 
-            duelOptionsContainer.innerHTML = '';
-            currentQuestion.options.forEach((option, idx) => {
-                const button = document.createElement('button');
-                button.classList.add('option-button');
-                button.textContent = option.text;
-                button.dataset.correct = option.correct;
-                button.dataset.optionIndex = idx;
-                button.addEventListener('click', duelSelectOption);
-                duelOptionsContainer.appendChild(button);
-            });
+    // Resim varsa ekle
+    if (currentQuestion.question.startsWith('http')) {
+        duelQuestionImage.src = currentQuestion.question;
+        duelQuestionImage.style.display = 'block';
+    } else {
+        duelQuestionImage.style.display = 'none';
 
-            resetDuelTimer();
-            startDuelTimer();
-            currentDuelRef.child('responses').child(duelCurrentQuestionIndex).remove();
-        }
+        // Metin konteynerı oluştur
+        const textContainer = document.createElement('div');
+        textContainer.className = 'question-text-container';
 
-        function resetDuelTimer() {
+        // Bilgi metnini ekle
+        const infoText = document.createElement('div');
+        infoText.className = 'question-info-text';
+        infoText.textContent = currentQuestion.question; // Üst metin
+        textContainer.appendChild(infoText);
+
+        // Ayırıcı çizgi ekle
+        const divider = document.createElement('div');
+        divider.className = 'question-divider';
+        textContainer.appendChild(divider);
+
+        // Soru metnini ekle
+        const questionText = document.createElement('div');
+        questionText.className = 'question-actual-text';
+        questionText.textContent = `Yukarıdaki bilgiye göre soruyu cevaplayınız.`; // Alt metin
+        textContainer.appendChild(questionText);
+
+        questionContainer.appendChild(textContainer);
+    }
+
+    duelOptionsContainer.innerHTML = '';
+    currentQuestion.options.forEach((option, idx) => {
+        const button = document.createElement('button');
+        button.classList.add('option-button');
+        button.textContent = option.text;
+        button.dataset.correct = option.correct;
+        button.dataset.optionIndex = idx;
+        button.addEventListener('click', duelSelectOption);
+        duelOptionsContainer.appendChild(button);
+    });
+
+    resetDuelTimer();
+    startDuelTimer();
+    currentDuelRef.child('responses').child(duelCurrentQuestionIndex).remove();
+}
+
+function resetDuelTimer() {
+    clearInterval(duelTimer);
+    duelTimeLeft = 45;
+    duelTimerElement.textContent = duelTimeLeft;
+    duelTimerElement.style.color = '#ff0000';
+}
+
+function startDuelTimer() {
+    duelTimer = setInterval(() => {
+        duelTimeLeft--;
+        duelTimerElement.textContent = duelTimeLeft;
+        if (duelTimeLeft <= 0 && !duelQuestionLocked) {
             clearInterval(duelTimer);
-            duelTimeLeft = 45;
-            duelTimerElement.textContent = duelTimeLeft;
-            duelTimerElement.style.color = '#ff0000';
+            duelQuestionLocked = true;
+            revealDuelAnswerAfterTimeout();
         }
+    }, 1000);
+}
 
-        function startDuelTimer() {
-            duelTimer = setInterval(() => {
-                duelTimeLeft--;
-                duelTimerElement.textContent = duelTimeLeft;
+function duelSelectOption(e) {
+    if (duelQuestionLocked) return;
+    const selectedButton = e.target;
+    const chosenOptionText = selectedButton.textContent;
+    const isCorrect = selectedButton.dataset.correct === 'true';
+    const playerId = selectedStudent.studentId;
 
-                if (duelTimeLeft <= 0 && !duelQuestionLocked) {
-                    clearInterval(duelTimer);
+    duelOptionsContainer.querySelectorAll('.option-button').forEach(b => {
+        b.disabled = true;
+        if (b !== selectedButton) {
+            b.classList.add('option-faded');
+        } else {
+            b.classList.add('option-chosen');
+        }
+    });
+
+    currentDuelRef.child('responses').child(duelCurrentQuestionIndex).child(playerId).set({
+        chosen: chosenOptionText,
+        correct: isCorrect
+    });
+}
+
+function listenToResponses() {
+    currentDuelRef.child('responses').on('value', snap => {
+        if (snap.exists()) {
+            const data = snap.val();
+            currentDuelRef.once('value', dsnap => {
+                const ddata = dsnap.val();
+                const invId = ddata.inviter.studentId;
+                const inId = ddata.invited.studentId;
+                const answeredCount = Object.keys(data[duelCurrentQuestionIndex] || {}).length;
+                if (answeredCount === 2 && !duelQuestionLocked) {
                     duelQuestionLocked = true;
+                    clearInterval(duelTimer);
                     revealDuelAnswerAfterTimeout();
                 }
-            }, 1000);
-        }
-
-        function duelSelectOption(e) {
-            if (duelQuestionLocked) return;
-            const selectedButton = e.target;
-            const chosenOptionText = selectedButton.textContent;
-            const isCorrect = selectedButton.dataset.correct === 'true';
-            const playerId = selectedStudent.studentId;
-
-            duelOptionsContainer.querySelectorAll('.option-button').forEach(b => {
-                b.disabled = true;
-                if (b !== selectedButton) {
-                    b.classList.add('option-faded');
-                } else {
-                    b.classList.add('option-chosen');
-                }
-            });
-
-            currentDuelRef.child('responses').child(duelCurrentQuestionIndex).child(playerId).set({
-                chosen: chosenOptionText,
-                correct: isCorrect
             });
         }
-
-        function listenToResponses() {
-            currentDuelRef.child('responses').on('value', snap => {
-                if (snap.exists()) {
-                    const data = snap.val();
-                    currentDuelRef.once('value', dsnap => {
-                        const ddata = dsnap.val();
-                        const invId = ddata.inviter.studentId;
-                        const inId = ddata.invited.studentId;
-
-                        const answeredCount = Object.keys(data[duelCurrentQuestionIndex] || {}).length;
-                        if (answeredCount === 2 && !duelQuestionLocked) {
-                            duelQuestionLocked = true;
-                            clearInterval(duelTimer);
-                            revealDuelAnswerAfterTimeout();
-                        }
-                    });
-                }
-            });
-        }
+    });
+}
 
         // Yeni +1 Efekti Fonksiyonu
         function showScoreIncrementEffect(scoreElement) {
