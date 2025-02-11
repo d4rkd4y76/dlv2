@@ -6103,42 +6103,51 @@ logoutButton.addEventListener('click', async () => {
 
 
         function fetchQuestions(classId, subjectId, topicId) {
-            const questionsRef = database.ref(`championData/headings/${classId}/lessons/${subjectId}/topics/${topicId}/questions`);
-            questionsRef.once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    const allQuestions = [];
-                    snapshot.forEach(childSnapshot => {
-                        const questionData = childSnapshot.val();
-                        allQuestions.push(questionData);
-                    });
-
-                    if (allQuestions.length < 10) {
-                        showAlert('Bu konuya ait yeterli soru yok.');
-                        return;
-                    }
-
-                    gameQuestions = shuffleArray(allQuestions).slice(0, 10);
-                    currentQuestionIndex = 0;
-                    score = 0;
-
-                    singlePlayerScreen.style.display = 'none';
-                    singlePlayerGameScreen.style.display = 'flex';
-                    scoreContainer.style.display = 'none';
-                    displayCurrentQuestion();
-
-                    // Tek Kişilik Oyun Müziğini Başlat
-                    singlePlayerQuestionMusic.currentTime = 0;
-                    singlePlayerQuestionMusic.play().catch(error => {
-                        console.error("Tek Kişilik Oyun Müziği Çalınamadı:", error);
-                    });
-                } else {
-                    showAlert('Bu konuya ait soru bulunamadı.');
-                }
-            }).catch(error => {
-                console.error("Sorular çekme hata:", error);
-                showAlert('Sorular çekilirken hata oluştu.');
+    const questionsRef = database.ref(`championData/headings/${classId}/lessons/${subjectId}/topics/${topicId}/questions`);
+    questionsRef.once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            const allQuestions = [];
+            snapshot.forEach(childSnapshot => {
+                const questionData = childSnapshot.val();
+                // Soru yapısını uyumlu hale getiriyoruz
+                const formattedQuestion = {
+                    info: questionData.question.info || '',
+                    actualQuestion: questionData.question.text || questionData.question,
+                    question: questionData.question.info || questionData.question,
+                    correct: questionData.correct,
+                    wrong1: questionData.wrong1,
+                    wrong2: questionData.wrong2
+                };
+                allQuestions.push(formattedQuestion);
             });
+
+            if (allQuestions.length < 10) {
+                showAlert('Bu konuya ait yeterli soru yok.');
+                return;
+            }
+
+            gameQuestions = shuffleArray(allQuestions).slice(0, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+
+            singlePlayerScreen.style.display = 'none';
+            singlePlayerGameScreen.style.display = 'flex';
+            scoreContainer.style.display = 'none';
+            displayCurrentQuestion();
+
+            // Tek Kişilik Oyun Müziğini Başlat
+            singlePlayerQuestionMusic.currentTime = 0;
+            singlePlayerQuestionMusic.play().catch(error => {
+                console.error("Tek Kişilik Oyun Müziği Çalınamadı:", error);
+            });
+        } else {
+            showAlert('Bu konuya ait soru bulunamadı.');
         }
+    }).catch(error => {
+        console.error("Sorular çekme hata:", error);
+        showAlert('Sorular çekilirken hata oluştu.');
+    });
+}
 
         function shuffleArray(array) {
             let currentIndex = array.length, randomIndex;
