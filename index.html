@@ -6170,41 +6170,46 @@ logoutButton.addEventListener('click', async () => {
     const progressPercentage = ((currentQuestionIndex) / 10) * 100;
     progressBarInner.style.width = `${progressPercentage}%`;
 
-    // Soru konteynerini temizle
-    const questionContainer = document.querySelector('.question-container');
-    questionContainer.innerHTML = '';
+// Soru konteynerini temizle
+const questionContainer = document.querySelector('.question-container');
+questionContainer.innerHTML = '';
 
-    // Resim varsa ekle
-    if (currentQuestion.question.startsWith('http')) {
-        const questionImage = document.createElement('img');
-        questionImage.src = currentQuestion.question;
-        questionImage.className = 'question-image';
-        questionImage.style.display = 'block';
-        questionContainer.appendChild(questionImage);
-    }
+if (currentQuestion.question.startsWith('http')) {
+  // Eğer soru resim URL'siyse
+  const questionImage = document.createElement('img');
+  questionImage.src = currentQuestion.question;
+  questionImage.className = 'question-image';
+  questionImage.style.display = 'block';
+  questionImage.alt = "Soru resmi";
+  questionContainer.appendChild(questionImage);
 
-    // Metin konteynerı oluştur
-    const textContainer = document.createElement('div');
-    textContainer.className = 'question-text-container';
+  if (currentQuestion.actualQuestion) {
+    const questionTextDiv = document.createElement('div');
+    questionTextDiv.className = 'question-text';
+    questionTextDiv.textContent = currentQuestion.actualQuestion;
+    questionContainer.appendChild(questionTextDiv);
+  }
+} else {
+  // Metin şeklindeki soru için
+  const textContainer = document.createElement('div');
+  textContainer.className = 'question-text-container';
 
-    // Bilgi metnini ekle
-    const infoText = document.createElement('div');
-    infoText.className = 'question-info-text';
-    infoText.textContent = currentQuestion.info || ''; // Info metni
-    textContainer.appendChild(infoText);
+  const infoText = document.createElement('div');
+  infoText.className = 'question-info-text';
+  infoText.textContent = currentQuestion.info || '';
+  textContainer.appendChild(infoText);
 
-    // Ayırıcı çizgi ekle
-    const divider = document.createElement('div');
-    divider.className = 'question-divider';
-    textContainer.appendChild(divider);
+  const divider = document.createElement('div');
+  divider.className = 'question-divider';
+  textContainer.appendChild(divider);
 
-    // Soru metnini ekle
-    const questionText = document.createElement('div');
-    questionText.className = 'question-actual-text';
-    questionText.textContent = currentQuestion.actualQuestion || currentQuestion.question;
-    textContainer.appendChild(questionText);
+  const questionText = document.createElement('div');
+  questionText.className = 'question-actual-text';
+  questionText.textContent = currentQuestion.question; // Artık doğru soru metni burada
+  textContainer.appendChild(questionText);
 
-    questionContainer.appendChild(textContainer);
+  questionContainer.appendChild(textContainer);
+}
 
     // Seçenekleri oluştur
     const options = [
@@ -7720,20 +7725,37 @@ async function updateDuelSelection(field, value) {
                     showAlert('Bu konuya ait yeterli soru yok.');
                     return;
                 }
-                let chosen = shuffleArray(allQuestions).slice(0,10);
-                chosen = chosen.map(q => {
-                    let options = [
-                        { text: q.correct, correct: true },
-                        { text: q.wrong1, correct: false },
-                        { text: q.wrong2, correct: false }
-                    ];
-                    let shuffled = shuffleArray(options);
-                    return {
-                        question: q.question,
-                        options: shuffled
-                    };
-                });
-                await currentDuelRef.child('questions').set(chosen);
+                // Firebase'den çekilen tüm sorulardan 10 tanesini rastgele seçelim:
+let chosen = shuffleArray(allQuestions).slice(0, 10);
+
+// Soru formatını doğru şekilde eşleyelim:
+chosen = chosen.map(q => {
+    let infoText = "";
+    let questionText = "";
+    // Eğer soru nesne formatındaysa:
+    if (typeof q.question === 'object' && q.question !== null) {
+        infoText = q.question.info || "";
+        questionText = q.question.text || "";
+    } else {
+        // Eğer soru doğrudan metin olarak saklanmışsa:
+        questionText = q.question;
+    }
+    return {
+        info: infoText,
+        actualQuestion: questionText,
+        question: questionText,
+        correct: q.correct,
+        wrong1: q.wrong1,
+        wrong2: q.wrong2,
+        options: shuffleArray([
+            { text: q.correct, correct: true },
+            { text: q.wrong1, correct: false },
+            { text: q.wrong2, correct: false }
+        ])
+    };
+});
+
+await currentDuelRef.child('questions').set(chosen);
                 await currentDuelRef.child('gameStarted').set(true);
                 showAlert("Düello Başlatıldı!");
             } else {
@@ -7787,40 +7809,49 @@ async function updateDuelSelection(field, value) {
     const progressPercentage = ((duelCurrentQuestionIndex) / 10) * 100;
     duelProgressBarInner.style.width = `${progressPercentage}%`;
 
-    // Soru konteynerini seç ve temizle
-    const questionContainer = document.querySelector('.question-container');
+    // Soru konteynerini düello oyun ekranından seçiyoruz
+    const questionContainer = document.querySelector('#duel-game-screen .question-container');
     questionContainer.innerHTML = '';
 
-    // Resim varsa ekle
     if (currentQuestion.question.startsWith('http')) {
-        duelQuestionImage.src = currentQuestion.question;
-        duelQuestionImage.style.display = 'block';
-    } else {
-        duelQuestionImage.style.display = 'none';
+  // Eğer soru resim URL'siyse
+  const questionImage = document.createElement('img');
+  questionImage.src = currentQuestion.question;
+  questionImage.className = 'question-image';
+  questionImage.style.display = 'block';
+  questionImage.alt = "Soru resmi";
+  questionContainer.appendChild(questionImage);
 
-        // Metin konteynerı oluştur
-        const textContainer = document.createElement('div');
-        textContainer.className = 'question-text-container';
+  if (currentQuestion.actualQuestion) {
+    const questionTextDiv = document.createElement('div');
+    questionTextDiv.className = 'question-text';
+    questionTextDiv.textContent = currentQuestion.actualQuestion;
+    questionContainer.appendChild(questionTextDiv);
+  }
+} else {
+  // Metin şeklindeki soru için
+  const textContainer = document.createElement('div');
+  textContainer.className = 'question-text-container';
 
-        // Bilgi metnini ekle
-        const infoText = document.createElement('div');
-        infoText.className = 'question-info-text';
-        infoText.textContent = currentQuestion.question; // Üst metin
-        textContainer.appendChild(infoText);
+  const infoText = document.createElement('div');
+  infoText.className = 'question-info-text';
+  infoText.textContent = currentQuestion.info || '';
+  textContainer.appendChild(infoText);
 
-        // Ayırıcı çizgi ekle
-        const divider = document.createElement('div');
-        divider.className = 'question-divider';
-        textContainer.appendChild(divider);
+  const divider = document.createElement('div');
+  divider.className = 'question-divider';
+  textContainer.appendChild(divider);
 
-        // Soru metnini ekle
-        const questionText = document.createElement('div');
-        questionText.className = 'question-actual-text';
-        questionText.textContent = `Yukarıdaki bilgiye göre soruyu cevaplayınız.`; // Alt metin
-        textContainer.appendChild(questionText);
+  const questionText = document.createElement('div');
+  questionText.className = 'question-actual-text';
+  questionText.textContent = currentQuestion.question; // Artık doğru soru metni burada
+  textContainer.appendChild(questionText);
 
-        questionContainer.appendChild(textContainer);
-    }
+  questionContainer.appendChild(textContainer);
+}
+
+
+
 
     duelOptionsContainer.innerHTML = '';
     currentQuestion.options.forEach((option, idx) => {
@@ -7837,6 +7868,7 @@ async function updateDuelSelection(field, value) {
     startDuelTimer();
     currentDuelRef.child('responses').child(duelCurrentQuestionIndex).remove();
 }
+
 
 function resetDuelTimer() {
     clearInterval(duelTimer);
@@ -9234,7 +9266,7 @@ async function purchaseUnlimited(cost) {
 
         await showAlert('✨ Sınırsız düello hakkı aktifleştirildi!');
        
-    } catch (error) {
+    } catch (error) {let chosen = shuffleArray(allQuestions).slice(0, 10);
         console.error('Satın alma hatası:', error);
         await showAlert('Satın alma işlemi başarısız oldu!');
     }
