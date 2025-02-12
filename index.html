@@ -6110,14 +6110,14 @@ logoutButton.addEventListener('click', async () => {
             snapshot.forEach(childSnapshot => {
                 const questionData = childSnapshot.val();
                 // Soru yapısını uyumlu hale getiriyoruz
-                const formattedQuestion = {
-                    info: questionData.question.info || '',
-                    actualQuestion: questionData.question.text || questionData.question,
-                    question: questionData.question.info || questionData.question,
-                    correct: questionData.correct,
-                    wrong1: questionData.wrong1,
-                    wrong2: questionData.wrong2
-                };
+const formattedQuestion = {
+    info: questionData.question.info || '',
+    actualQuestion: questionData.question.text || questionData.question,
+    question: questionData.question.text || questionData.question, // Düzeltilmiş
+    correct: questionData.correct,
+    wrong1: questionData.wrong1,
+    wrong2: questionData.wrong2
+};
                 allQuestions.push(formattedQuestion);
             });
 
