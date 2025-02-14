@@ -6192,23 +6192,37 @@ if (currentQuestion.question.startsWith('http')) {
 } else {
   // Metin şeklindeki soru için
   const textContainer = document.createElement('div');
-  textContainer.className = 'question-text-container';
+textContainer.className = 'question-text-container';
 
+// Eğer "info" alanı bir resim URL'si içeriyorsa (örneğin http://...png)
+if (
+  currentQuestion.info &&
+  /^https?:\/\/.*\.(png|jpg|jpeg|gif)$/i.test(currentQuestion.info)
+) {
+  const infoImage = document.createElement('img');
+  infoImage.src = currentQuestion.info;
+  infoImage.alt = 'Bilgi resmi';
+  infoImage.className = 'question-info-image'; // CSS ile boyutlandırma yapabilirsiniz
+  textContainer.appendChild(infoImage);
+} else {
+  // Aksi halde, metin olarak göster
   const infoText = document.createElement('div');
   infoText.className = 'question-info-text';
   infoText.textContent = currentQuestion.info || '';
   textContainer.appendChild(infoText);
+}
 
-  const divider = document.createElement('div');
-  divider.className = 'question-divider';
-  textContainer.appendChild(divider);
+const divider = document.createElement('div');
+divider.className = 'question-divider';
+textContainer.appendChild(divider);
 
-  const questionText = document.createElement('div');
-  questionText.className = 'question-actual-text';
-  questionText.textContent = currentQuestion.question; // Artık doğru soru metni burada
-  textContainer.appendChild(questionText);
+const questionText = document.createElement('div');
+questionText.className = 'question-actual-text';
+questionText.textContent = currentQuestion.question;
+textContainer.appendChild(questionText);
 
-  questionContainer.appendChild(textContainer);
+questionContainer.appendChild(textContainer);
+
 }
 
     // Seçenekleri oluştur
