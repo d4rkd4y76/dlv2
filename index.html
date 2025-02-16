@@ -4056,9 +4056,9 @@ animation: floatButton 1s ease infinite;
         </span>
         <div class="button-glow"></div>
     </button>
-	    <button class="friends-button" id="friends-button">
-               👥 Arkadaşlar
-            </button>
+<button class="friends-button" id="friends-button" style="display: none;">
+   👥 Arkadaşlar
+</button>
             <!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
             <button class="kupa-siralama-button" id="kupa-siralama-button">
                 🏆 Sezon Sıralaması
@@ -4272,10 +4272,8 @@ animation: floatButton 1s ease infinite;
 
 <div class="verification-overlay" id="verificationOverlay" style="display: none;">
     <div class="verification-content">
-        <h3>E-posta Doğrulama</h3>
-        <p>E-posta adresinize doğrulama bağlantısı gönderildi.</p>
-        <p>Lütfen e-postanızı kontrol edin ve hesabınızı doğrulayın.</p>
-        <p>Doğrulama işlemi tamamlandıktan sonra giriş yapabilirsiniz.</p>
+        <h3>Şahane Kayıt Başarılı 🎉</h3>
+        <p>Şimdi Giriş Yaparak Mücadeleye Başlayabilirsin 🤩</p>
     </div>
 </div>
 
@@ -9123,8 +9121,9 @@ submitRegistration.addEventListener('click', async () => {
             name: username,
             password: password,
             email: email,
-            diamond: 60,
-            photo: "https://firebasestorage.googleapis.com/v0/b/duellomatik.firebasestorage.app/o/icon-5355896_1920.png?alt=media&token=ac6bd293-f96c-45b9-84a9-35aff0e5784e",
+	    duelCredits: 300,
+            diamond: 1500,
+            photo: "https://cdn.pixabay.com/photo/2025/01/08/21/09/giraffe-9320109_640.jpg",
             gameCup: 0,
             inDuel: false,
             lastDiamondUpdate: firebase.database.ServerValue.TIMESTAMP
