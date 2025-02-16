@@ -7826,44 +7826,50 @@ await currentDuelRef.child('questions').set(chosen);
     questionContainer.innerHTML = '';
 
     if (currentQuestion.question.startsWith('http')) {
-  // Eğer soru resim URL'siyse
-  const questionImage = document.createElement('img');
-  questionImage.src = currentQuestion.question;
-  questionImage.className = 'question-image';
-  questionImage.style.display = 'block';
-  questionImage.alt = "Soru resmi";
-  questionContainer.appendChild(questionImage);
+        // Eğer soru resim URL'siyse
+        const questionImage = document.createElement('img');
+        questionImage.src = currentQuestion.question;
+        questionImage.className = 'question-image';
+        questionImage.style.display = 'block';
+        questionImage.alt = "Soru resmi";
+        questionContainer.appendChild(questionImage);
 
-  if (currentQuestion.actualQuestion) {
-    const questionTextDiv = document.createElement('div');
-    questionTextDiv.className = 'question-text';
-    questionTextDiv.textContent = currentQuestion.actualQuestion;
-    questionContainer.appendChild(questionTextDiv);
-  }
-} else {
-  // Metin şeklindeki soru için
-  const textContainer = document.createElement('div');
-  textContainer.className = 'question-text-container';
+        if (currentQuestion.actualQuestion) {
+            const questionTextDiv = document.createElement('div');
+            questionTextDiv.className = 'question-text';
+            questionTextDiv.textContent = currentQuestion.actualQuestion;
+            questionContainer.appendChild(questionTextDiv);
+        }
+    } else {
+        // Metin şeklindeki soru için
+        const textContainer = document.createElement('div');
+        textContainer.className = 'question-text-container';
 
-  const infoText = document.createElement('div');
-  infoText.className = 'question-info-text';
-  infoText.textContent = currentQuestion.info || '';
-  textContainer.appendChild(infoText);
+        // "info" alanı için resim URL kontrolü
+        if (currentQuestion.info && /^https?:\/\/.*\.(png|jpg|jpeg|gif)$/i.test(currentQuestion.info)) {
+            const infoImage = document.createElement('img');
+            infoImage.src = currentQuestion.info;
+            infoImage.alt = 'Bilgi resmi';
+            infoImage.className = 'question-info-image';
+            textContainer.appendChild(infoImage);
+        } else {
+            const infoText = document.createElement('div');
+            infoText.className = 'question-info-text';
+            infoText.textContent = currentQuestion.info || '';
+            textContainer.appendChild(infoText);
+        }
 
-  const divider = document.createElement('div');
-  divider.className = 'question-divider';
-  textContainer.appendChild(divider);
+        const divider = document.createElement('div');
+        divider.className = 'question-divider';
+        textContainer.appendChild(divider);
 
-  const questionText = document.createElement('div');
-  questionText.className = 'question-actual-text';
-  questionText.textContent = currentQuestion.question; // Artık doğru soru metni burada
-  textContainer.appendChild(questionText);
+        const questionText = document.createElement('div');
+        questionText.className = 'question-actual-text';
+        questionText.textContent = currentQuestion.question;
+        textContainer.appendChild(questionText);
 
-  questionContainer.appendChild(textContainer);
-}
-
-
-
+        questionContainer.appendChild(textContainer);
+    }
 
     duelOptionsContainer.innerHTML = '';
     currentQuestion.options.forEach((option, idx) => {
@@ -7880,6 +7886,7 @@ await currentDuelRef.child('questions').set(chosen);
     startDuelTimer();
     currentDuelRef.child('responses').child(duelCurrentQuestionIndex).remove();
 }
+
 
 
 function resetDuelTimer() {
