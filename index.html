@@ -8146,8 +8146,8 @@ if (winnerId && loserId) {
         }
 
         async function loadRanking() {
-   const CACHE_DURATION = 3600000; // 1 saat
-   const PLAYER_LIMIT = 10; // İlk 10 oyuncu
+   const CACHE_DURATION = 360000; // 1 saat
+   const PLAYER_LIMIT = 25; // İlk 10 oyuncu
 
    // Check cache first
    const cachedData = localStorage.getItem('rankingCache');
@@ -8215,7 +8215,7 @@ if (winnerId && loserId) {
 
 function displayRankingData(players) {
    rankingTableBody.innerHTML = '';
-   const topPlayers = players.slice(0, 5);
+   const topPlayers = players.slice(0, 25);
    const currentUserRank = players.findIndex(p => p.id === selectedStudent.studentId) + 1;
    const userTrophyCount = players.find(p => p.id === selectedStudent.studentId)?.gameCup || 0;
 
