@@ -9311,7 +9311,7 @@ function updateDuelButtonState() {
   const currentHour = now.getHours();
   const duelButton = document.getElementById('findDuelButton');
 
-  if (currentHour >=14  && currentHour < 20) {
+  if (currentHour >=17  && currentHour < 20) {
     duelButton.disabled = false;
     duelButton.classList.remove('disabled'); // CSS ile görsel efekt eklemek isterseniz
   } else {
