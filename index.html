@@ -4052,7 +4052,7 @@ animation: floatButton 1s ease infinite;
     <button class="find-duel-button" id="findDuelButton">
         <span class="button-content">
             <i class="duel-icon">⚔️</i>
-            <span>Düello Ara</span>
+            <span>Düello Ara (17:00-20:00)</span>
         </span>
         <div class="button-glow"></div>
     </button>
@@ -9303,6 +9303,52 @@ async function purchaseUnlimited(cost) {
     }
 }
 
+
+
+// Buton durumunu güncelleyen fonksiyon
+function updateDuelButtonState() {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const duelButton = document.getElementById('findDuelButton');
+
+  if (currentHour >= 17 && currentHour < 20) {
+    duelButton.disabled = false;
+    duelButton.classList.remove('disabled'); // CSS ile görsel efekt eklemek isterseniz
+  } else {
+    duelButton.disabled = true;
+    duelButton.classList.add('disabled');
+  }
+}
+
+// Sayfa yüklendiğinde buton durumunu ayarla
+updateDuelButtonState();
+
+// Her dakika buton durumunu güncelle
+setInterval(updateDuelButtonState, 60000);
+
+// Mevcut findDuelButton click event listener'ı aynı şekilde kalabilir
+document.getElementById('findDuelButton').addEventListener('click', () => {
+  // Buton disabled ise hiçbir işlem yapılmaz.
+  if (document.getElementById('findDuelButton').disabled) return;
+
+  // Buton aktifse mevcut kodunuz çalışır:
+  const availablePlayersList = document.getElementById('availablePlayersList');
+  availablePlayersList.innerHTML = '';
+  cleanupMatchmakingListeners();
+
+  const matchmakingRef = database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`);
+  matchmakingRef.onDisconnect().remove();
+
+  matchmakingRef.set({
+      name: selectedStudent.studentName,
+      classId: selectedStudent.classId,
+      studentId: selectedStudent.studentId,
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      status: 'searching'
+  }).then(() => {
+      showMatchmakingScreen();
+  });
+});
 
 
 
