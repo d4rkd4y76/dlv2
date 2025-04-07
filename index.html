@@ -9339,15 +9339,7 @@ document.getElementById('findDuelButton').addEventListener('click', () => {
   const matchmakingRef = database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`);
   matchmakingRef.onDisconnect().remove();
 
-  matchmakingRef.set({
-      name: selectedStudent.studentName,
-      classId: selectedStudent.classId,
-      studentId: selectedStudent.studentId,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-      status: 'searching'
-  }).then(() => {
-      showMatchmakingScreen();
-  });
+
 });
 
 
