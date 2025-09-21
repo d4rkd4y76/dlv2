@@ -3977,6 +3977,31 @@ animation: floatButton 1s ease infinite;
 
 
 </style>
+
+<style>
+/* --- Nova: Düello cezası kilit stili --- */
+.find-duel-button.locked,
+#findDuelButton:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.3);
+  position: relative;
+}
+.find-duel-button.locked::after,
+#findDuelButton:disabled::after {
+  content: "🔒";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1em;
+}
+/* Buton içindeki geri sayım metninin görünürlüğü için */
+#findDuelButton .button-content span.countdown-label {
+  font-weight: 700;
+}
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -4006,6 +4031,7 @@ animation: floatButton 1s ease infinite;
 </div>
 <button class="login-button" disabled="" id="login-button">Giriş</button>
 <button class="register-button" id="register-button">Kayıt Ol</button>
+
 <div class="error" id="student-selection-error"></div>
 </div>
 <!-- Ana Ekran -->
@@ -4375,7 +4401,24 @@ animation: floatButton 1s ease infinite;
 <!-- Tek Kişilik Oyun Müziği için Yeni Audio Elementi -->
 <audio id="singlePlayerQuestionMusic" preload="auto" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/oyun%20tek%20mz.mp3"></audio>
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+// Yardımcı: aktif invite ban var mı? (global veya sınıf path'i)
+async function readInviteBan(studentId, classId) {
+    if (typeof database === 'undefined' || !studentId) return null;
+    try {
+        const snapGlobal = await database.ref(`inviteBans/${studentId}`).once('value');
+        let data = snapGlobal && snapGlobal.exists && snapGlobal.exists() ? (snapGlobal.val() || null) : null;
+        if (!data && classId) {
+            const snapClass = await database.ref(`classes/${classId}/inviteBans/${studentId}`).once('value');
+            if (snapClass && snapClass.exists && snapClass.exists()) data = snapClass.val() || null;
+        }
+        return data;
+    } catch (e) {
+        console.warn('readInviteBan hata:', e);
+        return null;
+    }
+}
+</script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
@@ -4446,44 +4489,6 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
-// === Nova idempotent duel outcome helper ===
-// === Nova per-player idempotent awarding ===
-async function awardOncePerPlayer(studentId, classId, delta, duelKey) {
-    try {
-        const flagRef = database.ref(`classes/${classId}/students/${studentId}/appliedDuels/${duelKey}`);
-        const res = await flagRef.transaction(curr => {
-            if (curr === true) return; // already applied for this player
-            return true;
-        });
-        if (!res || !res.committed) return false;
-        // apply delta to player's gameCup
-        await database.ref(`classes/${classId}/students/${studentId}/gameCup`)
-            .transaction(current => Math.max((current || 0) + (delta || 0), 0));
-        return true;
-    } catch (e) {
-        console.warn('awardOncePerPlayer error:', e);
-        return false;
-    }
-}
-// === end per-player helper ===
-
-async function applyDuelOutcomeOnce(duelKey, applyFn) {
-    try {
-        const flagRef = database.ref(`duels/${duelKey}/pointsApplied`);
-        const res = await flagRef.transaction(curr => {
-            if (curr === true) return; // already applied
-            return true;               // mark applied
-        });
-        if (!res || !res.committed) return false;
-        await applyFn();
-        return true;
-    } catch(e) {
-        console.warn('applyDuelOutcomeOnce error:', e);
-        return false;
-    }
-}
-// === end helper ===
-
 
 
         // Diğer değişkenler
@@ -5085,48 +5090,77 @@ async function updateDuelScore(type, data) {
     try {
         switch(type) {
             case 'TIME_OUT':
-await applyDuelOutcomeOnce(currentDuelRef.key, async () => {
-        await Promise.all([
-            awardOncePerPlayer(inviterId, inviterClassId, -3, currentDuelRef.key),
-            awardOncePerPlayer(invitedId, invitedClassId, +6, currentDuelRef.key)
-        ]);
-    });
-    await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
-    break;
-
-
-
-            case 'DISCONNECTED':
-                // Ayrılan oyuncu -3, kalan oyuncu +6
-                const disconnectedId = data.disconnectedId;
-                const disconnectedClassId = data.disconnectedClassId;
-                const remainingId = disconnectedId === inviterId ? invitedId : inviterId;
-                const remainingClassId = disconnectedId === inviterId ? invitedClassId : inviterClassId;
-                
+                // Süre dolduğunda davet eden -3, misafir +6
                 await Promise.all([
-                    database.ref(`classes/${disconnectedClassId}/students/${disconnectedId}/gameCup`)
+                    database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
                         .transaction(current => Math.max((current || 0) - 3, 0)),
-                    database.ref(`classes/${remainingClassId}/students/${remainingId}/gameCup`)
+                    database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
                         .transaction(current => (current || 0) + 6)
                 ]);
-                await showAlert('👋 Rakip ayrıldı! (+6 🏆)');
+                await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
                 break;
 
-            case 'GAME_END':
-const {winnerId, winnerClassId, loserId, loserClassId} = data;
-    await applyDuelOutcomeOnce(currentDuelRef.key, async () => {
-        await Promise.all([
-            awardOncePerPlayer(winnerId, winnerClassId, +6, currentDuelRef.key),
-            awardOncePerPlayer(loserId, loserClassId, -3, currentDuelRef.key)
-        ]);
-    });
-    const message = winnerId === selectedStudent.studentId ? 
-        '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
-        '😔 Maalesef kaybettiniz. (-3 🏆)';
-    await showAlert(message);
+            case 'DISCONNECTED':
+    // Sadece OYUNDAN ÇIKAN kişiyi banla; kalan kişiye sadece bilgilendirme göster.
+    try {
+        const dcId = data && (data.disconnectedId || data.playerId || data.uid || data.studentId);
+        const dcClassId = data && (data.disconnectedClassId || data.classId || data.classID);
+        if (!dcId) {
+            console.warn('DISCONNECTED event without dcId, işlem yapılmadı.');
+            break;
+        }
+
+        // Bu istemci OYUNDAN ÇIKAN kişi mi?
+        const currentUid = (auth && auth.currentUser && auth.currentUser.uid) ? auth.currentUser.uid : null;
+        const currentStudentId = (typeof currentStudent !== 'undefined' && currentStudent && currentStudent.studentId) ? currentStudent.studentId : null;
+        const selectedId = (typeof selectedStudent !== 'undefined' && selectedStudent && selectedStudent.studentId) ? selectedStudent.studentId : null;
+        const localId = currentStudentId || currentUid || selectedId;
+
+        const isLeaver = (localId && (localId === dcId));
+
+        if (isLeaver) {
+            // YALNIZCA ayrılan istemcide ban yaz ve uyarı göster
+            const TEN_MINUTES_MS = 10 * 60 * 1000;
+            const expiresAt = Date.now() + TEN_MINUTES_MS;
+            let wrote = false;
+            if (typeof database !== 'undefined') {
+                try { await database.ref(`inviteBans/${dcId}`).set({ expiresAt }); wrote = true; } catch(e1){ console.warn('inviteBans global yazma hatası:', e1); }
+                if (dcClassId) {
+                    try { await database.ref(`classes/${dcClassId}/inviteBans/${dcId}`).set({ expiresAt }); wrote = true; } catch(e2){ console.warn('inviteBans class yazma hatası:', e2); }
+                }
+            }
+            if (typeof showAlert === 'function') {
+                const msg = wrote 
+                    ? 'Bağlantınız kesildi. Kupa değişmedi. 10 dakika davet gönderemezsiniz.'
+                    : 'Bağlantınız kesildi. Kupa değişmedi. (Ceza kaydı yazılamadı, loglandı.)';
+                await showAlert(msg);
+            }
+        } else {
+            // Bu istemci ayrılan kişi DEĞİL → sadece bilgi ver (ban yazma!)
+            if (typeof showAlert === 'function') {
+                await showAlert('Rakibiniz oyundan ayrıldı. Kupa değişmedi.');
+            }
+        }
+    } catch (err) {
+        console.error('DISCONNECTED işleminde hata:', err);
+        if (typeof showAlert === 'function') {
+            await showAlert('Bağlantı kesildi olayı işlendi, ancak beklenmeyen bir hata oluştu.');
+        }
+    }
     break;
 
-
+            case 'GAME_END':
+                // Normal oyun sonu: Kazanan +6, Kaybeden -3
+                const {winnerId, winnerClassId, loserId, loserClassId} = data;
+                await Promise.all([
+    database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
+    database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
+]);
+const message = winnerId === selectedStudent.studentId ? 
+                    '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
+                    '😔 Maalesef kaybettiniz. (-3 🏆)';
+                await showAlert(message);
+                break;
         }
         return true;
     } catch (error) {
@@ -6428,7 +6462,32 @@ function populateClassSelect(classesData) {
 
         // Davet Etme ve Dinleme
 async function sendInvitation(player) {
-    try {
+    
+
+        // --- INVITE BAN HARD GATE (ilk satırda kontrol) ---
+        try {
+            const inviterIdForBan = (selectedStudent && selectedStudent.studentId) || (currentStudent && currentStudent.studentId) || (auth && auth.currentUser && auth.currentUser.uid);
+            const inviterClassForBan = (selectedStudent && selectedStudent.classId) || (currentClassId) || (currentStudent && currentStudent.classId);
+            const banDataGate = await readInviteBan(inviterIdForBan, inviterClassForBan);
+            if (banDataGate) {
+                const expiresAtGate = banDataGate.expiresAt || 0;
+                const nowGate = Date.now();
+                if (expiresAtGate > nowGate) {
+                    const remainingSecGate = Math.ceil((expiresAtGate - nowGate) / 1000);
+                    if (typeof showAlert === 'function') {
+                        await showAlert(`⚠️ Davet gönderemezsiniz. Kalan ceza süresi: ${remainingSecGate} saniye.`);
+                    }
+                    return; // kesin dönüş: daveti durdur
+                }
+            }
+        } catch (eGate) {
+            console.warn('Invite ban hard gate kontrolü sırasında hata:', eGate);
+            // Hata olsa bile devam etmek yerine fail-safe davranalım:
+            // Eğer policy gereği mutlaka engellemek istiyorsan burada return; bırak.
+            // Şimdilik devam ediyoruz.
+        }
+        // --- /INVITE BAN HARD GATE ---
+try {
         console.log("Davet gönderilmeye çalışılıyor, oyuncu:", player);
 
         // --- 1. Kredi Kontrolleri ---
@@ -6461,6 +6520,33 @@ async function sendInvitation(player) {
 
         
         // --- Kupa farkı kontrolü (50'den fazlaysa davet engellenir) ---
+// --- Davet gönderen üzerinde aktif invite ban var mı kontrol et ---
+try {
+    const inviterIdForBan = (selectedStudent && selectedStudent.studentId) || (currentStudent && currentStudent.studentId) || (auth && auth.currentUser && auth.currentUser.uid);
+    const inviterClassForBan = (selectedStudent && selectedStudent.classId) || (currentClassId) || (currentStudent && currentStudent.classId);
+    const banData = await readInviteBan(inviterIdForBan, inviterClassForBan);
+    if (banData) {
+        const expiresAt = banData.expiresAt || 0;
+        const now = Date.now();
+        if (expiresAt > now) {
+            const remainingSec = Math.ceil((expiresAt - now) / 1000);
+            if (typeof showAlert === 'function') {
+                await showAlert(`⚠️ Davet gönderemezsiniz. Kalan ceza süresi: ${remainingSec} saniye.`);
+            }
+            return; // aktif ceza varken daveti engelle
+        } else {
+            // Süresi geçmişse temizle
+            try { await database.ref(`inviteBans/${inviterIdForBan}`).remove(); } catch(_) {}
+            if (inviterClassForBan) {
+                try { await database.ref(`classes/${inviterClassForBan}/inviteBans/${inviterIdForBan}`).remove(); } catch(_) {}
+            }
+        }
+    }
+} catch (e) {
+    console.error('inviteBan kontrolü sırasında hata:', e);
+    // Hata olsa bile davet akışına devam edilebilir
+}
+// --- /invite ban kontrolü sonu ---
         try {
             const [inviterCupSnap, invitedCupSnap] = await Promise.all([
                 database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/gameCup`).once('value'),
@@ -7455,7 +7541,7 @@ duelRef.on('value', async (snap) => {
         }
 
     } else {
-        if (!duelEnded) {
+        if (!duelEnded) { try { localStorage.setItem('duelPenaltyUntil', String(Date.now() + 10 * 60 * 1000)); } catch(e){}
             try {
                 const currentPlayerId = selectedStudent.studentId;
                 
@@ -7464,8 +7550,8 @@ duelRef.on('value', async (snap) => {
                     inviterClassId,
                     invitedId,
                     invitedClassId,
-                    disconnectedId: currentPlayerId === inviterId ? invitedId : inviterId,
-                    disconnectedClassId: currentPlayerId === inviterId ? invitedClassId : inviterClassId
+                    disconnectedId: currentPlayerId,
+                    disconnectedClassId: (currentPlayerId === inviterId ? inviterClassId : invitedClassId)
                 });
 
                 // inDuel durumlarını güncelle
@@ -9261,5 +9347,163 @@ async function purchaseUnlimited(cost) {
 
 
     </script>
+
+<script>
+// --- Nova: Düellodan erken çıkış için 10 dk ceza sistemi ---
+(function() {
+  const PENALTY_KEY = 'duelPenaltyUntil';
+  let penaltyInterval = null;
+
+  function getPenaltyRemaining() {
+    const until = parseInt(localStorage.getItem(PENALTY_KEY) || '0', 10);
+    if (!until) return 0;
+    const diff = Math.ceil((until - Date.now()) / 1000);
+    if (diff <= 0) {
+      localStorage.removeItem(PENALTY_KEY);
+      return 0;
+    }
+    return diff;
+  }
+
+  function formatMMSS(totalSeconds) {
+    const m = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const s = String(totalSeconds % 60).padStart(2, '0');
+    return m + ":" + s;
+  }
+
+  function setFindDuelLabelCountdown(seconds) {
+    const btn = document.getElementById('findDuelButton');
+    if (!btn) return;
+    const labelSpan = btn.querySelector('.button-content span:last-child');
+    if (!labelSpan) return;
+    labelSpan.classList.add('countdown-label');
+    labelSpan.textContent = "Ceza: " + formatMMSS(seconds);
+  }
+
+  function restoreFindDuelLabel() {
+    const btn = document.getElementById('findDuelButton');
+    if (!btn) return;
+    const labelSpan = btn.querySelector('.button-content span:last-child');
+    if (!labelSpan) return;
+    // Orijinal yazıyı geri getir
+    labelSpan.classList.remove('countdown-label');
+    labelSpan.textContent = "Düello Ara (17:00-20:00)";
+  }
+
+  function applyPenalty(seconds) {
+    const until = Date.now() + (seconds * 1000);
+    localStorage.setItem(PENALTY_KEY, String(until));
+    startPenaltyCountdown();
+  }
+
+  function startPenaltyCountdown() {
+    const btn = document.getElementById('findDuelButton');
+    if (!btn) return;
+    // Disable + locked görünüm
+    btn.disabled = true;
+    btn.classList.add('locked');
+
+    // İlk değer
+    let remaining = getPenaltyRemaining();
+    if (remaining <= 0) {
+      clearPenaltyUI();
+      return;
+    }
+    setFindDuelLabelCountdown(remaining);
+
+    // Her saniye güncelle
+    if (penaltyInterval) clearInterval(penaltyInterval);
+    penaltyInterval = setInterval(() => {
+      remaining = getPenaltyRemaining();
+      if (remaining > 0) {
+        setFindDuelLabelCountdown(remaining);
+      } else {
+        clearInterval(penaltyInterval);
+        clearPenaltyUI();
+      }
+    }, 1000);
+  }
+
+  function clearPenaltyUI() {
+    const btn = document.getElementById('findDuelButton');
+    if (!btn) return;
+    btn.disabled = false;
+    btn.classList.remove('locked');
+    restoreFindDuelLabel();
+  }
+
+  // Globalden erişim gerekirse:
+  window.__duelPenalty__ = {
+    applyPenalty,
+    getPenaltyRemaining
+  };
+
+  // 1) Sayfa yüklenince ceza var mı kontrol et
+  document.addEventListener('DOMContentLoaded', () => {
+    // Butona güvenlik amaçlı tıklama öncesi kontrol
+    const findBtn = document.getElementById('findDuelButton');
+    if (findBtn) {
+      findBtn.addEventListener('click', (e) => {
+        if (getPenaltyRemaining() > 0) {
+          e.preventDefault();
+          e.stopPropagation();
+          // UI zaten kilitli; ekstra mesaj isterseniz şunu açabilirsiniz:
+          // alert('Düello erken terk edildi. 10 dakika beklemelisiniz.');
+          return false;
+        }
+      }, true); // CAPTURE fazında, diğer listener'lardan önce
+    }
+
+    // Eğer aktif ceza varsa başlat
+    if (getPenaltyRemaining() > 0) {
+      startPenaltyCountdown();
+    }
+  });
+
+  // 2) Her türlü çıkış/yenileme/geri durumunda — oyun başlamış ve bitmemişse — ceza uygula
+  window.addEventListener('beforeunload', () => {
+    try {
+      if (typeof duelGameStarted !== 'undefined' && typeof duelEnded !== 'undefined') {
+        if (duelGameStarted && !duelEnded) {
+          const remaining = getPenaltyRemaining();
+          if (remaining === 0) {
+            localStorage.setItem(PENALTY_KEY, String(Date.now() + 10 * 60 * 1000));
+          }
+        }
+      }
+    } catch (e) { /* yut */ }
+  });
+
+  // 3) Uygulama içi geri dönüş/çıkış butonlarını yakalayarak da koruma altına al
+  document.addEventListener('click', function(ev) {
+    const t = ev.target;
+    // Bu butonlardan biri tetiklenirse ve düello bitmemişse, ceza uygula
+    const shouldImpose = t && (
+      t.id === 'duel-final-back-button' || // final butonu (bitmişse duelEnded=true, ceza uygulanmaz)
+      t.classList.contains('back-button') ||
+      t.id === 'final-back-button' ||
+      t.id === 'logout-button' ||
+      t.id === 'rankingBackButton'
+    );
+    if (shouldImpose) {
+      try {
+        if (typeof duelGameStarted !== 'undefined' && typeof duelEnded !== 'undefined') {
+          if (duelGameStarted && !duelEnded) {
+            localStorage.setItem(PENALTY_KEY, String(Date.now() + 10 * 60 * 1000));
+            // UI anında kilitlensin
+            startPenaltyCountdown();
+          }
+        }
+      } catch (e) { /* yut */ }
+    }
+  }, true); // capture
+
+  // 4) Oyun doğal şekilde bittiğinde (global değişkenler set ediliyor) UI otomatik açılır.
+  //    Zira reset akışı içinde duelEnded = true set ediliyor; bu blok sadece koruma amaçlı.
+  //    Eğer başka yerlerde "oyun bitti" sinyali veriyorsanız, oradan da clearPenaltyUI() çağırabilirsiniz.
+
+})();
+</script>
+
 </body>
 </html>
