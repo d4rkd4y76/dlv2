@@ -4006,7 +4006,6 @@ animation: floatButton 1s ease infinite;
 </div>
 <button class="login-button" disabled="" id="login-button">Giriş</button>
 <button class="register-button" id="register-button">Kayıt Ol</button>
-
 <div class="error" id="student-selection-error"></div>
 </div>
 <!-- Ana Ekran -->
@@ -4447,6 +4446,44 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
+// === Nova idempotent duel outcome helper ===
+// === Nova per-player idempotent awarding ===
+async function awardOncePerPlayer(studentId, classId, delta, duelKey) {
+    try {
+        const flagRef = database.ref(`classes/${classId}/students/${studentId}/appliedDuels/${duelKey}`);
+        const res = await flagRef.transaction(curr => {
+            if (curr === true) return; // already applied for this player
+            return true;
+        });
+        if (!res || !res.committed) return false;
+        // apply delta to player's gameCup
+        await database.ref(`classes/${classId}/students/${studentId}/gameCup`)
+            .transaction(current => Math.max((current || 0) + (delta || 0), 0));
+        return true;
+    } catch (e) {
+        console.warn('awardOncePerPlayer error:', e);
+        return false;
+    }
+}
+// === end per-player helper ===
+
+async function applyDuelOutcomeOnce(duelKey, applyFn) {
+    try {
+        const flagRef = database.ref(`duels/${duelKey}/pointsApplied`);
+        const res = await flagRef.transaction(curr => {
+            if (curr === true) return; // already applied
+            return true;               // mark applied
+        });
+        if (!res || !res.committed) return false;
+        await applyFn();
+        return true;
+    } catch(e) {
+        console.warn('applyDuelOutcomeOnce error:', e);
+        return false;
+    }
+}
+// === end helper ===
+
 
 
         // Diğer değişkenler
@@ -5048,15 +5085,16 @@ async function updateDuelScore(type, data) {
     try {
         switch(type) {
             case 'TIME_OUT':
-                // Süre dolduğunda davet eden -3, misafir +6
-                await Promise.all([
-                    database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
-                        .transaction(current => Math.max((current || 0) - 3, 0)),
-                    database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
-                        .transaction(current => (current || 0) + 6)
-                ]);
-                await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
-                break;
+await applyDuelOutcomeOnce(currentDuelRef.key, async () => {
+        await Promise.all([
+            awardOncePerPlayer(inviterId, inviterClassId, -3, currentDuelRef.key),
+            awardOncePerPlayer(invitedId, invitedClassId, +6, currentDuelRef.key)
+        ]);
+    });
+    await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
+    break;
+
+
 
             case 'DISCONNECTED':
                 // Ayrılan oyuncu -3, kalan oyuncu +6
@@ -5075,17 +5113,20 @@ async function updateDuelScore(type, data) {
                 break;
 
             case 'GAME_END':
-                // Normal oyun sonu: Kazanan +6, Kaybeden -3
-                const {winnerId, winnerClassId, loserId, loserClassId} = data;
-                await Promise.all([
-    database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
-    database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
-]);
-const message = winnerId === selectedStudent.studentId ? 
-                    '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
-                    '😔 Maalesef kaybettiniz. (-3 🏆)';
-                await showAlert(message);
-                break;
+const {winnerId, winnerClassId, loserId, loserClassId} = data;
+    await applyDuelOutcomeOnce(currentDuelRef.key, async () => {
+        await Promise.all([
+            awardOncePerPlayer(winnerId, winnerClassId, +6, currentDuelRef.key),
+            awardOncePerPlayer(loserId, loserClassId, -3, currentDuelRef.key)
+        ]);
+    });
+    const message = winnerId === selectedStudent.studentId ? 
+        '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
+        '😔 Maalesef kaybettiniz. (-3 🏆)';
+    await showAlert(message);
+    break;
+
+
         }
         return true;
     } catch (error) {
