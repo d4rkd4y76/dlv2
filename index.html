@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Şampiyonlar Düellosu</title>
-    <!-- Comfortaa Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Şampiyonlar Düellosu</title>
+<!-- Comfortaa Font -->
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<style>
         /* CSS Kodları */
         * {
             box-sizing: border-box;
@@ -3978,546 +3979,407 @@ animation: floatButton 1s ease infinite;
 </style>
 </head>
 <body>
-    <!-- Oyundakiler Modal -->
-    <div class="players-overlay" id="playersOverlay">
-        <div class="players-content">
-            <div class="players-header">
-                <h3>Oyundakiler</h3>
-                <button class="players-close" id="playersCloseButton">✖</button>
-            </div>
-            <ul class="players-list" id="playersList"></ul>
-        </div>
-    </div>
-
-    <!-- Öğrenci Seçimi Ekranı -->
-    <div class="container student-selection-container" id="student-selection-screen">
-        <h2>🏆 Düellomatik 🏆</h2>
-        <div class="table-section">
-            <h3>Öğrenci Seçme</h3>
-            <label for="selection-class-select">Sınıfı Seç:</label>
-            <select id="selection-class-select">
-                <option value="">Seçiniz</option>
-            </select>
-
+<!-- Oyundakiler Modal -->
+<div class="players-overlay" id="playersOverlay">
+<div class="players-content">
+<div class="players-header">
+<h3>Oyundakiler</h3>
+<button class="players-close" id="playersCloseButton">✖</button>
+</div>
+<ul class="players-list" id="playersList"></ul>
+</div>
+</div>
+<!-- Öğrenci Seçimi Ekranı -->
+<div class="container student-selection-container" id="student-selection-screen">
+<h2>🏆 Düellomatik 🏆</h2>
+<div class="table-section">
+<h3>Öğrenci Seçme</h3>
+<label for="selection-class-select">Sınıfı Seç:</label>
+<select id="selection-class-select">
+<option value="">Seçiniz</option>
+</select>
 <!-- Eski select yerine eklenecek input -->
 <label for="selection-name-input">Kullanıcı Adı:</label>
-<input type="text" id="selection-name-input" placeholder="Kullanıcı adınızı giriniz" disabled>
-
-
-            <label for="student-password-input">Şifre Giriniz:</label>
-            <input type="password" id="student-password-input" placeholder="Şifre" disabled>
-        </div>
-        <button class="login-button" id="login-button" disabled>Giriş</button>
-        <button class="register-button" id="register-button">Kayıt Ol</button> 
-            </button>
-        <div class="error" id="student-selection-error"></div>
-    </div>
-
-    <!-- Ana Ekran -->
-    <div class="container" id="main-screen" style="display: none;">
-<div class="profile-icon-container">
-    <img 
-        src="https://i.pinimg.com/originals/66/22/ab/6622ab37c6db6ac166dfec760a2f2939.gif" 
-        alt="Profile" 
-        id="profile-icon" 
-        class="profile-icon">
+<input disabled="" id="selection-name-input" placeholder="Kullanıcı adınızı giriniz" type="text"/>
+<label for="student-password-input">Şifre Giriniz:</label>
+<input disabled="" id="student-password-input" placeholder="Şifre" type="password"/>
 </div>
-     <div class="student-info">
-    <img src="" alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" style="display: none;">
-    <div class="student-name" id="student-name"></div>
-    <div class="student-stats-container">
-        <div class="student-stats">
-            <div class="stats-item trophy-stats">
-                <div class="stats-glow trophy-glow"></div>
-                <span class="stats-icon">🏆</span>
-                <span class="stats-value trophy-value" id="game-cup-score">0</span>
-            </div>
-            <div class="stats-item diamond-stats">
-                <div class="stats-glow diamond-glow"></div>
-                <span class="stats-icon">💎</span>
-                <span class="stats-value diamond-value" id="diamond-value">0</span>
+<button class="login-button" disabled="" id="login-button">Giriş</button>
+<button class="register-button" id="register-button">Kayıt Ol</button>
+
+<div class="error" id="student-selection-error"></div>
+</div>
+<!-- Ana Ekran -->
+<div class="container" id="main-screen" style="display: none;">
+<div class="profile-icon-container">
+<img alt="Profile" class="profile-icon" id="profile-icon" src="https://i.pinimg.com/originals/66/22/ab/6622ab37c6db6ac166dfec760a2f2939.gif"/>
+</div>
+<div class="student-info">
+<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;"/>
+<div class="student-name" id="student-name"></div>
+<div class="student-stats-container">
+<div class="student-stats">
+<div class="stats-item trophy-stats">
+<div class="stats-glow trophy-glow"></div>
+<span class="stats-icon">🏆</span>
+<span class="stats-value trophy-value" id="game-cup-score">0</span>
+</div>
+<div class="stats-item diamond-stats">
+<div class="stats-glow diamond-glow"></div>
+<span class="stats-icon">💎</span>
+<span class="stats-value diamond-value" id="diamond-value">0</span>
 </div>
 <div class="stats-item credits-stats" id="credits-stats">
-        <div class="stats-glow credits-glow"></div>
-        <span class="stats-icon">⚔️</span>
-        <span class="stats-value credits-value" id="duel-credits-value">0</span>
-        <div class="tip-title" style="display: none;">Düello Hakkı</div>
-            </div>
-        </div>
-    </div>
+<div class="stats-glow credits-glow"></div>
+<span class="stats-icon">⚔️</span>
+<span class="stats-value credits-value" id="duel-credits-value">0</span>
+<div class="tip-title" style="display: none;">Düello Hakkı</div>
 </div>
-
-        <div class="buttons">
-            <button class="single-player">Tek Kişilik Oyun</button>
-    <button class="find-duel-button" id="findDuelButton">
-        <span class="button-content">
-            <i class="duel-icon">⚔️</i>
-            <span>Düello Ara (17:00-20:00)</span>
-        </span>
-        <div class="button-glow"></div>
-    </button>
+</div>
+</div>
+</div>
+<div class="buttons">
+<button class="single-player">Tek Kişilik Oyun</button>
+<button class="find-duel-button" id="findDuelButton">
+<span class="button-content">
+<i class="duel-icon">⚔️</i>
+<span>Düello Ara (17:00-20:00)</span>
+</span>
+<div class="button-glow"></div>
+</button>
 <button class="friends-button" id="friends-button" style="display: none;">
    👥 Arkadaşlar
 </button>
-            <!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
-            <button class="kupa-siralama-button" id="kupa-siralama-button">
+<!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
+<button class="kupa-siralama-button" id="kupa-siralama-button">
                 🏆 Sezon Sıralaması
             </button>
-	    <button class="logout-button" id="logout-button">Çıkış Yap</button>
-
-        </div>
-    </div>
-
+<button class="logout-button" id="logout-button">Çıkış Yap</button>
+</div>
+</div>
 <!-- Arkadaşlar Ekranı -->
 <div class="friends-container" id="friends-screen" style="display: none;">
-    <h2>Arkadaşlar</h2>
-    
-    <!-- Arama Bölümü -->
-    <div class="search-section">
-        <div class="search-box">
-            <input type="text" id="friend-search" placeholder="Arkadaş Ara...">
-            <button id="search-button">🔍 Ara</button>
-        </div>
-        <div class="search-results" id="search-results">
-            <!-- Arama sonuçları buraya gelecek -->
-        </div>
-    </div>
-
-    <!-- Arkadaş Listesi -->
-    <div class="friends-list-section">
-        <h3>Arkadaş Listem</h3>
-        <ul class="players-list" id="friends-list">
-            <!-- Arkadaş listesi buraya gelecek -->
-        </ul>
-    </div>
-
-    <button class="back-button">Geri Dön</button>
+<h2>Arkadaşlar</h2>
+<!-- Arama Bölümü -->
+<div class="search-section">
+<div class="search-box">
+<input id="friend-search" placeholder="Arkadaş Ara..." type="text"/>
+<button id="search-button">🔍 Ara</button>
 </div>
-
-
-    <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
-    <div class="ranking-panel" id="rankingPanel" style="display: none;">
-        <h2>Sezon Sıralaması</h2>
-        <div class="ranking-table-container">
-            <table class="ranking-table" id="ranking-table">
-                <thead>
-                    <tr>
-                        <th>Sıra</th>
-                        <th>Foto</th>
-                        <th>İsim</th>
-                        <th>Sınıf</th>
-                        <th>KupaSayısı</th>
-                    </tr>
-                </thead>
-                <tbody id="ranking-table-body">
-                    <!-- Sıralama verileri buraya eklenecek -->
-                </tbody>
-            </table>
-        </div>
-
+<div class="search-results" id="search-results">
+<!-- Arama sonuçları buraya gelecek -->
+</div>
+</div>
+<!-- Arkadaş Listesi -->
+<div class="friends-list-section">
+<h3>Arkadaş Listem</h3>
+<ul class="players-list" id="friends-list">
+<!-- Arkadaş listesi buraya gelecek -->
+</ul>
+</div>
+<button class="back-button">Geri Dön</button>
+</div>
+<!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
+<div class="ranking-panel" id="rankingPanel" style="display: none;">
+<h2>Sezon Sıralaması</h2>
+<div class="ranking-table-container">
+<table class="ranking-table" id="ranking-table">
+<thead>
+<tr>
+<th>Sıra</th>
+<th>Foto</th>
+<th>İsim</th>
+<th>Sınıf</th>
+<th>KupaSayısı</th>
+</tr>
+</thead>
+<tbody id="ranking-table-body">
+<!-- Sıralama verileri buraya eklenecek -->
+</tbody>
+</table>
+</div>
 <div class="user-ranking-stats">
-        <div class="stats-header">Genel Sıralama Durumunuz</div>
-        <div class="stats-content">
-            <div class="rank-info">
-                <div class="rank-number" id="userRankNumber">
-                    <span class="rank-label">Sıralama</span>
-                    <span class="rank-value">-</span>
-                </div>
-                <div class="total-players" id="totalPlayers">
-                    <span class="total-label">Toplam Oyuncu</span>
-                    <span class="total-value">-</span>
-                </div>
-            </div>
-            <div class="user-trophy">
-                <span class="trophy-icon">🏆</span>
-                <span class="trophy-value" id="userTrophyCount">-</span>
-            </div>
-        </div>
-    </div>
-        <button class="ranking-back-button" id="rankingBackButton">Geri Dön</button>
-    </div>
-
-    <!-- Tek Kişilik Oyun Ekranı -->
-    <div class="game-container" id="single-player-screen">
-        <h2>Tek Kişilik Oyun</h2>
-        <div class="table-section">
-            <h3>Konu Belirleme</h3>
-            <label for="class-select">Sınıf Seç:</label>
-            <select id="class-select">
-                <option value="">Seçiniz</option>
-            </select>
-
-            <label for="subject-select">Ders Seç:</label>
-            <select id="subject-select">
-                <option value="">Seçiniz</option>
-            </select>
-
-            <label for="topic-select">Konu Seç:</label>
-            <select id="topic-select">
-                <option value="">Seçiniz</option>
-            </select>
-        </div>
-        <button class="start-game-button" id="start-game-button" disabled>Oyuna Başla</button>
-        <button class="back-button">Geri Dön</button>
-    </div>
-
-    <!-- Tek Kişilik Oyun Sorular Ekranı -->
-    <div class="single-player-game-container" id="single-player-game-screen">
-        <div class="progress-container">
-            <div class="question-number" id="question-number">Soru 1/10</div>
-            <div class="progress-bar">
-                <div class="progress-bar-inner" id="progress-bar-inner"></div>
-            </div>
-        </div>
-        <div class="timer-container">
-            <div class="timer" id="timer">45</div>
-        </div>
-        <div class="question-container">
-            <img src="" alt="Soru Resmi" class="question-image" id="question-image" style="display: none;">
-            <div class="question-text" id="question-text">Soru metni burada olacak.</div>
-        </div>
-        <div class="options-container" id="options-container"></div>
-        <div class="score-container" id="score-container">
-            <span id="score"></span>
-            <div class="score-message" id="score-message"></div>
-            <img id="score-image" class="final-image" style="display:none;" alt="Sonuç Resmi">
-            <!-- "Geri Dön" butonu -->
-            <button class="end-game-button" id="final-back-button">Geri Dön</button>
-        </div>
-    </div>
-
-    <!-- Düello Seçim Ekranı -->
-    <div class="duel-selection-container" id="duel-selection-screen">
-<div class="countdown-container">
-    <div class="countdown" id="duelCountdown">10</div>
+<div class="stats-header">Genel Sıralama Durumunuz</div>
+<div class="stats-content">
+<div class="rank-info">
+<div class="rank-number" id="userRankNumber">
+<span class="rank-label">Sıralama</span>
+<span class="rank-value">-</span>
 </div>
-<div id="selecting-student-banner" class="selecting-student-banner"></div>
-        <div class="table-section">
-            <h3>Konu Belirlendi.</h3>
-            <label for="duel-class-select">Sınıfınız:</label>
-            <select id="duel-class-select">
-                <option value="">Seçiniz</option>
-            </select>
-
-            <label for="duel-subject-select">Düello Dersi:</label>
-            <select id="duel-subject-select">
-                <option value="">Seçiniz</option>
-            </select>
-
-            <label for="duel-topic-select">Düello Konusu:</label>
-            <select id="duel-topic-select">
-                <option value="">Seçiniz</option>
-            </select>
-        </div>
-
-        <div class="duel-bottom-info">
-            <div class="duel-player-info" id="duel-inviter-info">
-                <img src="" class="duel-player-photo" id="duel-inviter-photo">
-                <div class="duel-player-name" id="duel-inviter-name"></div>
-            </div>
-            <div class="duel-player-info" id="duel-invited-info">
-                <img src="" class="duel-player-photo" id="duel-invited-photo">
-                <div class="duel-player-name" id="duel-invited-name"></div>
-            </div>
-        <div class="duel-controls">
-            <button class="duel-start-button" id="duel-start-button" style="display:none;" disabled>Düelloya Başla</button>
-
-        </div>
-        </div>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
+<div class="total-players" id="totalPlayers">
+<span class="total-label">Toplam Oyuncu</span>
+<span class="total-value">-</span>
+</div>
+</div>
+<div class="user-trophy">
+<span class="trophy-icon">🏆</span>
+<span class="trophy-value" id="userTrophyCount">-</span>
+</div>
+</div>
+</div>
+<button class="ranking-back-button" id="rankingBackButton">Geri Dön</button>
+</div>
+<!-- Tek Kişilik Oyun Ekranı -->
+<div class="game-container" id="single-player-screen">
+<h2>Tek Kişilik Oyun</h2>
+<div class="table-section">
+<h3>Konu Belirleme</h3>
+<label for="class-select">Sınıf Seç:</label>
+<select id="class-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="subject-select">Ders Seç:</label>
+<select id="subject-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="topic-select">Konu Seç:</label>
+<select id="topic-select">
+<option value="">Seçiniz</option>
+</select>
+</div>
+<button class="start-game-button" disabled="" id="start-game-button">Oyuna Başla</button>
+<button class="back-button">Geri Dön</button>
+</div>
+<!-- Tek Kişilik Oyun Sorular Ekranı -->
+<div class="single-player-game-container" id="single-player-game-screen">
+<div class="progress-container">
+<div class="question-number" id="question-number">Soru 1/10</div>
+<div class="progress-bar">
+<div class="progress-bar-inner" id="progress-bar-inner"></div>
+</div>
+</div>
+<div class="timer-container">
+<div class="timer" id="timer">45</div>
+</div>
+<div class="question-container">
+<img alt="Soru Resmi" class="question-image" id="question-image" src="" style="display: none;"/>
+<div class="question-text" id="question-text">Soru metni burada olacak.</div>
+</div>
+<div class="options-container" id="options-container"></div>
+<div class="score-container" id="score-container">
+<span id="score"></span>
+<div class="score-message" id="score-message"></div>
+<img alt="Sonuç Resmi" class="final-image" id="score-image" style="display:none;"/>
+<!-- "Geri Dön" butonu -->
+<button class="end-game-button" id="final-back-button">Geri Dön</button>
+</div>
+</div>
+<!-- Düello Seçim Ekranı -->
+<div class="duel-selection-container" id="duel-selection-screen">
+<div class="countdown-container">
+<div class="countdown" id="duelCountdown">10</div>
+</div>
+<div class="selecting-student-banner" id="selecting-student-banner"></div>
+<div class="table-section">
+<h3>Konu Belirlendi.</h3>
+<label for="duel-class-select">Sınıfınız:</label>
+<select id="duel-class-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="duel-subject-select">Düello Dersi:</label>
+<select id="duel-subject-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="duel-topic-select">Düello Konusu:</label>
+<select id="duel-topic-select">
+<option value="">Seçiniz</option>
+</select>
+</div>
+<div class="duel-bottom-info">
+<div class="duel-player-info" id="duel-inviter-info">
+<img class="duel-player-photo" id="duel-inviter-photo" src=""/>
+<div class="duel-player-name" id="duel-inviter-name"></div>
+</div>
+<div class="duel-player-info" id="duel-invited-info">
+<img class="duel-player-photo" id="duel-invited-photo" src=""/>
+<div class="duel-player-name" id="duel-invited-name"></div>
+</div>
+<div class="duel-controls">
+<button class="duel-start-button" disabled="" id="duel-start-button" style="display:none;">Düelloya Başla</button>
+</div>
+</div>
+</div>
 <!-- Yeni modal ekranları - body etiketinin sonuna, diğer modallardan önce eklenecek -->
 <div class="registration-overlay" id="registrationOverlay" style="display: none;">
-    <div class="registration-content">
-        <div class="registration-header">
-            <h2>Yeni Hesap Oluştur</h2>
-            <button class="close-button" id="closeRegistration">✖</button>
-        </div>
-        <div class="registration-form">
-            <select id="registerClassSelect" class="registration-input">
-                <option value="">Sınıf Seçin</option>
-            </select>
-            
-            <input type="text" id="registerUsername" 
-                   class="registration-input" 
-                   placeholder="Kullanıcı Adı (max 11 karakter)" 
-                   maxlength="11">
-            
-            <input type="password" id="registerPassword" 
-                   class="registration-input" 
-                   placeholder="Şifre (en az 6 karakter, harf ve rakam içermeli)">
-            
-            <input type="email" id="registerEmail" 
-                   class="registration-input" 
-                   placeholder="E-posta Adresi">
-            
-            <button id="submitRegistration" class="registration-submit" disabled>
+<div class="registration-content">
+<div class="registration-header">
+<h2>Yeni Hesap Oluştur</h2>
+<button class="close-button" id="closeRegistration">✖</button>
+</div>
+<div class="registration-form">
+<select class="registration-input" id="registerClassSelect">
+<option value="">Sınıf Seçin</option>
+</select>
+<input class="registration-input" id="registerUsername" maxlength="11" placeholder="Kullanıcı Adı (max 11 karakter)" type="text"/>
+<input class="registration-input" id="registerPassword" placeholder="Şifre (en az 6 karakter, harf ve rakam içermeli)" type="password"/>
+<input class="registration-input" id="registerEmail" placeholder="E-posta Adresi" type="email"/>
+<button class="registration-submit" disabled="" id="submitRegistration">
                 Kayıt Ol
             </button>
-        </div>
-        <div id="registrationError" class="registration-error"></div>
-    </div>
 </div>
-
+<div class="registration-error" id="registrationError"></div>
+</div>
+</div>
 <div class="verification-overlay" id="verificationOverlay" style="display: none;">
-    <div class="verification-content">
-        <h3>Şahane Kayıt Başarılı 🎉</h3>
-        <p>Şimdi Giriş Yaparak Mücadeleye Başlayabilirsin 🤩</p>
-    </div>
+<div class="verification-content">
+<h3>Şahane Kayıt Başarılı 🎉</h3>
+<p>Şimdi Giriş Yaparak Mücadeleye Başlayabilirsin 🤩</p>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</div>
 <div class="matchmaking-screen" id="matchmakingScreen">
-    <div class="matchmaking-content">
-        <h2>Düello Rakibi Aranıyor</h2>
-        
-        <!-- Arama Animasyonu -->
-        <div class="searching-animation"></div>
-        
-        <!-- Mevcut Oyuncular Listesi -->
-        <div class="available-players">
-            <h3>Müsait Oyuncular</h3>
-            <div class="players-list" id="availablePlayersList">
-                <!-- Oyuncular dinamik olarak buraya eklenecek -->
-            </div>
-        </div>
-        
-        <!-- İptal Butonu -->
-        <button class="cancel-search-button" id="cancelSearchButton">
+<div class="matchmaking-content">
+<h2>Düello Rakibi Aranıyor</h2>
+<!-- Arama Animasyonu -->
+<div class="searching-animation"></div>
+<!-- Mevcut Oyuncular Listesi -->
+<div class="available-players">
+<h3>Müsait Oyuncular</h3>
+<div class="players-list" id="availablePlayersList">
+<!-- Oyuncular dinamik olarak buraya eklenecek -->
+</div>
+</div>
+<!-- İptal Butonu -->
+<button class="cancel-search-button" id="cancelSearchButton">
             Aramayı İptal Et
         </button>
-    </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!-- Düello Oyun Ekranı -->
-    <div class="duel-game-container" id="duel-game-screen">
-        <div class="progress-container">
-            <div class="question-number" id="duel-question-number">Soru 1/10</div>
-            <div class="progress-bar">
-                <div class="progress-bar-inner" id="duel-progress-bar-inner"></div>
-            </div>
-        </div>
-        <div class="timer-container">
-            <div class="timer" id="duel-timer">45</div>
-        </div>
-        <div class="question-container">
-            <img src="" alt="Soru Resmi" class="question-image" id="duel-question-image" style="display: none;">
-            <div class="question-text" id="duel-question-text">Soru metni burada olacak.</div>
-        </div>
-        <div class="options-container" id="duel-options-container"></div>
-
-        <div class="players-info-row">
-            <div class="duel-player-score" id="duel-player-inviter-score">
-                <img id="duel-player-inviter-photo" src="">
-                <div class="duel-player-name" id="duel-player-inviter-name"></div>
-                <div class="duel-player-correct-count" id="inviter-correct-count">0</div>
-            </div>
-            <div class="duel-player-score" id="duel-player-invited-score">
-                <img id="duel-player-invited-photo" src="">
-                <div class="duel-player-name" id="duel-player-invited-name"></div>
-                <div class="duel-player-correct-count" id="invited-correct-count">0</div>
-            </div>
-        </div>
-
-        <div class="score-container" id="duel-final-container">
-            <div class="winner-message" id="winner-message"></div>
-            <button class="end-game-button" id="duel-final-back-button">Oyunu Sonlandır</button>
-        </div>
-    </div>
-
-    <!-- Alert Modal -->
-    <div class="alert-overlay" id="alertOverlay">
-        <div class="alert-content">
-            <div class="alert-message" id="alertMessage"></div>
-            <button class="alert-ok-button" id="alertOkButton">Tamam</button>
-        </div>
-    </div>
-
-    <!-- Prompt Modal -->
-    <div class="prompt-overlay" id="promptOverlay">
-        <div class="prompt-content">
-            <div class="prompt-message" id="promptMessage"></div>
-            <input type="text" class="prompt-input" id="promptInput">
-            <div class="prompt-buttons">
-                <button class="prompt-cancel-button" id="promptCancelButton">İptal</button>
-                <button class="prompt-ok-button" id="promptOkButton">Tamam</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Davet Modalı -->
-    <div class="invitation-overlay" id="invitationOverlay">
-        <div class="invitation-content">
-            <div class="invitation-message" id="invitationMessage"></div>
-            <div class="invitation-buttons">
-                <button class="invitation-decline-button" id="invitationDeclineButton">Reddet</button>
-                <button class="invitation-accept-button" id="invitationAcceptButton">Kabul Et</button>
-            </div>
-        </div>
-    </div>
-
-
-
-
-
-
-
-
-
+</div>
+<!-- Düello Oyun Ekranı -->
+<div class="duel-game-container" id="duel-game-screen">
+<div class="progress-container">
+<div class="question-number" id="duel-question-number">Soru 1/10</div>
+<div class="progress-bar">
+<div class="progress-bar-inner" id="duel-progress-bar-inner"></div>
+</div>
+</div>
+<div class="timer-container">
+<div class="timer" id="duel-timer">45</div>
+</div>
+<div class="question-container">
+<img alt="Soru Resmi" class="question-image" id="duel-question-image" src="" style="display: none;"/>
+<div class="question-text" id="duel-question-text">Soru metni burada olacak.</div>
+</div>
+<div class="options-container" id="duel-options-container"></div>
+<div class="players-info-row">
+<div class="duel-player-score" id="duel-player-inviter-score">
+<img id="duel-player-inviter-photo" src=""/>
+<div class="duel-player-name" id="duel-player-inviter-name"></div>
+<div class="duel-player-correct-count" id="inviter-correct-count">0</div>
+</div>
+<div class="duel-player-score" id="duel-player-invited-score">
+<img id="duel-player-invited-photo" src=""/>
+<div class="duel-player-name" id="duel-player-invited-name"></div>
+<div class="duel-player-correct-count" id="invited-correct-count">0</div>
+</div>
+</div>
+<div class="score-container" id="duel-final-container">
+<div class="winner-message" id="winner-message"></div>
+<button class="end-game-button" id="duel-final-back-button">Oyunu Sonlandır</button>
+</div>
+</div>
+<!-- Alert Modal -->
+<div class="alert-overlay" id="alertOverlay">
+<div class="alert-content">
+<div class="alert-message" id="alertMessage"></div>
+<button class="alert-ok-button" id="alertOkButton">Tamam</button>
+</div>
+</div>
+<!-- Prompt Modal -->
+<div class="prompt-overlay" id="promptOverlay">
+<div class="prompt-content">
+<div class="prompt-message" id="promptMessage"></div>
+<input class="prompt-input" id="promptInput" type="text"/>
+<div class="prompt-buttons">
+<button class="prompt-cancel-button" id="promptCancelButton">İptal</button>
+<button class="prompt-ok-button" id="promptOkButton">Tamam</button>
+</div>
+</div>
+</div>
+<!-- Davet Modalı -->
+<div class="invitation-overlay" id="invitationOverlay">
+<div class="invitation-content">
+<div class="invitation-message" id="invitationMessage"></div>
+<div class="invitation-buttons">
+<button class="invitation-decline-button" id="invitationDeclineButton">Reddet</button>
+<button class="invitation-accept-button" id="invitationAcceptButton">Kabul Et</button>
+</div>
+</div>
+</div>
 <div class="profile-change-overlay" id="profileChangeOverlay">
-    <div class="profile-change-content">
-        <div class="profile-change-header">
-            <div class="current-diamonds">
-                <span class="diamond-icon">💎</span>
-                <span class="diamond-amount" id="currentDiamonds">0</span>
-            </div>
-            <h2>Mağaza 🛒</h2>
-            <button class="profile-close-button" id="profileCloseButton">✖</button>
-        </div>
-        
-        <div class="profile-categories">
-            <button class="category-button" data-category="duel">⚔️ Düello Bileti Satın Al</button>
-            <button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
-            <button class="category-button" data-category="cesur">⭐Koleksiyoner Nişanlar⭐</button>         
-            <button class="category-button" data-category="sampiyon">👑Şampiyon👑</button>
-     
-        </div>
-
-        <!-- Düello Hakları Mağazası -->
-        <div class="duel-credits-store" id="duelCreditsStore" style="display: none;">
-            <div class="credits-packages-container">
-                <!-- 100 Hak Paketi -->
-                <div class="credit-package">
-                    <div class="package-header">
-                        <span class="package-amount">🎫 100 Düello Bileti</span>
-                    </div>
-                    <div class="package-price">
-                        <span class="diamond-amount">100</span>
-                        <span class="diamond-icon">💎</span>
-                    </div>
-                    <button class="buy-button" onclick="purchaseCredits(100, 100)">
-                        Satın Al
-                    </button>
-                </div>
-
-                <!-- 300 Hak Paketi -->
-                <div class="credit-package">
-                    <div class="package-header">
-                        <span class="package-amount">🎫 300 Düello Bileti</span>
-                    </div>
-                    <div class="package-price">
-                        <span class="diamond-amount">250</span>
-                        <span class="diamond-icon">💎</span>
-                    </div>
-                    <button class="buy-button" onclick="purchaseCredits(300, 250)">
-                        Satın Al
-                    </button>
-                </div>
-
-                <!-- 750 Hak Paketi -->
-                <div class="credit-package">
-                    <div class="package-header">
-                        <span class="package-amount">🎫 750 Düello Bileti</span>
-                    </div>
-                    <div class="package-price">
-                        <span class="diamond-amount">500</span>
-                        <span class="diamond-icon">💎</span>
-                    </div>
-                    <button class="buy-button" onclick="purchaseCredits(750, 500)">
-                        Satın Al
-                    </button>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Profil Fotoğrafları Konteyneri -->
-        <div class="profile-photos-container" id="profilePhotosContainer"></div>
-    </div>
+<div class="profile-change-content">
+<div class="profile-change-header">
+<div class="current-diamonds">
+<span class="diamond-icon">💎</span>
+<span class="diamond-amount" id="currentDiamonds">0</span>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!-- Arka Plan Müziği için Audio Elementi -->
-    <audio id="duelBackgroundMusic" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/dllo%20mz.mp3" preload="auto"></audio>
-    <!-- Kazanan Ekranı için Yeni Audio Elementi -->
-    <audio id="winnerMusic" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/win%20mz.mp3" preload="auto"></audio>
-    <!-- Tek Kişilik Oyun Müziği için Yeni Audio Elementi -->
-    <audio id="singlePlayerQuestionMusic" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/oyun%20tek%20mz.mp3" preload="auto"></audio>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script>
+<h2>Mağaza 🛒</h2>
+<button class="profile-close-button" id="profileCloseButton">✖</button>
+</div>
+<div class="profile-categories">
+<button class="category-button" data-category="duel">⚔️ Düello Bileti Satın Al</button>
+<button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
+<button class="category-button" data-category="cesur">⭐Koleksiyoner Nişanlar⭐</button>
+<button class="category-button" data-category="sampiyon">👑Şampiyon👑</button>
+</div>
+<!-- Düello Hakları Mağazası -->
+<div class="duel-credits-store" id="duelCreditsStore" style="display: none;">
+<div class="credits-packages-container">
+<!-- 100 Hak Paketi -->
+<div class="credit-package">
+<div class="package-header">
+<span class="package-amount">🎫 100 Düello Bileti</span>
+</div>
+<div class="package-price">
+<span class="diamond-amount">100</span>
+<span class="diamond-icon">💎</span>
+</div>
+<button class="buy-button" onclick="purchaseCredits(100, 100)">
+                        Satın Al
+                    </button>
+</div>
+<!-- 300 Hak Paketi -->
+<div class="credit-package">
+<div class="package-header">
+<span class="package-amount">🎫 300 Düello Bileti</span>
+</div>
+<div class="package-price">
+<span class="diamond-amount">250</span>
+<span class="diamond-icon">💎</span>
+</div>
+<button class="buy-button" onclick="purchaseCredits(300, 250)">
+                        Satın Al
+                    </button>
+</div>
+<!-- 750 Hak Paketi -->
+<div class="credit-package">
+<div class="package-header">
+<span class="package-amount">🎫 750 Düello Bileti</span>
+</div>
+<div class="package-price">
+<span class="diamond-amount">500</span>
+<span class="diamond-icon">💎</span>
+</div>
+<button class="buy-button" onclick="purchaseCredits(750, 500)">
+                        Satın Al
+                    </button>
+</div>
+</div>
+</div>
+<!-- Profil Fotoğrafları Konteyneri -->
+<div class="profile-photos-container" id="profilePhotosContainer"></div>
+</div>
+</div>
+<!-- Arka Plan Müziği için Audio Elementi -->
+<audio id="duelBackgroundMusic" preload="auto" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/dllo%20mz.mp3"></audio>
+<!-- Kazanan Ekranı için Yeni Audio Elementi -->
+<audio id="winnerMusic" preload="auto" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/win%20mz.mp3"></audio>
+<!-- Tek Kişilik Oyun Müziği için Yeni Audio Elementi -->
+<audio id="singlePlayerQuestionMusic" preload="auto" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/oyun%20tek%20mz.mp3"></audio>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
         // JavaScript Kodları
 
         // Audio Elementlerini Seçme
@@ -5216,12 +5078,10 @@ async function updateDuelScore(type, data) {
                 // Normal oyun sonu: Kazanan +6, Kaybeden -3
                 const {winnerId, winnerClassId, loserId, loserClassId} = data;
                 await Promise.all([
-                    database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`)
-                        .transaction(current => (current || 0) + 3),
-                    database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`)
-                        .transaction(current => Math.max((current || 0) - 1.5, 0))
-                ]);
-                const message = winnerId === selectedStudent.studentId ? 
+    database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
+    database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
+]);
+const message = winnerId === selectedStudent.studentId ? 
                     '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
                     '😔 Maalesef kaybettiniz. (-3 🏆)';
                 await showAlert(message);
@@ -6558,6 +6418,26 @@ async function sendInvitation(player) {
             return;
         }
 
+        
+        // --- Kupa farkı kontrolü (50'den fazlaysa davet engellenir) ---
+        try {
+            const [inviterCupSnap, invitedCupSnap] = await Promise.all([
+                database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/gameCup`).once('value'),
+                database.ref(`classes/${player.classId}/students/${player.studentId}/gameCup`).once('value')
+            ]);
+            const inviterCup = inviterCupSnap.exists() ? inviterCupSnap.val() : 0;
+            const invitedCup = invitedCupSnap.exists() ? invitedCupSnap.val() : 0;
+            const cupDiff = Math.abs((inviterCup || 0) - (invitedCup || 0));
+            if (cupDiff > 50) {
+                await showAlert('⚠️ Aranızdaki kupa sayısı 50\'den fazla, davet gönderemezsiniz.');
+                return;
+            }
+        } catch(e) {
+            console.warn('Kupa farkı kontrolü yapılamadı:', e);
+            await showAlert('⚠️ Kupa bilgileri alınamadı. Lütfen tekrar deneyin.');
+            return;
+        }
+        // --- Kupa farkı kontrolü bitti ---
         console.log("Davet gönderilecek oyuncu ID:", player.studentId);
         const invitationPath = `invitations/${player.studentId}`;
         console.log("Davet path:", invitationPath);
@@ -6928,6 +6808,33 @@ async function cleanupOldRejectedInvites(studentId) {
 setInterval(cleanupRejectedInvites, 30000);
 
 invitationAcceptButton.addEventListener('click', async () => {
+    // --- Kupa farkı kontrolü (accept tarafı) ---
+    try {
+        const inviterId = currentInvitation.invitedByStudentId;
+        const inviterClassId = currentInvitation.invitedByClassId;
+        const invitedId = selectedStudent.studentId;
+        const invitedClassId = selectedStudent.classId;
+        const [inviterCupSnap, invitedCupSnap] = await Promise.all([
+            database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`).once('value'),
+            database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`).once('value')
+        ]);
+        const inviterCup = inviterCupSnap.exists() ? inviterCupSnap.val() : 0;
+        const invitedCup = invitedCupSnap.exists() ? invitedCupSnap.val() : 0;
+        const cupDiff = Math.abs((inviterCup || 0) - (invitedCup || 0));
+        if (cupDiff > 50) {
+            await showAlert('⚠️ Aranızdaki kupa sayısı 50\'den fazla, daveti kabul edemezsiniz.');
+            try { await database.ref(`invitations/${selectedStudent.studentId}`).remove(); } catch(e) {}
+            invitationOverlay.style.display = 'none';
+            currentInvitation = null;
+            return;
+        }
+    } catch(e) {
+        console.warn('Kupa farkı kontrolü (accept) yapılamadı:', e);
+        await showAlert('⚠️ Kupa bilgileri alınamadı. Lütfen tekrar deneyin.');
+        return;
+    }
+    // --- Kupa farkı kontrolü bitti ---
+    
    if (currentInvitation && selectedStudent.studentId) {
        try {
            // Önce davet gönderen kişinin hala online olup olmadığını kontrol et
@@ -8262,8 +8169,7 @@ function updateUserStats(rank, total, trophies) {
 }
 
     </script>
-
-    <script>
+<script>
         // Ensure the script runs after the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
             const kupaSiralamaButton = document.getElementById('kupa-siralama-button');
@@ -9305,42 +9211,6 @@ async function purchaseUnlimited(cost) {
 
 
 
-// Buton durumunu güncelleyen fonksiyon
-function updateDuelButtonState() {
-  const now = new Date();
-  const currentHour = now.getHours();
-  const duelButton = document.getElementById('findDuelButton');
-
-  if (currentHour >=17  && currentHour < 20) {
-    duelButton.disabled = false;
-    duelButton.classList.remove('disabled'); // CSS ile görsel efekt eklemek isterseniz
-  } else {
-    duelButton.disabled = true;
-    duelButton.classList.add('disabled');
-  }
-}
-
-// Sayfa yüklendiğinde buton durumunu ayarla
-updateDuelButtonState();
-
-// Her dakika buton durumunu güncelle
-setInterval(updateDuelButtonState, 60000);
-
-// Mevcut findDuelButton click event listener'ı aynı şekilde kalabilir
-document.getElementById('findDuelButton').addEventListener('click', () => {
-  // Buton disabled ise hiçbir işlem yapılmaz.
-  if (document.getElementById('findDuelButton').disabled) return;
-
-  // Buton aktifse mevcut kodunuz çalışır:
-  const availablePlayersList = document.getElementById('availablePlayersList');
-  availablePlayersList.innerHTML = '';
-  cleanupMatchmakingListeners();
-
-  const matchmakingRef = database.ref(`matchmaking/${selectedStudent.classId}/${selectedStudent.studentId}`);
-  matchmakingRef.onDisconnect().remove();
-
-
-});
 
 
 
@@ -9350,6 +9220,5 @@ document.getElementById('findDuelButton').addEventListener('click', () => {
 
 
     </script>
-    </body>
-    
+</body>
 </html>
