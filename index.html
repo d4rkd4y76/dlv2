@@ -4068,7 +4068,7 @@ animation: floatButton 1s ease infinite;
 <button class="find-duel-button" id="findDuelButton">
 <span class="button-content">
 <i class="duel-icon">⚔️</i>
-<span>Düello Ara (17:00-20:00)</span>
+<span>Düello Ara</span>
 </span>
 <div class="button-glow"></div>
 </button>
@@ -4115,6 +4115,7 @@ animation: floatButton 1s ease infinite;
 <th>Foto</th>
 <th>İsim</th>
 <th>Sınıf</th>
+<th>MaçSayısı</th>
 <th>KupaSayısı</th>
 </tr>
 </thead>
@@ -4341,7 +4342,6 @@ animation: floatButton 1s ease infinite;
 <button class="profile-close-button" id="profileCloseButton">✖</button>
 </div>
 <div class="profile-categories">
-<button class="category-button" data-category="duel">⚔️ Düello Bileti Satın Al</button>
 <button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
 <button class="category-button" data-category="cesur">⭐Koleksiyoner Nişanlar⭐</button>
 <button class="category-button" data-category="sampiyon">👑Şampiyon👑</button>
@@ -4352,7 +4352,7 @@ animation: floatButton 1s ease infinite;
 <!-- 100 Hak Paketi -->
 <div class="credit-package">
 <div class="package-header">
-<span class="package-amount">🎫 100 Düello Bileti</span>
+
 </div>
 <div class="package-price">
 <span class="diamond-amount">100</span>
@@ -7255,9 +7255,9 @@ function switchToDuelScreen(duelKey) {
                     } else {
                         // Kredileri 3 eksiltelim
                         database.ref(`classes/${inviterClassId}/students/${inviterId}/duelCredits`)
-                            .set(inviterCredits - 3);
+                            .set((inviterCredits || 0) + 1);
                         database.ref(`classes/${invitedClassId}/students/${invitedId}/duelCredits`)
-                            .set(invitedCredits - 3);
+                            .set((invitedCredits || 0) + 1);
                         // Tekrar kredi düşülmesini engellemek için bayrak ekleyelim
                         duelRef.child('creditsDeducted').set(true);
                     }
@@ -7541,7 +7541,7 @@ duelRef.on('value', async (snap) => {
         }
 
     } else {
-        if (!duelEnded) { try { localStorage.setItem('duelPenaltyUntil', String(Date.now() + 10 * 60 * 1000)); } catch(e){}
+        if (!duelEnded) { try { localStorage.setItem('duelPenaltyUntil', String(Date.now() + 1 * 60 * 1000)); } catch(e){}
             try {
                 const currentPlayerId = selectedStudent.studentId;
                 
@@ -7550,8 +7550,8 @@ duelRef.on('value', async (snap) => {
                     inviterClassId,
                     invitedId,
                     invitedClassId,
-                    disconnectedId: currentPlayerId,
-                    disconnectedClassId: (currentPlayerId === inviterId ? inviterClassId : invitedClassId)
+                    disconnectedId: currentPlayerId === inviterId ? invitedId : inviterId,
+                    disconnectedClassId: currentPlayerId === inviterId ? invitedClassId : inviterClassId
                 });
 
                 // inDuel durumlarını güncelle
@@ -8196,13 +8196,12 @@ if (winnerId && loserId) {
                if (classSnap.students) {
                    for (const [studentId, student] of Object.entries(classSnap.students)) {
                        // Sadece gerekli alanları al
-                       players.push({
-                           id: studentId,
+                       players.push({id: studentId,
                            name: student.name || 'Anonim',
                            className: classSnap.name,
                            gameCup: student.gameCup || 0,
-                           photo: student.photo || 'https://via.placeholder.com/50'
-                       });
+                           matchCount: student.duelCredits || 0,
+                           photo: student.photo || 'https://via.placeholder.com/50'});
 
                        if (studentId === selectedStudent.studentId) {
                            userTrophyCount = student.gameCup || 0;
@@ -8257,7 +8256,13 @@ function displayRankingData(players) {
                onerror="this.src='https://via.placeholder.com/50'"></td>
            <td class="player-name-column">${player.name}</td>
            <td class="class-name-column">${player.className}</td>
-           <td class="trophy-column">
+           <td class="match-count-column">
+   <div class="match-wrapper">
+       <span class="match-label">🎯</span>
+       <span class="match-count">${player.matchCount}</span>
+   </div>
+</td>
+<td class="trophy-column">
                <div class="trophy-wrapper">
                    <span class="trophy-icon">🏆</span>
                    <span class="trophy-count">${player.gameCup}</span>
@@ -9387,7 +9392,7 @@ async function purchaseUnlimited(cost) {
     if (!labelSpan) return;
     // Orijinal yazıyı geri getir
     labelSpan.classList.remove('countdown-label');
-    labelSpan.textContent = "Düello Ara (17:00-20:00)";
+    labelSpan.textContent = "Düello Ara";
   }
 
   function applyPenalty(seconds) {
