@@ -3976,6 +3976,22 @@ animation: floatButton 1s ease infinite;
 
 
 
+
+/* --- Nova Stars --- */
+.star-badges{ display:inline-flex; gap:4px; vertical-align:middle; margin-left:6px; }
+.star{ font-size:16px; filter: drop-shadow(0 0 1px rgba(255,215,0,.6)); animation: starPulse 1.8s ease-in-out infinite; }
+.star.bright{ filter: drop-shadow(0 0 2px rgba(255,230,80,.9)) drop-shadow(0 0 6px rgba(255,200,50,.6)); }
+.star.flame{ position:relative; animation: starFlame 1.2s ease-in-out infinite; }
+.star.flame::after{
+    content: ''; position:absolute; top:-6px; left:50%; width:6px; height:10px; transform:translateX(-50%);
+    background: radial-gradient(circle at 50% 100%, rgba(255,140,0,.9), rgba(255,69,0,.6) 60%, rgba(255,0,0,0) 70%);
+    filter: blur(1px);
+    border-radius: 50% 50% 40% 40%;
+    opacity:.8;
+}
+@keyframes starPulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.12);} }
+@keyframes starFlame { 0%,100%{ transform: translateY(0) rotate(-2deg);} 50%{ transform: translateY(-1px) rotate(2deg);} }
+
 </style>
 
 <style>
@@ -5150,16 +5166,38 @@ async function updateDuelScore(type, data) {
     break;
 
             case 'GAME_END':
-                // Normal oyun sonu: Kazanan +6, Kaybeden -3
+                
+                // Normal oyun sonu: Kazanan +6, Kaybeden -3 (tek sefer)
                 const {winnerId, winnerClassId, loserId, loserClassId} = data;
-                await Promise.all([
-    database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
-    database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
-]);
-const message = winnerId === selectedStudent.studentId ? 
-                    '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
-                    '😔 Maalesef kaybettiniz. (-3 🏆)';
-                await showAlert(message);
+
+                let canApply = true;
+                try {
+                    if (typeof currentDuelRef !== 'undefined' && currentDuelRef) {
+                        const tx = await currentDuelRef.child('scoreApplied').transaction((val) => {
+                            if (val === true) return; // zaten uygulanmış
+                            return true;              // ilk uygulama
+                        });
+                        if (!tx.committed) {
+                            canApply = false;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('scoreApplied transaction yapılamadı:', e);
+                }
+
+                if (canApply && winnerId && loserId) {
+                    await Promise.all([
+                        database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
+                        database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
+                    ]);
+                    const message = winnerId === selectedStudent.studentId ? 
+                        '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
+                        '😔 Maalesef kaybettiniz. (-3 🏆)';
+                    if (typeof showAlert === 'function') await showAlert(message);
+                } else {
+                    console.log('GAME_END: puanlar zaten uygulanmış — ikinci yazım engellendi.');
+                }
+            
                 break;
         }
         return true;
@@ -5217,7 +5255,7 @@ async function displaySearchResults(results) {
 
         li.innerHTML = `
             <img src="${photo}" alt="${student.name}" class="player-photo">
-            <span class="player-name">${student.name} / (${className})</span>
+            <span class="player-name">${student.name} / (${className}) ${getStars(student.duelCredits || 0)}</span>
             ${actionHtml}
         `;
 
@@ -7541,7 +7579,7 @@ duelRef.on('value', async (snap) => {
         }
 
     } else {
-        if (!duelEnded) { try { localStorage.setItem('duelPenaltyUntil', String(Date.now() + 1 * 60 * 1000)); } catch(e){}
+        if (!duelEnded) { try { } catch(e){}
             try {
                 const currentPlayerId = selectedStudent.studentId;
                 
@@ -8254,11 +8292,11 @@ function displayRankingData(players) {
            <td class="rank-column">${index + 1}</td>
            <td><img src="${player.photo}" alt="${player.name}" class="ranking-player-photo" 
                onerror="this.src='https://via.placeholder.com/50'"></td>
-           <td class="player-name-column">${player.name}</td>
+           <td class="player-name-column">${player.name} ${getStars(player.matchCount || 0)}</td>
            <td class="class-name-column">${player.className}</td>
            <td class="match-count-column">
    <div class="match-wrapper">
-       <span class="match-label">🎯</span>
+       <span class="match-label">⚔️</span>
        <span class="match-count">${player.matchCount}</span>
    </div>
 </td>
@@ -9354,160 +9392,30 @@ async function purchaseUnlimited(cost) {
     </script>
 
 <script>
-// --- Nova: Düellodan erken çıkış için 10 dk ceza sistemi ---
-(function() {
-  const PENALTY_KEY = 'duelPenaltyUntil';
-  let penaltyInterval = null;
+// Ceza sistemi KALDIRILDI: Nova
 
-  function getPenaltyRemaining() {
-    const until = parseInt(localStorage.getItem(PENALTY_KEY) || '0', 10);
-    if (!until) return 0;
-    const diff = Math.ceil((until - Date.now()) / 1000);
-    if (diff <= 0) {
-      localStorage.removeItem(PENALTY_KEY);
-      return 0;
+
+// --- Nova: Yıldız yardımcıları ---
+function getStars(count){
+    let n = 0;
+    if (count >= 100 && count < 300) n = 1;
+    else if (count >= 300 && count < 500) n = 2;
+    else if (count >= 500 && count < 800) n = 3;
+    else if (count >= 800 && count < 1000) n = 4;
+    else if (count >= 1000) n = 5;
+
+    if (n === 0) return '';
+    const bright = (n >= 3) ? ' bright' : '';
+    const flame = (n === 5) ? ' flame' : '';
+    let html = '<span class="star-badges">';
+    for (let i=0;i<n;i++){
+        const extra = (n === 5) ? flame : bright;
+        html += `<span class="star${extra}">⭐</span>`;
     }
-    return diff;
-  }
+    html += '</span>';
+    return html;
+}
 
-  function formatMMSS(totalSeconds) {
-    const m = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-    const s = String(totalSeconds % 60).padStart(2, '0');
-    return m + ":" + s;
-  }
-
-  function setFindDuelLabelCountdown(seconds) {
-    const btn = document.getElementById('findDuelButton');
-    if (!btn) return;
-    const labelSpan = btn.querySelector('.button-content span:last-child');
-    if (!labelSpan) return;
-    labelSpan.classList.add('countdown-label');
-    labelSpan.textContent = "Ceza: " + formatMMSS(seconds);
-  }
-
-  function restoreFindDuelLabel() {
-    const btn = document.getElementById('findDuelButton');
-    if (!btn) return;
-    const labelSpan = btn.querySelector('.button-content span:last-child');
-    if (!labelSpan) return;
-    // Orijinal yazıyı geri getir
-    labelSpan.classList.remove('countdown-label');
-    labelSpan.textContent = "Düello Ara";
-  }
-
-  function applyPenalty(seconds) {
-    const until = Date.now() + (seconds * 1000);
-    localStorage.setItem(PENALTY_KEY, String(until));
-    startPenaltyCountdown();
-  }
-
-  function startPenaltyCountdown() {
-    const btn = document.getElementById('findDuelButton');
-    if (!btn) return;
-    // Disable + locked görünüm
-    btn.disabled = true;
-    btn.classList.add('locked');
-
-    // İlk değer
-    let remaining = getPenaltyRemaining();
-    if (remaining <= 0) {
-      clearPenaltyUI();
-      return;
-    }
-    setFindDuelLabelCountdown(remaining);
-
-    // Her saniye güncelle
-    if (penaltyInterval) clearInterval(penaltyInterval);
-    penaltyInterval = setInterval(() => {
-      remaining = getPenaltyRemaining();
-      if (remaining > 0) {
-        setFindDuelLabelCountdown(remaining);
-      } else {
-        clearInterval(penaltyInterval);
-        clearPenaltyUI();
-      }
-    }, 1000);
-  }
-
-  function clearPenaltyUI() {
-    const btn = document.getElementById('findDuelButton');
-    if (!btn) return;
-    btn.disabled = false;
-    btn.classList.remove('locked');
-    restoreFindDuelLabel();
-  }
-
-  // Globalden erişim gerekirse:
-  window.__duelPenalty__ = {
-    applyPenalty,
-    getPenaltyRemaining
-  };
-
-  // 1) Sayfa yüklenince ceza var mı kontrol et
-  document.addEventListener('DOMContentLoaded', () => {
-    // Butona güvenlik amaçlı tıklama öncesi kontrol
-    const findBtn = document.getElementById('findDuelButton');
-    if (findBtn) {
-      findBtn.addEventListener('click', (e) => {
-        if (getPenaltyRemaining() > 0) {
-          e.preventDefault();
-          e.stopPropagation();
-          // UI zaten kilitli; ekstra mesaj isterseniz şunu açabilirsiniz:
-          // alert('Düello erken terk edildi. 10 dakika beklemelisiniz.');
-          return false;
-        }
-      }, true); // CAPTURE fazında, diğer listener'lardan önce
-    }
-
-    // Eğer aktif ceza varsa başlat
-    if (getPenaltyRemaining() > 0) {
-      startPenaltyCountdown();
-    }
-  });
-
-  // 2) Her türlü çıkış/yenileme/geri durumunda — oyun başlamış ve bitmemişse — ceza uygula
-  window.addEventListener('beforeunload', () => {
-    try {
-      if (typeof duelGameStarted !== 'undefined' && typeof duelEnded !== 'undefined') {
-        if (duelGameStarted && !duelEnded) {
-          const remaining = getPenaltyRemaining();
-          if (remaining === 0) {
-            localStorage.setItem(PENALTY_KEY, String(Date.now() + 10 * 60 * 1000));
-          }
-        }
-      }
-    } catch (e) { /* yut */ }
-  });
-
-  // 3) Uygulama içi geri dönüş/çıkış butonlarını yakalayarak da koruma altına al
-  document.addEventListener('click', function(ev) {
-    const t = ev.target;
-    // Bu butonlardan biri tetiklenirse ve düello bitmemişse, ceza uygula
-    const shouldImpose = t && (
-      t.id === 'duel-final-back-button' || // final butonu (bitmişse duelEnded=true, ceza uygulanmaz)
-      t.classList.contains('back-button') ||
-      t.id === 'final-back-button' ||
-      t.id === 'logout-button' ||
-      t.id === 'rankingBackButton'
-    );
-    if (shouldImpose) {
-      try {
-        if (typeof duelGameStarted !== 'undefined' && typeof duelEnded !== 'undefined') {
-          if (duelGameStarted && !duelEnded) {
-            localStorage.setItem(PENALTY_KEY, String(Date.now() + 10 * 60 * 1000));
-            // UI anında kilitlensin
-            startPenaltyCountdown();
-          }
-        }
-      } catch (e) { /* yut */ }
-    }
-  }, true); // capture
-
-  // 4) Oyun doğal şekilde bittiğinde (global değişkenler set ediliyor) UI otomatik açılır.
-  //    Zira reset akışı içinde duelEnded = true set ediliyor; bu blok sadece koruma amaçlı.
-  //    Eğer başka yerlerde "oyun bitti" sinyali veriyorsanız, oradan da clearPenaltyUI() çağırabilirsiniz.
-
-})();
 </script>
 
 </body>
