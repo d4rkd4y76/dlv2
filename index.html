@@ -5109,9 +5109,9 @@ async function updateDuelScore(type, data) {
                 // Süre dolduğunda davet eden -3, misafir +6
                 await Promise.all([
                     database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
-                        .transaction(current => Math.max((current || 0) - 3, 0)),
+                        .transaction(current => Math.max((current || 0) - 0, 0)),
                     database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
-                        .transaction(current => (current || 0) + 6)
+                        .transaction(current => (current || 0) + 0)
                 ]);
                 await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
                 break;
