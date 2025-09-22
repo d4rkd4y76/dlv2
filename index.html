@@ -3979,6 +3979,24 @@ animation: floatButton 1s ease infinite;
 
 /* --- Nova Stars --- */
 .star-badges{ display:inline-flex; gap:4px; vertical-align:middle; margin-left:6px; }
+
+/* --- Nova Stars (Frame Update) --- */
+.star-frame{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:4px;
+  margin-top:6px;
+  padding:4px 8px;
+  border:1px solid rgba(255,193,7,.9);
+  background: linear-gradient(180deg, rgba(255, 243, 205, .35), rgba(255, 214, 102, .12));
+  border-radius:10px;
+  min-height:26px;
+  min-width:56px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08), inset 0 0 4px rgba(255, 213, 79, .25);
+}
+.star-frame .star-badges{ margin-left:0 !important; }
+.star-frame .star{ line-height:1; display:inline-block; }
 .star{ font-size:16px; filter: drop-shadow(0 0 1px rgba(255,215,0,.6)); animation: starPulse 1.8s ease-in-out infinite; }
 .star.bright{ filter: drop-shadow(0 0 2px rgba(255,230,80,.9)) drop-shadow(0 0 6px rgba(255,200,50,.6)); }
 .star.flame{ position:relative; animation: starFlame 1.2s ease-in-out infinite; }
@@ -4058,6 +4076,7 @@ animation: floatButton 1s ease infinite;
 <div class="student-info">
 <img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;"/>
 <div class="student-name" id="student-name"></div>
+<div class="star-frame" id="student-stars"></div>
 <div class="student-stats-container">
 <div class="student-stats">
 <div class="stats-item trophy-stats">
@@ -4231,10 +4250,12 @@ animation: floatButton 1s ease infinite;
 <div class="duel-player-info" id="duel-inviter-info">
 <img class="duel-player-photo" id="duel-inviter-photo" src=""/>
 <div class="duel-player-name" id="duel-inviter-name"></div>
+<div class="star-frame" id="duel-inviter-stars"></div>
 </div>
 <div class="duel-player-info" id="duel-invited-info">
 <img class="duel-player-photo" id="duel-invited-photo" src=""/>
 <div class="duel-player-name" id="duel-invited-name"></div>
+<div class="star-frame" id="duel-invited-stars"></div>
 </div>
 <div class="duel-controls">
 <button class="duel-start-button" disabled="" id="duel-start-button" style="display:none;">Düelloya Başla</button>
@@ -4306,11 +4327,13 @@ animation: floatButton 1s ease infinite;
 <div class="duel-player-score" id="duel-player-inviter-score">
 <img id="duel-player-inviter-photo" src=""/>
 <div class="duel-player-name" id="duel-player-inviter-name"></div>
+<div class="star-frame" id="duel-player-inviter-stars-ingame"></div>
 <div class="duel-player-correct-count" id="inviter-correct-count">0</div>
 </div>
 <div class="duel-player-score" id="duel-player-invited-score">
 <img id="duel-player-invited-photo" src=""/>
 <div class="duel-player-name" id="duel-player-invited-name"></div>
+<div class="star-frame" id="duel-player-invited-stars-ingame"></div>
 <div class="duel-player-correct-count" id="invited-correct-count">0</div>
 </div>
 </div>
@@ -4503,6 +4526,8 @@ document.getElementById('duel-final-back-button').addEventListener('click', asyn
   measurementId: "G-4HXFJJ0WLR"
 };
         firebase.initializeApp(firebaseConfig);
+    // Nova guard for auth
+    try { window.auth = window.auth || (firebase && firebase.auth ? firebase.auth() : null); } catch(e){ window.auth = null; }
         const database = firebase.database();
         const auth = firebase.auth();
 
@@ -4738,6 +4763,20 @@ window.onload = async () => {
 
             // Öğrenci bilgilerini ayarla
             studentName.textContent = selectedStudent.studentName;
+            try {
+                database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/duelCredits`).once('value')
+                .then(function(snap){
+                    var cnt = snap && snap.exists() ? snap.val() : 0;
+                    var st = document.getElementById('student-stars');
+                    if (st) st.innerHTML = getStars(cnt);
+                })
+                .catch(function(e){
+                    console.warn('Yıldızlar (ana ekran) yüklenemedi:', e);
+                });
+            } catch(e) {
+                console.warn('Yıldızlar (ana ekran) yüklenemedi:', e);
+            }
+
 
             // Sırasıyla sistemleri başlat
             await addLoggedInPlayer(selectedStudent);
@@ -4793,7 +4832,7 @@ window.onload = async () => {
         }
         fetchAllClasses();
 
-        auth.onAuthStateChanged(user => {
+        (auth ? auth : null).onAuthStateChanged(user => {
             if (user) {
                 console.log("Kullanıcı oturum açtı:", user);
             } else {
@@ -5109,9 +5148,9 @@ async function updateDuelScore(type, data) {
                 // Süre dolduğunda davet eden -3, misafir +6
                 await Promise.all([
                     database.ref(`classes/${inviterClassId}/students/${inviterId}/gameCup`)
-                        .transaction(current => Math.max((current || 0) - 0, 0)),
+                        .transaction(current => Math.max((current || 0) - 3, 0)),
                     database.ref(`classes/${invitedClassId}/students/${invitedId}/gameCup`)
-                        .transaction(current => (current || 0) + 0)
+                        .transaction(current => (current || 0) + 6)
                 ]);
                 await showAlert('⏰ Süre doldu! Misafir oyuncu kazandı. (-3/+6 🏆)');
                 break;
@@ -5127,7 +5166,7 @@ async function updateDuelScore(type, data) {
         }
 
         // Bu istemci OYUNDAN ÇIKAN kişi mi?
-        const currentUid = (auth && auth.currentUser && auth.currentUser.uid) ? auth.currentUser.uid : null;
+        const currentUid = (auth && (auth ? auth : null).currentUser && (auth ? auth : null).currentUser.uid) ? (auth ? auth : null).currentUser.uid : null;
         const currentStudentId = (typeof currentStudent !== 'undefined' && currentStudent && currentStudent.studentId) ? currentStudent.studentId : null;
         const selectedId = (typeof selectedStudent !== 'undefined' && selectedStudent && selectedStudent.studentId) ? selectedStudent.studentId : null;
         const localId = currentStudentId || currentUid || selectedId;
@@ -5255,7 +5294,8 @@ async function displaySearchResults(results) {
 
         li.innerHTML = `
             <img src="${photo}" alt="${student.name}" class="player-photo">
-            <span class="player-name">${student.name} / (${className}) ${getStars(student.duelCredits || 0)}</span>
+            <span class="player-name">${student.name} / (${className}) </span>
+            <div class="star-frame">${getStars(student.duelCredits || 0)}</div>
             ${actionHtml}
         `;
 
@@ -6504,7 +6544,7 @@ async function sendInvitation(player) {
 
         // --- INVITE BAN HARD GATE (ilk satırda kontrol) ---
         try {
-            const inviterIdForBan = (selectedStudent && selectedStudent.studentId) || (currentStudent && currentStudent.studentId) || (auth && auth.currentUser && auth.currentUser.uid);
+            const inviterIdForBan = (selectedStudent && selectedStudent.studentId) || (currentStudent && currentStudent.studentId) || (auth && (auth ? auth : null).currentUser && (auth ? auth : null).currentUser.uid);
             const inviterClassForBan = (selectedStudent && selectedStudent.classId) || (currentClassId) || (currentStudent && currentStudent.classId);
             const banDataGate = await readInviteBan(inviterIdForBan, inviterClassForBan);
             if (banDataGate) {
@@ -6560,7 +6600,7 @@ try {
         // --- Kupa farkı kontrolü (50'den fazlaysa davet engellenir) ---
 // --- Davet gönderen üzerinde aktif invite ban var mı kontrol et ---
 try {
-    const inviterIdForBan = (selectedStudent && selectedStudent.studentId) || (currentStudent && currentStudent.studentId) || (auth && auth.currentUser && auth.currentUser.uid);
+    const inviterIdForBan = (selectedStudent && selectedStudent.studentId) || (currentStudent && currentStudent.studentId) || (auth && (auth ? auth : null).currentUser && (auth ? auth : null).currentUser.uid);
     const inviterClassForBan = (selectedStudent && selectedStudent.classId) || (currentClassId) || (currentStudent && currentStudent.classId);
     const banData = await readInviteBan(inviterIdForBan, inviterClassForBan);
     if (banData) {
@@ -7272,6 +7312,27 @@ function switchToDuelScreen(duelKey) {
             invitedId = initialData.invited.studentId;
             invitedClassId = initialData.invited.classId;
             
+            // Nova: update framed stars under names in selection panel
+            try {
+                Promise.all([
+                    database.ref(`classes/${inviterClassId}/students/${inviterId}/duelCredits`).once('value'),
+                    database.ref(`classes/${invitedClassId}/students/${invitedId}/duelCredits`).once('value')
+                ]).then(function(snaps){
+                    var invCountSnap = snaps[0], inCountSnap = snaps[1];
+                    var invCount = invCountSnap && invCountSnap.exists() ? invCountSnap.val() : 0;
+                    var inCount  = inCountSnap && inCountSnap.exists()  ? inCountSnap.val()  : 0;
+                    var invStarsEl = document.getElementById('duel-inviter-stars');
+                    var inStarsEl  = document.getElementById('duel-invited-stars');
+                    if (invStarsEl) invStarsEl.innerHTML = getStars(invCount);
+                    if (inStarsEl)  inStarsEl.innerHTML  = getStars(inCount);
+                }).catch(function(e){
+                    console.warn('Yıldızlar (selection) yüklenemedi:', e);
+                });
+            } catch(e) {
+                console.warn('Yıldızlar (selection) yüklenemedi:', e);
+            }
+
+            
             // --- Kredilerin Düşürülmesi İşlemi ---
             // Eğer henüz kredi düşülmemişse (creditsDeducted yoksa)
             if (!initialData.creditsDeducted) {
@@ -7847,6 +7908,26 @@ await currentDuelRef.child('questions').set(chosen);
             document.getElementById('duel-player-invited-name').textContent = data.invited.name;
 
             duelInviterScore = 0;
+            // Nova: populate framed stars under names (in‑game)
+            try {
+                Promise.all([
+                    database.ref(`classes/${data.inviter.classId}/students/${data.inviter.studentId}/duelCredits`).once('value'),
+                    database.ref(`classes/${data.invited.classId}/students/${data.invited.studentId}/duelCredits`).once('value')
+                ]).then(function(snaps){
+                    var invCountSnap = snaps[0], inCountSnap = snaps[1];
+                    var invCount = invCountSnap && invCountSnap.exists() ? invCountSnap.val() : 0;
+                    var inCount  = inCountSnap && inCountSnap.exists()  ? inCountSnap.val()  : 0;
+                    var invStarsGame = document.getElementById('duel-player-inviter-stars-ingame');
+                    var inStarsGame  = document.getElementById('duel-player-invited-stars-ingame');
+                    if (invStarsGame) invStarsGame.innerHTML = getStars(invCount);
+                    if (inStarsGame)  inStarsGame.innerHTML  = getStars(inCount);
+                }).catch(function(e){
+                    console.warn('Yıldızlar (in‑game) yüklenemedi:', e);
+                });
+            } catch(e) {
+                console.warn('Yıldızlar (in‑game) yüklenemedi:', e);
+            }
+
             duelInvitedScore = 0;
             inviterCorrectCountEl.textContent = "0";
             invitedCorrectCountEl.textContent = "0";
@@ -8292,7 +8373,7 @@ function displayRankingData(players) {
            <td class="rank-column">${index + 1}</td>
            <td><img src="${player.photo}" alt="${player.name}" class="ranking-player-photo" 
                onerror="this.src='https://via.placeholder.com/50'"></td>
-           <td class="player-name-column">${player.name} ${getStars(player.matchCount || 0)}</td>
+           <td class="player-name-column"><div class="name-line">${player.name}</div><div class="star-frame">${getStars(player.matchCount || 0)}</div></td>
            <td class="class-name-column">${player.className}</td>
            <td class="match-count-column">
    <div class="match-wrapper">
@@ -9204,7 +9285,7 @@ submitRegistration.addEventListener('click', async () => {
         }
 
         // Firebase Authentication ile kullanıcı oluştur
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const userCredential = await (auth ? auth : null).createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
         // E-posta doğrulama gönder
@@ -9251,7 +9332,7 @@ function resetRegistrationForm() {
 }
 
 // E-posta doğrulama durumu kontrolü
-auth.onAuthStateChanged((user) => {
+(auth ? auth : null).onAuthStateChanged((user) => {
     if (user && !user.emailVerified) {
         user.reload().then(() => {
             if (user.emailVerified) {
