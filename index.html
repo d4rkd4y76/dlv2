@@ -4036,6 +4036,25 @@ animation: floatButton 1s ease infinite;
 }
 </style>
 
+
+<style>
+/* === RESİMLİ SORU (robust) === */
+.resimli-soru-banner {
+  display: none;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ff5722;
+  background: linear-gradient(90deg, #ffecd2, #fcb69f, #ffecd2);
+  padding: 10px 18px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: rsbPulse 1.5s infinite alternate;
+}
+@keyframes rsbPulse { from{ transform:scale(1); opacity:.85 } to{ transform:scale(1.05); opacity:1 } }
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -9497,6 +9516,69 @@ function getStars(count){
     return html;
 }
 
+</script>
+
+
+<script>
+(function(){
+  function ensureBanner(container){
+    if(!container) return null;
+    let banner = container.querySelector('.resimli-soru-banner');
+    if(!banner){
+      banner = document.createElement('div');
+      banner.className = 'resimli-soru-banner';
+      banner.textContent = '📷 RESİMLİ SORU';
+      container.insertBefore(banner, container.firstChild);
+    }
+    return banner;
+  }
+
+  function containerHasImage(container){
+    if(!container) return false;
+    // 1) Any <img> inside (regardless of class)
+    if(container.querySelector('img')) return true;
+    // 2) Any element with background-image url()
+    const nodes = container.querySelectorAll('*');
+    for(const el of nodes){
+      const bg = getComputedStyle(el).backgroundImage;
+      if(bg && bg !== 'none' && bg.includes('url(')) return true;
+      // data attributes commonly used
+      if(el.dataset){
+        if(el.dataset.info || el.dataset.image || el.dataset.img) return true;
+      }
+    }
+    // 3) Try global question object patterns
+    try {
+      if(window.currentQuestion){
+        const cq = window.currentQuestion;
+        if(cq.info || (cq.question && cq.question.info)) return true;
+      }
+      if(window.activeQuestion && (activeQuestion.info || (activeQuestion.question && activeQuestion.question.info))) return true;
+    } catch(e){}
+    return false;
+  }
+
+  function updateAllBanners(){
+    document.querySelectorAll('.question-container').forEach(container => {
+      const banner = ensureBanner(container);
+      const hasImg = containerHasImage(container);
+      banner.style.display = hasImg ? 'block' : 'none';
+    });
+  }
+
+  // Public hook so you can call after DB fetch
+  window.onNewQuestionLoaded = function(){ updateAllBanners(); };
+
+  // Initial
+  document.addEventListener('DOMContentLoaded', updateAllBanners, {once:true});
+
+  // Observe DOM changes (new questions, attribute changes incl. src/style)
+  const obs = new MutationObserver(() => { updateAllBanners(); });
+  obs.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['src','style','data-info','data-image','data-img']});
+
+  // Fallback timer (cheap)
+  setInterval(updateAllBanners, 1000);
+})();
 </script>
 
 </body>
