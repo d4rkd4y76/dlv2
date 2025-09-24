@@ -483,7 +483,7 @@ option {
     background: url('https://i.ibb.co/2FVVr25/Yeni-proje-2.gif') center center;
     background-size: cover;
     background-repeat: no-repeat;
-    border: 5px solid transparent;z
+    border: 5px solid transparent;
     border-radius: 20px; /* Köşe yuvarlama */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Yumuşak gölge */
     overflow: hidden; /* Taşmaları gizler */
@@ -4229,6 +4229,35 @@ animation: floatButton 1s ease infinite;
 /* Compact rank inside tables/cards */
 .player-name-column .rank-label{ display:block; margin:2px auto 0; font-size:.8em; }
 .star-frame + .rank-label{ display:block; }
+</style>
+
+
+<style id="nova-rank-centering-fix">
+/* --- Nova mobile/desktop centering & stacking for name → stars → rank --- */
+#main-screen{ width:100% !important; max-width:1400px; margin:0 auto !important; }
+.player-name-column{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; line-height:1.15;
+}
+.player-name-column .name-line{ margin:0 0 4px 0; font-weight:600; }
+.player-name-column .star-frame{ margin-top:4px; }
+.player-name-column .rank-label{ margin-top:6px; min-width:72px; text-align:center; }
+.rank-label{ display:inline-block; text-transform:capitalize; }
+/* Ensure the star frame itself is perfectly centered and "symmetric" */
+.star-frame{ display:flex; justify-content:center; align-items:center; margin-left:auto; margin-right:auto; }
+/* Profile block (ana ekran) — guarantee order: name > stars > rank and center */
+.student-info{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+#student-name{ text-align:center; }
+#student-stars{ margin-top:6px; }
+#student-rank{ margin-top:6px; }
+/* Ranking table name cell */
+.ranking-table .player-name-column .rank-label{ margin-top:6px; }
+/* Phones: keep everything centered in a single column nicely */
+@media (max-width: 520px){
+  .ranking-table .player-name-column{ align-items:center; text-align:center; }
+  .ranking-table td, .ranking-table th{ vertical-align:middle; }
+  .star-frame{ min-width:56px; }
+}
 </style>
 
 </head>
