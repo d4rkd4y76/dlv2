@@ -4075,17 +4075,17 @@ html, body {
 /* === NOVA: Sürpriz Kutu Stil === */
 .surprise-box{
   position:absolute;
-  top:8px; left:8px;     /* Sol üstte, foto ile çakışmayı önle */
+  top:4px; left:4px;      /* Sol üst, foto ile çakışmayı önle */
   display:flex; flex-direction:column; align-items:center;
-  z-index:2; /* Foto üstüne gelmesin */
+  z-index:3;
   user-select:none;
   cursor: pointer;
   filter: grayscale(0.25);
-  opacity: .85;
+  opacity: .9;
   transition: transform .2s ease, filter .2s ease, opacity .2s ease;
 }
 .surprise-box img{
-  width:64px; height:64px; object-fit:contain; pointer-events:none;
+  width:56px; height:56px; object-fit:contain; pointer-events:none;
 }
 .surprise-box-counter{
   margin-top:4px;
@@ -4103,11 +4103,12 @@ html, body {
 @keyframes sbPulse { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.06)} }
 
 
-/* NOVA mobile fix: surprise box should never cover profile photo */
+/* NOVA mobile hard fix: keep surprise box clear of profile image */
 @media (max-width: 480px) {
-  .surprise-box { top:6px; left:6px; z-index:1; }
-  .surprise-box img { width:56px; height:56px; }
-  .surprise-box-counter { font-size:.8rem; padding:6px 10px; }
+  #main-screen { position: relative; }
+  .surprise-box { top: 6px; left: 6px; z-index: 2; }
+  .surprise-box img { width: 44px; height: 44px; }
+  .surprise-box-counter { font-size: .78rem; padding: 6px 10px; }
 }
 
 /* Particles for reward animation */
@@ -4453,7 +4454,7 @@ html, body {
 <div class="error" id="student-selection-error"></div>
 </div>
 <!-- Ana Ekran -->
-<div class="container" id="main-screen" style="display: none;">
+<div class="container" id="main-screen" style="display: none; position: relative;">
 <div class="profile-icon-container">
 <img alt="Profile" class="profile-icon" id="profile-icon" src="https://i.pinimg.com/originals/66/22/ab/6622ab37c6db6ac166dfec760a2f2939.gif"/>
 </div>
