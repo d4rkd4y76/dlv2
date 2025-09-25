@@ -4600,12 +4600,44 @@ animation: floatButton 1s ease infinite;
 </div>
 </div>
 <div class="profile-change-overlay" id="profileChangeOverlay">
+<!-- Elmas Takas Modal (Minimal, layoutı bozmaz) -->
+<div id="diamondExchangeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;">
+  <div style="max-width:420px;margin:8vh auto;background:#0b1220;border:2px solid #1f2a44;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.5);padding:18px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-size:20px;font-weight:800;color:#e5e7eb;">💱 Elmas Takas</div>
+      <button onclick="closeDiamondExchangeModal()" aria-label="Kapat"
+              style="background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;">✖</button>
+    </div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:12px;">
+      1 Düello Kredisi → <b style="color:#f0f9ff">5 💎</b>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:10px 0 14px;">
+      <label for="exchange-count-input" style="color:#cbd5e1;font-size:14px;">Adet</label>
+      <input id="exchange-count-input" type="number" min="1" value="1"
+             style="flex:0 0 120px;padding:10px;border-radius:10px;border:2px solid #ff8a00;font-size:1.05em;text-align:center;background:#0b1220;color:#e2e8f0;">
+      <span id="exchange-current-credits" style="margin-left:auto;font-size:13px;color:#94a3b8;">Mevcut Kredin: ...</span>
+    </div>
+    <button onclick="handleDiamondExchangeModal()"
+            style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer;">
+      Elmas Al
+    </button>
+    <div style="margin-top:10px;font-size:12px;color:#64748b;">İşlem onayından sonra elmas ve krediler anında güncellenir.</div>
+  </div>
+</div>
+
 <div class="profile-change-content">
 <div class="profile-change-header">
 <div class="current-diamonds">
 <span class="diamond-icon">💎</span>
 <span class="diamond-amount" id="currentDiamonds">0</span>
 </div>
+<span id="openExchangeButtonWrap" style="display:inline-block;margin-left:8px;">
+  <button id="openExchangeButton" onclick="openDiamondExchangeModal()"
+          style="background:#0ea5e9;border:none;color:#fff;border-radius:10px;padding:6px 10px;font-weight:700;cursor:pointer;">
+    💱 Elmas Takas
+  </button>
+</span>
+
 <h2>Mağaza 🛒</h2>
 <button class="profile-close-button" id="profileCloseButton">✖</button>
 </div>
@@ -9819,6 +9851,158 @@ function getRankHTML(count){
   // Fallback timer (cheap)
   setInterval(updateAllBanners, 1000);
 })();
+</script>
+
+
+<script>
+function safeShowAlert(msg){
+  try{
+    if (typeof showAlert === 'function') { showAlert(msg); }
+    else { window.alert(msg); }
+  }catch(e){ try{ window.alert(msg); }catch(_){} }
+}
+
+function openDiamondExchangeModal(){
+  try{
+    const m = document.getElementById('diamondExchangeModal');
+    if(!m){ safeShowAlert('Takas penceresi yüklenemedi.'); return; }
+    m.style.display = 'block';
+    refreshExchangeModalStats();
+  }catch(e){ console.error(e); }
+}
+function closeDiamondExchangeModal(){
+  const m = document.getElementById('diamondExchangeModal');
+  if(m) m.style.display = 'none';
+}
+
+async function refreshExchangeModalStats(){
+  try{
+    if(!window.selectedStudent || !window.database) return;
+    const ref = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    const snap = await ref.once('value');
+    if(!snap.exists()) return;
+    const data = snap.val() || {};
+    const el = document.getElementById('exchange-current-credits');
+    if(el) el.textContent = `Mevcut Kredin: ${data.duelCredits || 0}`;
+  }catch(e){ console.error('refreshExchangeModalStats:', e); }
+}
+
+// showAlert tarzı onay penceresi: showAlertConfirm varsa onu kullan, yoksa Nova modal
+async function safeShowConfirm(msg){
+  try{
+    if (typeof showAlertConfirm === 'function'){
+      return await showAlertConfirm(msg);
+    }
+  }catch(e){}
+  return await new Promise((resolve)=>{
+    try{
+      let ov = document.getElementById('novaConfirmOverlay');
+      if(!ov){
+        // Dinamik olarak oluştur (ilk kullanımda)
+        const tpl = document.createElement('div');
+        tpl.innerHTML = `
+<div id="novaConfirmOverlay" style="position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;">
+  <div style="max-width:420px;margin:12vh auto;background:#0b1220;border:2px solid #1f2a44;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.5);padding:18px;width:calc(100% - 40px);">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:18px;font-weight:800;color:#e5e7eb;">Onay Gerekli</div>
+      <button id="novaConfirmClose" aria-label="Kapat"
+              style="background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;">✖</button>
+    </div>
+    <div id="novaConfirmMessage" style="margin:12px 0 16px;font-size:14px;line-height:1.4;color:#cbd5e1;white-space:pre-line;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button id="novaConfirmCancel" style="background:#1f2937;color:#e5e7eb;border:1px solid #334155;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;">
+        Vazgeç
+      </button>
+      <button id="novaConfirmOk" style="background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;">
+        Onayla
+      </button>
+    </div>
+  </div>
+</div>`;
+        document.body.appendChild(tpl.firstElementChild);
+      }
+      ov = document.getElementById('novaConfirmOverlay');
+      const msgEl = document.getElementById('novaConfirmMessage');
+      const okBtn = document.getElementById('novaConfirmOk');
+      const cancelBtn = document.getElementById('novaConfirmCancel');
+      const closeBtn = document.getElementById('novaConfirmClose');
+      msgEl.textContent = msg;
+      ov.style.display = 'flex';
+      const cleanup = () => {
+        ov.style.display = 'none';
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        closeBtn.onclick = null;
+        window.removeEventListener('keydown', onKey);
+        ov.onclick = null;
+      };
+      const onKey = (e) => { if (e.key === 'Escape'){ cleanup(); resolve(false); } };
+      okBtn.onclick = () => { cleanup(); resolve(true); };
+      cancelBtn.onclick = () => { cleanup(); resolve(false); };
+      closeBtn.onclick = () => { cleanup(); resolve(false); };
+      ov.onclick = (e) => { if (e.target === ov){ cleanup(); resolve(false); } };
+      window.addEventListener('keydown', onKey);
+    }catch(e){ resolve(window.confirm(msg)); }
+  });
+}
+
+async function handleDiamondExchangeModal(){
+  try{
+    const qtyEl = document.getElementById('exchange-count-input');
+    let qty = parseInt(qtyEl && qtyEl.value ? qtyEl.value : '0', 10);
+    if(!Number.isFinite(qty) || qty < 1){
+      safeShowAlert('Lütfen geçerli bir adet giriniz (>=1).');
+      return;
+    }
+    // Ön okuma: yeterli kredi var mı?
+    const ref = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    const beforeSnap = await ref.once('value');
+    const before = beforeSnap.val() || {};
+    const have = before.duelCredits || 0;
+    if (have < qty){
+      safeShowAlert('Yetersiz düello kredisi.');
+      return;
+    }
+    const ok = await safeShowConfirm(`Seçilen: ${qty} kredi → ${qty*5} 💎
+Emin misiniz?`);
+    if(!ok) return;
+
+    // Transaction ile uygula
+    await ref.transaction((user)=>{
+      if(!user) return user;
+      const current = user.duelCredits || 0;
+      if(current < qty){ return user; } // güvenlik
+      const maxDiamond = 25000;
+      const gain = qty * 5;
+      user.duelCredits = current - qty;
+      user.diamond = Math.min((user.diamond || 0) + gain, maxDiamond);
+      user.lastDiamondUpdate = Date.now();
+      return user;
+    }, function(err, committed, snap){
+      if(err){ safeShowAlert('Bir hata oluştu.'); console.error(err); return; }
+      const after = snap && snap.val ? snap.val() : null;
+      if(!after){ safeShowAlert('Bir hata oluştu.'); return; }
+      const deltaCredits = have - (after.duelCredits || 0);
+      if(deltaCredits < qty){
+        safeShowAlert('İşlem gerçekleştirilemedi. Lütfen tekrar deneyin.');
+        return;
+      }
+      const diamondValueEl = document.getElementById('diamond-value');
+      const diamondHeaderEl = document.getElementById('currentDiamonds');
+      const creditsUIEl = document.getElementById('duel-credits-value');
+      if (diamondValueEl) diamondValueEl.textContent = after.diamond || 0;
+      if (diamondHeaderEl) diamondHeaderEl.textContent = after.diamond || 0;
+      if (creditsUIEl) creditsUIEl.textContent = after.unlimitedCreditsUntil && after.unlimitedCreditsUntil > Date.now()
+        ? `${Math.ceil((after.unlimitedCreditsUntil - Date.now()) / (1000*60*60*24))}Gün`
+        : (after.duelCredits || 0);
+      refreshExchangeModalStats();
+      setTimeout(()=>{ safeShowAlert('Takas tamamlandı! ✨'); }, 30);
+    });
+  }catch(e){
+    console.error('handleDiamondExchangeModal error:', e);
+    safeShowAlert('Beklenmeyen bir hata oluştu.');
+  }
+}
 </script>
 
 </body>
