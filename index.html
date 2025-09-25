@@ -4371,6 +4371,38 @@ html, body {
 <style id="nova-surprise-anchor-fix">
 #main-screen{ position: relative !important; }
 </style>
+
+<style id="nova-surprise-badge-style">
+#surpriseBoxAnchor{display:flex; flex-direction:column; align-items:flex-start; gap:2px;}
+#surpriseProgressBadge.ready{color:#065f46;background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.35);}
+</style>
+
+
+<style id="nova-surprise-badge-polish-upd">
+#surpriseBoxAnchor{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+#surpriseBoxButton{ transition:opacity .2s ease, transform .2s ease, filter .2s ease; }
+#surpriseBoxButton img{ display:block; width:50px; height:50px; border-radius:50%; object-fit:cover; }
+#surpriseBoxAnchor:not(.ready) #surpriseBoxButton,
+#surpriseBoxButton[disabled]{ opacity:.45; filter:grayscale(60%) saturate(.6) brightness(.95); }
+#surpriseBoxAnchor.ready #surpriseBoxButton{ opacity:1; filter:none; }
+
+.surprise-badge{
+  font-size:12px; font-weight:800; padding:5px 10px; border-radius:999px;
+  color:#0f172a; background:rgba(255,255,255,.92);
+  border:1px solid rgba(2,132,199,.35);
+  box-shadow:0 8px 18px rgba(2,132,199,.12), inset 0 1px 0 rgba(255,255,255,.5);
+  text-align:center; white-space:nowrap; backdrop-filter: blur(2px);
+}
+#surpriseBoxAnchor:not(.ready) .surprise-badge{
+  color:#334155; background:rgba(241,245,249,.92);
+  border:1px solid rgba(100,116,139,.35);
+}
+#surpriseBoxAnchor.ready .surprise-badge{
+  color:#065f46; background:rgba(209,250,229,.92);
+  border:1px solid rgba(16,185,129,.45);
+}
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -4379,6 +4411,7 @@ html, body {
 <div class="players-header">
 <h3>Oyundakiler</h3>
 <button class="players-close" id="playersCloseButton">✖</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <ul class="players-list" id="playersList"></ul>
 </div>
@@ -4406,12 +4439,13 @@ html, body {
 <!-- Ana Ekran -->
 <div class="container" id="main-screen" style="display: none;">
 <!-- Surprise Box (Nova) -->
-<div <div id="surpriseBoxAnchor" style="position:fixed; top:10px; left:10px; z-index:1000;">
+<div <div id="surpriseBoxAnchor" style="position:fixed; top:10px; left:10px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:4px;">
   <button id="surpriseBoxButton" title="Sürpriz Kutu"
     style="position:static; z-index:9999; background:transparent; border:none; cursor:pointer;">
     <div class="surprise-pulse"></div>
     <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWNsZThnZ2o3Zmljd3ExeWYxZG1hOTRhcG8yM3NyYXhza3diYzA0ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VIe5NOnlPxJ9FcONBq/giphy.gif" alt="Sürpriz Kutu" style="width:50px;height:50px;border-radius:50%;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,.25)" />
   </button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 
 <!-- Surprise Modal -->
@@ -4477,6 +4511,7 @@ html, body {
                 🏆 Sezon Sıralaması
             </button>
 <button class="logout-button" id="logout-button">Çıkış Yap</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 <!-- Arkadaşlar Ekranı -->
@@ -4487,6 +4522,7 @@ html, body {
 <div class="search-box">
 <input id="friend-search" placeholder="Arkadaş Ara..." type="text"/>
 <button id="search-button">🔍 Ara</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <div class="search-results" id="search-results">
 <!-- Arama sonuçları buraya gelecek -->
@@ -4500,6 +4536,7 @@ html, body {
 </ul>
 </div>
 <button class="back-button">Geri Dön</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
 <div class="ranking-panel" id="rankingPanel" style="display: none;">
@@ -4541,6 +4578,7 @@ html, body {
 </div>
 </div>
 <button class="ranking-back-button" id="rankingBackButton">Geri Dön</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <!-- Tek Kişilik Oyun Ekranı -->
 <div class="game-container" id="single-player-screen">
@@ -4562,6 +4600,7 @@ html, body {
 </div>
 <button class="start-game-button" disabled="" id="start-game-button">Oyuna Başla</button>
 <button class="back-button">Geri Dön</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <!-- Tek Kişilik Oyun Sorular Ekranı -->
 <div class="single-player-game-container" id="single-player-game-screen">
@@ -4585,6 +4624,7 @@ html, body {
 <img alt="Sonuç Resmi" class="final-image" id="score-image" style="display:none;"/>
 <!-- "Geri Dön" butonu -->
 <button class="end-game-button" id="final-back-button">Geri Dön</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 <!-- Düello Seçim Ekranı -->
@@ -4623,6 +4663,7 @@ html, body {
 </div>
 <div class="duel-controls">
 <button class="duel-start-button" disabled="" id="duel-start-button" style="display:none;">Düelloya Başla</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 </div>
@@ -4632,6 +4673,7 @@ html, body {
 <div class="registration-header">
 <h2>Yeni Hesap Oluştur</h2>
 <button class="close-button" id="closeRegistration">✖</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <div class="registration-form">
 <select class="registration-input" id="registerClassSelect">
@@ -4643,6 +4685,7 @@ html, body {
 <button class="registration-submit" disabled="" id="submitRegistration">
                 Kayıt Ol
             </button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <div class="registration-error" id="registrationError"></div>
 </div>
@@ -4669,6 +4712,7 @@ html, body {
 <button class="cancel-search-button" id="cancelSearchButton">
             Aramayı İptal Et
         </button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 <!-- Düello Oyun Ekranı -->
@@ -4706,6 +4750,7 @@ html, body {
 <div class="score-container" id="duel-final-container">
 <div class="winner-message" id="winner-message"></div>
 <button class="end-game-button" id="duel-final-back-button">Oyunu Sonlandır</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 <!-- Alert Modal -->
@@ -4713,6 +4758,7 @@ html, body {
 <div class="alert-content">
 <div class="alert-message" id="alertMessage"></div>
 <button class="alert-ok-button" id="alertOkButton">Tamam</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 <!-- Prompt Modal -->
@@ -4723,6 +4769,7 @@ html, body {
 <div class="prompt-buttons">
 <button class="prompt-cancel-button" id="promptCancelButton">İptal</button>
 <button class="prompt-ok-button" id="promptOkButton">Tamam</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 </div>
@@ -4733,6 +4780,7 @@ html, body {
 <div class="invitation-buttons">
 <button class="invitation-decline-button" id="invitationDeclineButton">Reddet</button>
 <button class="invitation-accept-button" id="invitationAcceptButton">Kabul Et</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 </div>
@@ -4777,11 +4825,13 @@ html, body {
 
 <h2>Mağaza 🛒</h2>
 <button class="profile-close-button" id="profileCloseButton">✖</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <div class="profile-categories">
 <button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
 <button class="category-button" data-category="cesur">⭐Koleksiyoner Nişanlar⭐</button>
 <button class="category-button" data-category="sampiyon">👑Şampiyon👑</button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <!-- Düello Hakları Mağazası -->
 <div class="duel-credits-store" id="duelCreditsStore" style="display: none;">
@@ -4798,6 +4848,7 @@ html, body {
 <button class="buy-button" onclick="purchaseCredits(100, 100)">
                         Satın Al
                     </button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <!-- 300 Hak Paketi -->
 <div class="credit-package">
@@ -4811,6 +4862,7 @@ html, body {
 <button class="buy-button" onclick="purchaseCredits(300, 250)">
                         Satın Al
                     </button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 <!-- 750 Hak Paketi -->
 <div class="credit-package">
@@ -4824,6 +4876,7 @@ html, body {
 <button class="buy-button" onclick="purchaseCredits(750, 500)">
                         Satın Al
                     </button>
+  <div id="surpriseProgressBadge" class="surprise-badge">5 maç kaldı</div>
 </div>
 </div>
 </div>
@@ -10238,6 +10291,54 @@ Emin misiniz?`);
     if (c % 5 === 0) localStorage.setItem(KEY_READY,'1');
     updateEligibility();
   }
+})();
+
+
+<script id="nova-surprise-badge-logic">
+(function(){
+  const ANCHOR = document.getElementById('surpriseBoxAnchor');
+  const BADGE  = document.getElementById('surpriseProgressBadge');
+  const BTN    = document.getElementById('surpriseBoxButton');
+  const KEY_COUNT = 'nova_duel_count';
+  const KEY_READY = 'nova_surprise_ready';
+
+  function getMatchCount(){
+    if (window.duelMatchCount != null) return Number(window.duelMatchCount)||0;
+    return Number(localStorage.getItem(KEY_COUNT)||0);
+  }
+  function setMatchCount(n){ localStorage.setItem(KEY_COUNT, String(n)); }
+
+  function isReady(){
+    const c = getMatchCount();
+    const rem = (5 - (c % 5)) % 5;
+    return (localStorage.getItem(KEY_READY) === '1') || rem === 0;
+  }
+
+  function updateBadge(){
+    if (!BADGE || !ANCHOR || !BTN) return;
+    const c = getMatchCount();
+    const rem = (5 - (c % 5)) % 5;
+    const ready = isReady();
+    ANCHOR.classList.toggle('ready', ready);
+    BTN.disabled = !ready;
+    BADGE.textContent = ready ? 'Kutu hazır!' : (rem + ' maç kaldı');
+  }
+
+  // Patch existing notifyDuelCompleted to also refresh badge
+  const oldNotify = window.notifyDuelCompleted;
+  window.notifyDuelCompleted = function(){
+    if (typeof oldNotify === 'function') oldNotify();
+    else {
+      let c = getMatchCount()+1;
+      setMatchCount(c);
+      if (c % 5 === 0) localStorage.setItem(KEY_READY, '1');
+    }
+    updateBadge();
+  };
+
+  // Initial
+  updateBadge();
+  window.addEventListener('load', updateBadge); document.addEventListener('DOMContentLoaded', updateBadge);
 })();
 </script>
 
