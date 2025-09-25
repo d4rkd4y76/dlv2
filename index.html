@@ -4518,6 +4518,42 @@ html, body {
 /* Lighter shadows (global pass) */
 </style>
 
+
+<style id="nova-teams-css">
+.teams-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100000;}
+.teams-panel{width:min(920px,96vw);max-height:90vh;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;}
+.teams-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e5e7eb;}
+.teams-header h2{margin:0;font-size:1.3rem}
+.teams-close{background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280}
+.teams-tabs{display:flex;gap:8px;padding:10px;border-bottom:1px solid #eef2f7;}
+.teams-tab{background:#eef2ff;border:none;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700;color:#374151}
+.teams-tab.active{background:#4f46e5;color:#fff}
+.teams-body{padding:14px;overflow:auto}
+.teams-table{width:100%;border-collapse:separate;border-spacing:0 8px}
+.teams-table th,.teams-table td{padding:10px 12px;background:#f8fafc;border-radius:10px;text-align:left}
+.players-list{display:flex;flex-direction:column;gap:10px}
+.player-row{display:flex;align-items:center;gap:10px;background:#f3f4f6;border-radius:10px;padding:10px}
+.player-row .nm{flex:1;font-weight:700}
+.player-row .meta{color:#6b7280;font-size:.9rem}
+.invite-btn{background:#10b981;border:none;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+.invite-btn[disabled]{background:#9ca3af;cursor:not-allowed}
+.myteam-info{display:flex;flex-direction:column;gap:8px}
+.leave-team-wrap{margin-top:10px;display:flex;gap:10px;align-items:center}
+.leave-team-button{background:#ef4444;border:none;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+.leave-team-button[disabled]{background:#fecaca;color:#7f1d1d;cursor:not-allowed}
+.leave-note,.teams-note{color:#6b7280;font-size:.9rem}
+.inbox-list{display:flex;flex-direction:column;gap:10px}
+.inbox-item{background:#f3f4f6;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center}
+.inbox-item .txt{flex:1}
+.inbox-item .actions{display:flex;gap:8px}
+.inbox-item .actions button{border:none;border-radius:8px;padding:6px 10px;cursor:pointer}
+.actions .accept{background:#22c55e;color:#fff}
+.actions .decline{background:#ef4444;color:#fff}
+/* Button on main screen */
+.teams-button{background:linear-gradient(135deg,#22c1c3,#0aa1a9);color:#fff;border:none;border-radius:12px;padding:18px;font-size:1.1em;cursor:pointer;transition:transform .2s,box-shadow .3s}
+.teams-button:hover{transform:scale(1.03);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -4596,7 +4632,9 @@ html, body {
 <i class="duel-icon">⚔️</i>
 <span>Düello Ara</span>
 </span>
-<div class="button-glow"></div>
+<div class="button-glow">
+    <button class="teams-button" id="openTeamsButton">🏳️‍🌈 Takımlar</button>
+</div>
 </button>
 <button class="friends-button" id="friends-button" style="display: none;">
    👥 Arkadaşlar
@@ -10295,7 +10333,7 @@ async function initSurpriseBox(){
       const eligible = Math.floor(totalMatches / 5) > opened;
       const rem = (5 - (totalMatches % 5)) % 5; // 0..4
 
-      counterEl.textContent = eligible ? "Hazır! Açmak için dokun" : `Kalan : ${rem===0?5:rem}`;
+      counterEl.textContent = eligible ? "Hazır! Açmak için dokun" : `Kalan maç: ${rem===0?5:rem}`;
       box.classList.toggle('active', eligible);
       box.classList.toggle('locked', !eligible);
     };
@@ -10309,7 +10347,7 @@ async function initSurpriseBox(){
         const totalMatches = data.duelCredits || 0;
         const opened = data.surpriseOpenedCount || 0;
         const eligible = Math.floor(totalMatches / 5) > opened;
-        if(!eligible){ await showAlert("🔒 Sürpriz kutusunu açmak için yeterli maçınız yok."); return; }
+        if(!eligible){ await showAlert("🔒 Bu kutu için yeterli maçınız yok."); return; }
 
         // RNG — dağılım: %5→500, %10→100, %30→50, %50→30, aksi 10 (garanti alt ödül)
         const r = Math.random() * 100;
@@ -10439,6 +10477,326 @@ async function novaSafeIncrementMatchCountOnce(){
   }
   document.addEventListener('click', primeAudio, {once:true});
   document.addEventListener('touchstart', primeAudio, {once:true});
+})();
+</script>
+
+
+<!-- === NOVA: Teams Panel === -->
+<div class="teams-overlay" id="teamsOverlay" style="display:none;">
+  <div class="teams-panel" role="dialog" aria-modal="true" aria-labelledby="teamsTitle">
+    <div class="teams-header">
+      <h2 id="teamsTitle">Takımlar</h2>
+      <button class="teams-close" id="closeTeamsButton" aria-label="Kapat">✖</button>
+    </div>
+
+<div class="teams-tabs">
+      <button class="teams-tab active" data-tab="standings">Sıralama</button>
+      <button class="teams-tab" data-tab="players">Oyuncular</button>
+      <button class="teams-tab" data-tab="myteam">Takımım</button>
+      <button class="teams-tab" data-tab="inbox">Mesaj Kutusu</button>
+    </div>
+
+    <div class="teams-body">
+
+      <!-- Standings -->
+      <section class="teams-section" id="tab-standings" style="display:block;">
+        <table class="teams-table" id="teamsStandingsTable">
+          <thead><tr><th>Sıra</th><th>Takım</th><th>Üye</th><th>Toplam Kupa</th></tr></thead>
+          <tbody><!-- populated by JS --></tbody>
+        </table>
+      </section>
+
+      <!-- Players -->
+      <section class="teams-section" id="tab-players" style="display:none;">
+        <div class="players-list" id="allPlayersList"><!-- populated by JS --></div>
+        <div class="teams-note">* Davetleri sadece takım liderleri gönderebilir. Bir oyuncu aynı anda yalnızca 1 takımda olabilir.</div>
+      </section>
+
+      <!-- My Team -->
+      <section class="teams-section" id="tab-myteam" style="display:none;">
+        <div class="myteam-info">
+          <div><b>Takımım:</b> <span id="myTeamName">—</span></div>
+          <div><b>Lider:</b> <span id="myTeamLeader">—</span></div>
+          <div><b>Üyeler:</b></div>
+          <ul id="myTeamMembers"></ul>
+          <div class="leave-team-wrap">
+            <button id="leaveTeamButton" class="leave-team-button" disabled>Takımdan Ayrıl</button>
+            <div class="leave-note">* Takıma girişten itibaren 30 gün dolmadan ayrılamazsın.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inbox -->
+      <section class="teams-section" id="tab-inbox" style="display:none;">
+        <div id="inboxList" class="inbox-list"><!-- invites & messages --></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+<!-- === /NOVA: Teams Panel === -->
+
+
+
+
+
+<script id="nova-teams-js">
+(function(){
+  // === Context auto-detect (no inputs for students) ===
+  function db(){ return (window.firebase && firebase.database && firebase.database()) || null; }
+  function ref(path){ return db() ? db().ref(path) : null; }
+  function once(path){ return new Promise(res=> ref(path).once('value', s=>res(s.val()))); }
+
+  const meUid = window.currentStudentId || window.studentId || (window.currentUser && window.currentUser.uid) || localStorage.getItem('studentId') || null;
+
+  async function resolveClassId(){
+    // 1) Prefer global/localStorage
+    let cid = window.currentClassId || window.classId || localStorage.getItem('classId') || null;
+    if (cid) return cid;
+    // 2) Try to infer from /loggedinPlayers (indexed)
+    try {
+      const all = await once('/loggedinPlayers') || {};
+      for (const k in all) {
+        const row = all[k];
+        if (row && row.studentId === meUid && row.classId) return row.classId;
+      }
+    } catch(e){}
+    // 3) Fallback: scan classes to find where this uid exists
+    try {
+      const classes = await once('/classes') || {};
+      for (const cid2 in classes) {
+        if (classes[cid2]?.students && classes[cid2].students[meUid]) return cid2;
+      }
+    } catch(e){}
+    return null;
+  }
+
+  // UI Refs
+  const openBtn = document.getElementById('openTeamsButton');
+  const overlay = document.getElementById('teamsOverlay');
+  const closeBtn = document.getElementById('closeTeamsButton');
+  const tabs = Array.from(document.querySelectorAll('.teams-tab'));
+  const sections = {
+    standings: document.getElementById('tab-standings'),
+    players: document.getElementById('tab-players'),
+    myteam: document.getElementById('tab-myteam'),
+    inbox: document.getElementById('tab-inbox')
+  };
+  const standingsBody = document.querySelector('#teamsStandingsTable tbody');
+  const playersList = document.getElementById('allPlayersList');
+  const myTeamName = document.getElementById('myTeamName');
+  const myTeamLeader = document.getElementById('myTeamLeader');
+  const myTeamMembers = document.getElementById('myTeamMembers');
+  const leaveBtn = document.getElementById('leaveTeamButton');
+  const inboxList = document.getElementById('inboxList');
+
+  let inboxOff = null;
+  let CLASS_ID = null;
+
+  function openPanel(){
+    overlay.style.display='flex';
+    bootstrap().then(()=>{
+      subscribeInbox();
+      refreshAll();
+    });
+  }
+  function closePanel(){
+    overlay.style.display='none';
+    unsubscribeInbox();
+  }
+
+  openBtn && openBtn.addEventListener('click', openPanel);
+  closeBtn && closeBtn.addEventListener('click', closePanel);
+  overlay && overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closePanel(); });
+
+  tabs.forEach(btn=>btn.addEventListener('click',()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const key = btn.dataset.tab;
+    Object.keys(sections).forEach(k=> sections[k].style.display = (k===key?'block':'none'));
+  }));
+
+  async function bootstrap(){
+    if (!CLASS_ID) CLASS_ID = await resolveClassId();
+  }
+
+  async function getStudents(){
+    if(!CLASS_ID) return {};
+    return await once('/classes/'+CLASS_ID+'/students') || {};
+  }
+  async function getTeams(){
+    if(!CLASS_ID) return {};
+    const v = await once('/classes/'+CLASS_ID+'/teams') || {};
+    // Seed in-memory for view if missing
+    if(Object.keys(v||{}).length === 0){
+      ["TAKIM1","TAKIM2","TAKIM3","TAKIM4","TAKIM5"].forEach(id=> v[id] = {name:id, leaderUid:null, members:{}, totalCups:0});
+    }
+    return v;
+  }
+  async function getMe(){
+    if(!CLASS_ID || !meUid) return null;
+    return await once('/classes/'+CLASS_ID+'/students/'+meUid);
+  }
+
+  /* ====== STANDINGS ====== */
+  async function refreshStandings(){
+    const [students, teams] = await Promise.all([getStudents(), getTeams()]);
+    const rows = Object.keys(teams||{}).map(id=>{
+      const t = teams[id] || {name:id, members:{}, totalCups:0};
+      const memberUids = Object.keys(t.members||{});
+      let total = Number(t.totalCups||0);
+      if((!total || total===0) && memberUids.length){
+        total = memberUids.reduce((acc, uid)=> acc + Number(students?.[uid]?.gameCup||0), 0);
+      }
+      return { id, name: t.name || id, total, count: memberUids.length };
+    }).sort((a,b)=> b.total - a.total);
+    standingsBody.innerHTML = rows.map((r,i)=>`
+      <tr><td>${i+1}</td><td>${r.name}</td><td>${r.count}</td><td>${r.total}</td></tr>
+    `).join('') || '<tr><td colspan="4">Takım bulunamadı.</td></tr>';
+  }
+
+  /* ====== PLAYERS ====== */
+  async function refreshPlayers(){
+    const [students, teams, me] = await Promise.all([getStudents(), getTeams(), getMe()]);
+    const canInvite = !!(me && me.isTeamLeader && me.teamId);
+    playersList.innerHTML = Object.entries(students||{}).map(([uid,u])=>{
+      const inTeam = !!u.teamId;
+      const disabled = (!canInvite || uid===meUid || (inTeam && u.teamId !== me?.teamId));
+      const btnLabel = inTeam ? (u.teamId===me?.teamId?'Takımında':'Diğer takımda') : 'Davet Et';
+      const meta = [(u.className||''),(Number(u.gameCup||0)+' kupa')].filter(Boolean).join(' • ');
+      return `<div class="player-row" data-uid="${uid}">
+        <div class="nm">${u.name||'Oyuncu'}</div>
+        <div class="meta">${meta}</div>
+        <button class="invite-btn" ${disabled?'disabled':''} data-uid="${uid}">${btnLabel}</button>
+      </div>`;
+    }).join('') || '<div class="teams-note">Oyuncu bulunamadı.</div>';
+
+    playersList.querySelectorAll('.invite-btn').forEach(btn=>{
+      btn.addEventListener('click', async (e)=>{
+        if(!canInvite) return;
+        const targetUid = e.currentTarget.getAttribute('data-uid');
+        const invite = {
+          invitedByStudentId: meUid, classId: CLASS_ID, teamId: me.teamId,
+          timestamp: (firebase.database && firebase.database.ServerValue && firebase.database.ServerValue.TIMESTAMP) || Date.now(),
+          status: 'pending'
+        };
+        const r = ref('/invitations/'+targetUid).push(); r && r.set(invite);
+        e.currentTarget.textContent = 'Gönderildi'; e.currentTarget.disabled = true;
+      });
+    });
+  }
+
+  /* ====== MY TEAM ====== */
+  async function refreshMyTeam(){
+    const [students, teams, me] = await Promise.all([getStudents(), getTeams(), getMe()]);
+    if(!me || !me.teamId){
+      myTeamName.textContent = '—';
+      myTeamLeader.textContent = '—';
+      myTeamMembers.innerHTML = '<li>Herhangi bir takımda değilsin.</li>';
+      leaveBtn.disabled = true; return;
+    }
+    const t = teams[me.teamId] || {name:me.teamId, members:{}};
+    myTeamName.textContent = t.name || me.teamId;
+    myTeamLeader.textContent = (students?.[t.leaderUid]?.name) || '—';
+    const memberUids = Object.keys(t.members||{});
+    myTeamMembers.innerHTML = (memberUids.length
+      ? memberUids.map(uid=>`<li>${students?.[uid]?.name||uid} — ${Number(students?.[uid]?.gameCup||0)} kupa</li>`).join('')
+      : '<li>Bu takımda henüz üye yok.</li>');
+
+    const canLeave = (Date.now() - (Number(me.joinedTeamAt)||0)) >= 30*24*60*60*1000;
+    leaveBtn.disabled = !canLeave;
+    leaveBtn.onclick = ()=>{
+      if(!canLeave) return;
+      const updates = {};
+      updates['/classes/'+CLASS_ID+'/students/'+meUid+'/teamId'] = null;
+      updates['/classes/'+CLASS_ID+'/teams/'+me.teamId+'/members/'+meUid] = null;
+      ref('/').update(updates); refreshAll();
+    };
+  }
+
+  /* ====== INBOX ====== */
+  function subscribeInbox(){
+    if(!meUid) { inboxList.innerHTML = '<div class="teams-note">Giriş gerekli.</div>'; return; }
+    const r = ref('/invitations/'+meUid); if(!r) return;
+    inboxOff = r.on('value', snap => {
+      const val = snap.val()||{};
+      const items = Object.entries(val).sort((a,b)=> (b[1]?.timestamp||0)-(a[1]?.timestamp||0));
+      if(!items.length){ inboxList.innerHTML = '<div class="teams-note">Mesaj yok.</div>'; return; }
+      inboxList.innerHTML = items.map(([id,inv])=>{
+        const time = new Date(inv.timestamp||Date.now()).toLocaleString();
+        return `<div class="inbox-item" data-id="${id}" data-team="${inv.teamId}" data-class="${inv.classId}">
+          <div class="txt"><b>${inv.invitedByStudentId}</b> seni <b>${inv.teamId}</b> takımına davet etti. <span class="when">${time}</span></div>
+          <div class="actions">
+            <button class="accept">Kabul</button>
+            <button class="decline">Reddet</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      inboxList.querySelectorAll('.inbox-item').forEach(el=>{
+        const id = el.getAttribute('data-id');
+        const teamId = el.getAttribute('data-team');
+        const cId = el.getAttribute('data-class');
+        const acceptBtn = el.querySelector('.accept');
+        const declineBtn = el.querySelector('.decline');
+        acceptBtn.onclick = async ()=>{
+          acceptBtn.disabled = true; declineBtn.disabled = true;
+          await ref('/invitations/'+meUid+'/'+id+'/status').set('accepted');
+          const meSnap = await ref('/classes/'+cId+'/students/'+meUid).once('value');
+          const meData = meSnap.val()||{};
+          if(meData.teamId){ alert('Zaten takımda.'); return; }
+          const updates = {};
+          updates['/classes/'+cId+'/students/'+meUid+'/teamId'] = teamId;
+          updates['/classes/'+cId+'/students/'+meUid+'/joinedTeamAt'] = Date.now();
+          updates['/classes/'+cId+'/teams/'+teamId+'/members/'+meUid] = true;
+          ref('/').update(updates); refreshAll();
+        };
+        declineBtn.onclick = async ()=>{
+          await ref('/invitations/'+meUid+'/'+id+'/status').set('declined');
+          el.remove();
+        };
+      });
+    });
+  }
+  function unsubscribeInbox(){
+    if(inboxOff && meUid){ ref('/invitations/'+meUid).off('value', inboxOff); inboxOff = null; }
+  }
+
+  async function refreshAll(){
+    await Promise.all([refreshStandings(), refreshPlayers(), refreshMyTeam()]);
+  }
+})();
+</script>
+
+
+
+
+
+<script id="nova-teams-admin-js">
+(function(){
+  // Admin-only helper: call window.novaSetTeamLeader(uid, teamId) from console
+  window.novaSetTeamLeader = function(uid, teamId){
+    if(!window.firebase) { alert('Firebase yok.'); return; }
+    const updates = {};
+    updates['/teams/'+teamId+'/name'] = teamId;
+    updates['/teams/'+teamId+'/leaderUid'] = uid;
+    updates['/teams/'+teamId+'/members/'+uid] = true;
+    updates['/users/'+uid+'/isLeader'] = true;
+    updates['/users/'+uid+'/teamId'] = teamId;
+    updates['/users/'+uid+'/joinedTeamAt'] = Date.now();
+    firebase.database().ref('/').update(updates);
+    alert('Lider atandı: '+uid+' -> '+teamId);
+  };
+  // Seed teams (once): window.novaSeedTeams()
+  window.novaSeedTeams = function(){
+    if(!window.firebase) { alert('Firebase yok.'); return; }
+    const base = {};
+    ["TAKIM1","TAKIM2","TAKIM3","TAKIM4","TAKIM5"].forEach(id=>{
+      base['/teams/'+id] = { name:id, leaderUid:null, members:{} };
+    });
+    firebase.database().ref('/').update(base);
+    alert('Takımlar oluşturuldu.');
+  };
 })();
 </script>
 
