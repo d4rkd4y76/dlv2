@@ -10251,5 +10251,53 @@ Emin misiniz?`);
 }
 </style>
 
+
+<style id="nova-store-polish-mobile-row">
+/* Force one-row layout on small screens; scale items to fit */
+@media (max-width: 600px){
+  .profile-change-header{
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:10px 8px;
+    flex-wrap:nowrap !important;   /* keep on one line */
+    overflow:hidden;
+  }
+  .profile-change-header *{min-width:0;} /* allow shrinking */
+  /* Diamonds */
+  .profile-change-header .current-diamonds{
+    padding:6px 10px;
+    border-radius:10px;
+    flex:0 1 auto;
+    white-space:nowrap;
+  }
+  .profile-change-header .current-diamonds .diamond-amount{
+    font-size:clamp(12px, 3.2vw, 16px);
+  }
+  /* Exchange button */
+  #openExchangeButton{
+    padding:6px 12px !important;
+    font-size:clamp(12px, 3.2vw, 15px) !important;
+    flex:0 1 auto;
+  }
+  /* Title chip */
+  .profile-change-header h2{
+    padding:6px 10px;
+    font-size:clamp(14px, 3.6vw, 18px);
+    flex:1 1 30%;
+    text-align:center;
+    margin:0;
+  }
+  /* Close chip */
+  #profileCloseButton, .profile-close-button{
+    height: clamp(30px, 5vw, 34px);
+    min-width: clamp(30px, 5vw, 34px);
+    padding:0 8px;
+    flex:0 0 auto;
+  }
+}
+</style>
+
 </body>
 </html>
