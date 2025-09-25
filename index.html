@@ -4010,6 +4010,67 @@ animation: floatButton 1s ease infinite;
 @keyframes starPulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.12);} }
 @keyframes starFlame { 0%,100%{ transform: translateY(0) rotate(-2deg);} 50%{ transform: translateY(-1px) rotate(2deg);} }
 
+
+/* === Mobile Market/Profile Scroll Fixes (Nova) === */
+html, body {
+  min-height: 100dvh;
+  overflow-y: auto;
+}
+
+@supports (height: 100dvh) {
+  .profile-change-overlay { min-height: 100dvh; }
+}
+
+.profile-change-overlay {
+  overflow-y: auto;                 /* Allow the overlay to scroll on small screens */
+  align-items: flex-start;          /* Avoid vertical centering that hides the header */
+  padding-top: max(12px, env(safe-area-inset-top));  /* Respect notches/status bars */
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.profile-change-content {
+  max-height: none;                 /* Let content grow; inner sections handle their own scroll */
+}
+
+/* Inner store scrollers */
+.duel-credits-store {
+  max-height: none;                 /* Remove restrictive height */
+  overflow-y: visible;
+}
+
+/* Make package grid single-column on phones */
+@media (max-width: 600px) {
+  .profile-change-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .credits-packages-container {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+  .profile-categories {
+    padding: 10px;
+  }
+  .ranking-panel { width: 100%; }
+}
+
+/* Ensure headers/buttons are fully visible and not cut */
+.profile-change-header,
+.profile-categories,
+.profile-change-content h2 {
+  scroll-margin-top: 16px;
+}
+
+/* Allow touch momentum scrolling on iOS */
+.profile-change-overlay,
+.duel-credits-store,
+.credits-packages-container {
+  -webkit-overflow-scrolling: touch;
+}
+/* === End of Mobile Fixes === */
+
 </style>
 
 <style>
