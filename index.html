@@ -10309,7 +10309,7 @@ async function initSurpriseBox(){
         const totalMatches = data.duelCredits || 0;
         const opened = data.surpriseOpenedCount || 0;
         const eligible = Math.floor(totalMatches / 5) > opened;
-        if(!eligible){ await showAlert("🔒 Bu kutu için yeterli maçınız yok."); return; }
+        if(!eligible){ await showAlert("🔒 Sürpriz kutusunu açmak için yeterli maçınız yok."); return; }
 
         // RNG — dağılım: %5→500, %10→100, %30→50, %50→30, aksi 10 (garanti alt ödül)
         const r = Math.random() * 100;
