@@ -10295,7 +10295,7 @@ async function initSurpriseBox(){
       const eligible = Math.floor(totalMatches / 5) > opened;
       const rem = (5 - (totalMatches % 5)) % 5; // 0..4
 
-      counterEl.textContent = eligible ? "Hazır! Açmak için dokun" : `Kalan : ${rem===0?5:rem}`;
+      counterEl.textContent = eligible ? "Hazır!" : `Kalan : ${rem===0?5:rem}`;
       box.classList.toggle('active', eligible);
       box.classList.toggle('locked', !eligible);
     };
