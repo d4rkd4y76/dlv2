@@ -4075,17 +4075,17 @@ html, body {
 /* === NOVA: Sürpriz Kutu Stil === */
 .surprise-box{
   position:absolute;
-  top:4px; left:4px;      /* Sol üst, foto ile çakışmayı önle */
+  top:12px; left:12px;     /* Market logosunun simetriği: sol üst */
   display:flex; flex-direction:column; align-items:center;
-  z-index:3;
+  z-index:5;
   user-select:none;
   cursor: pointer;
   filter: grayscale(0.25);
-  opacity: .9;
+  opacity: .75;
   transition: transform .2s ease, filter .2s ease, opacity .2s ease;
 }
 .surprise-box img{
-  width:56px; height:56px; object-fit:contain; pointer-events:none;
+  width:92px; height:92px; object-fit:contain; pointer-events:none;
 }
 .surprise-box-counter{
   margin-top:4px;
@@ -4101,15 +4101,6 @@ html, body {
 .surprise-box.locked{ filter: grayscale(0.6); opacity:.6; cursor:not-allowed; }
 .surprise-box.active{ filter: grayscale(0); opacity:1; animation: sbPulse 1.4s ease-in-out infinite; }
 @keyframes sbPulse { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.06)} }
-
-
-/* NOVA mobile hard fix: keep surprise box clear of profile image */
-@media (max-width: 480px) {
-  #main-screen { position: relative; }
-  .surprise-box { top: 6px; left: 6px; z-index: 2; }
-  .surprise-box img { width: 44px; height: 44px; }
-  .surprise-box-counter { font-size: .78rem; padding: 6px 10px; }
-}
 
 /* Particles for reward animation */
 .reward-overlay{
@@ -4418,6 +4409,38 @@ html, body {
 #profileCloseButton{
   background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.28);
   border-radius:10px; padding:6px 10px; color:#b91c1c; font-weight:900; cursor:pointer;
+}
+</style>
+
+
+<style id="nova-hard-overrides">
+/* Nova: Surprise Box placement & mobile fixes */
+#main-screen { position: relative !important; }
+#surprise-box.surprise-box {
+  position: absolute !important;
+  top: 12px !important;
+  left: 12px !important;
+  z-index: 2 !important; /* Under profile photo if overlaps */
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+#surprise-box.surprise-box img {
+  width: 48px !important;
+  height: 48px !important;
+}
+#surprise-box .surprise-box-counter {
+  font-size: .80rem !important;
+  padding: 6px 10px !important;
+  margin-top: 6px !important;
+}
+.student-photo { position: relative; z-index: 10 !important; }
+
+/* Small screens */
+@media (max-width: 480px) {
+  #surprise-box.surprise-box {
+    position: fixed !important; top: 10px !important; left: 10px !important; z-index: 50 !important;
+  }
+  #surprise-box.surprise-box img { width: 44px !important; height: 44px !important; }
+  #surprise-box .surprise-box-counter { font-size: .78rem !important; }
 }
 </style>
 
