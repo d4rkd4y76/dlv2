@@ -4075,17 +4075,17 @@ html, body {
 /* === NOVA: Sürpriz Kutu Stil === */
 .surprise-box{
   position:absolute;
-  top:12px; left:12px;     /* Market logosunun simetriği: sol üst */
+  top:8px; left:8px;     /* Sol üstte, foto ile çakışmayı önle */
   display:flex; flex-direction:column; align-items:center;
-  z-index:5;
+  z-index:2; /* Foto üstüne gelmesin */
   user-select:none;
   cursor: pointer;
   filter: grayscale(0.25);
-  opacity: .75;
+  opacity: .85;
   transition: transform .2s ease, filter .2s ease, opacity .2s ease;
 }
 .surprise-box img{
-  width:92px; height:92px; object-fit:contain; pointer-events:none;
+  width:64px; height:64px; object-fit:contain; pointer-events:none;
 }
 .surprise-box-counter{
   margin-top:4px;
@@ -4101,6 +4101,14 @@ html, body {
 .surprise-box.locked{ filter: grayscale(0.6); opacity:.6; cursor:not-allowed; }
 .surprise-box.active{ filter: grayscale(0); opacity:1; animation: sbPulse 1.4s ease-in-out infinite; }
 @keyframes sbPulse { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.06)} }
+
+
+/* NOVA mobile fix: surprise box should never cover profile photo */
+@media (max-width: 480px) {
+  .surprise-box { top:6px; left:6px; z-index:1; }
+  .surprise-box img { width:56px; height:56px; }
+  .surprise-box-counter { font-size:.8rem; padding:6px 10px; }
+}
 
 /* Particles for reward animation */
 .reward-overlay{
