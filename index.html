@@ -4321,6 +4321,69 @@ html, body {
 }
 </style>
 
+
+<style id="nova-store-integrated-styles">
+:root{
+  --chip-border:1px solid rgba(2,132,199,.22);
+  --shadow-lg:0 12px 30px rgba(2,132,199,.18);
+}
+/* Header grid ensures single row on mobile and desktop */
+.profile-change-header{
+  position:sticky; top:0; z-index:10;
+  display:grid; grid-template-columns:auto auto 1fr auto; align-items:center;
+  gap:10px; padding:10px 12px;
+  background:rgba(255,255,255,.85); backdrop-filter: blur(8px);
+  border-bottom:1px solid #eef2f7;
+}
+.current-diamonds{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:8px 12px; border-radius:12px;
+  background:linear-gradient(180deg, rgba(14,165,233,.10), rgba(14,165,233,.05));
+  border:1px solid rgba(14,165,233,.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+  white-space:nowrap; max-width:32vw;
+}
+.current-diamonds .diamond-icon{filter:drop-shadow(0 2px 6px rgba(14,165,233,.35))}
+.current-diamonds .diamond-amount{
+  font-weight:900; letter-spacing:.2px;
+  background:linear-gradient(90deg,#0ea5e9,#3b82f6,#60a5fa);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  font-size:clamp(14px, 3.6vw, 18px);
+}
+#openExchangeButton{
+  background:linear-gradient(135deg,#0ea5e9,#2563eb);
+  color:#fff; border:none; border-radius:999px;
+  padding:8px 14px; font-weight:800; letter-spacing:.2px;
+  box-shadow:var(--shadow-lg); cursor:pointer; position:relative;
+  white-space:nowrap; max-width:34vw; overflow:hidden; text-overflow:ellipsis;
+}
+#openExchangeButton::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:translateX(-120%) skewX(-18deg); animation:shine 2.8s infinite;
+}
+@keyframes shine{to{transform:translateX(120%) skewX(-18deg)}}
+.profile-change-header h2{
+  margin:0; padding:6px 10px; border-radius:12px; text-align:center;
+  background:rgba(2,132,199,.08); border:var(--chip-border);
+  font-weight:900; letter-spacing:.3px; display:flex; align-items:center; gap:8px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-size:clamp(15px,3.8vw,18px);
+}
+#profileCloseButton{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:clamp(30px,5vw,34px); min-width:clamp(30px,5vw,34px);
+  padding:0 10px; border-radius:12px; line-height:1;
+  background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.28);
+  color:#b91c1c; font-weight:900; cursor:pointer; user-select:none;
+}
+/* Mobile tweaks */
+@media (max-width: 600px){
+  .current-diamonds{max-width:28vw}
+  #openExchangeButton{max-width:32vw}
+}
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -4688,19 +4751,16 @@ html, body {
 
 <div class="profile-change-content">
 <div class="profile-change-header">
-<div class="current-diamonds">
-<span class="diamond-icon">💎</span>
-<span class="diamond-amount" id="currentDiamonds">0</span>
-</div>
-<span id="openExchangeButtonWrap" style="display:inline-block;margin-left:8px;">
-  <button id="openExchangeButton" onclick="openDiamondExchangeModal()"
-          style="background:#0ea5e9;border:none;color:#fff;border-radius:10px;padding:6px 10px;font-weight:700;cursor:pointer;">
-    💱 Elmas Takas
-  </button>
-</span>
+  <div class="current-diamonds">
+    <span class="diamond-icon">💎</span>
+    <span class="diamond-amount" id="currentDiamonds">0</span>
+  </div>
 
-<h2>Mağaza 🛒</h2>
-<button class="profile-close-button" id="profileCloseButton">✖</button>
+  <button id="openExchangeButton" onclick="openDiamondExchangeModal()">💱 Elmas Takas</button>
+
+  <h2>Mağaza <span class="cart-icon">🛒</span></h2>
+
+  <button id="profileCloseButton">✖</button>
 </div>
 <div class="profile-categories">
 <button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
@@ -10065,293 +10125,6 @@ Emin misiniz?`);
   }
 }
 </script>
-
-
-<!-- Nova visual polish overrides: structure untouched -->
-<style id="nova-store-polish">
-/* Diamond badge: glassy, bright, no black */
-.profile-change-header .current-diamonds{
-  background: radial-gradient(120% 120% at 0% 0%, rgba(99, 179, 237, 0.25), rgba(14,165,233,0.10) 40%, rgba(255,255,255,0.06) 80%);
-  border: 1px solid rgba(14,165,233,0.35);
-  box-shadow: 0 8px 24px rgba(14,165,233,0.12), inset 0 1px 0 rgba(255,255,255,0.35);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color:#0b1220;
-  padding:10px 16px;
-  border-radius:14px;
-  gap:8px;
-  margin:10px 12px;
-}
-.profile-change-header .current-diamonds .diamond-icon{filter:drop-shadow(0 2px 6px rgba(14,165,233,.35));}
-.profile-change-header .current-diamonds .diamond-amount{
-  font-weight:900;
-  letter-spacing:.3px;
-  background: linear-gradient(90deg,#0ea5e9 0%, #3b82f6 40%, #60a5fa 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-
-/* Elmas Takas button: clean gradient pill, subtle shine */
-#openExchangeButton{
-  background: linear-gradient(135deg,#0ea5e9,#2563eb) !important;
-  color:#fff !important;
-  border:none !important;
-  border-radius:999px !important;
-  padding:8px 14px !important;
-  font-weight:800 !important;
-  letter-spacing:.2px !important;
-  box-shadow: 0 10px 24px rgba(37,99,235,.22), inset 0 1px 0 rgba(255,255,255,.25) !important;
-  position:relative;
-  overflow:hidden;
-}
-#openExchangeButton::after{
-  content:"";
-  position:absolute; inset:0;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
-  transform: translateX(-120%) skewX(-18deg);
-  animation: novaShine 2.6s infinite;
-}
-@keyframes novaShine{100%{transform: translateX(120%) skewX(-18deg);}}
-
-/* Header title as real title */
-.profile-change-header h2{
-  margin:0;
-  font-size:clamp(1.2rem,2.8vw,1.6rem);
-  font-weight:900;
-  letter-spacing:.3px;
-  display:flex; align-items:center; gap:8px;
-  background: linear-gradient(90deg,#0f172a,#1e293b,#0ea5e9);
-  -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow: 0 1px 0 rgba(255,255,255,.25);
-}
-
-/* Container spacing without layout change */
-.profile-change-header{
-  align-items:center;
-  gap:10px;
-  border-bottom: 1px solid #eef2f7;
-  background:#fff;
-}
-</style>
-
-
-<style id="nova-store-polish-responsive">
-/* --- Responsive & centering fixes (no DOM changes) --- */
-
-/* Keep header layout stable and scalable */
-.profile-change-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-/* Diamond badge: stay centered and never overflow */
-.profile-change-header .current-diamonds{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  white-space:nowrap;
-  max-width:100%;
-  padding-inline:14px;
-}
-.profile-change-header .current-diamonds .diamond-icon{flex:0 0 auto;}
-.profile-change-header .current-diamonds .diamond-amount{
-  display:inline-block;
-  min-width:2ch;
-  text-align:center;
-  line-height:1;
-  font-size:clamp(14px, 3.5vw, 18px);
-}
-
-/* Exchange button scales, never wraps */
-#openExchangeButton{
-  white-space:nowrap;
-  font-size:clamp(12px, 3.2vw, 16px) !important;
-  padding:8px 14px !important;
-}
-
-/* Title & Close: put each into a colored chip */
-.profile-change-header h2{
-  padding:6px 12px;
-  border-radius:12px;
-  background:rgba(2,132,199,0.08);
-  border:1px solid rgba(2,132,199,0.22);
-  -webkit-text-fill-color:initial; /* keep readable inside chip */
-  color:#0b1220;
-  font-weight:800;
-  display:flex; align-items:center; gap:8px;
-}
-#profileCloseButton, .profile-close-button{
-  background:rgba(239,68,68,0.08);
-  border:1px solid rgba(239,68,68,0.28);
-  border-radius:12px;
-  padding:6px 10px;
-  line-height:1;
-  font-weight:800;
-  color:#991b1b;
-}
-
-/* On small screens: stack neatly and center */
-@media (max-width: 600px){
-  .profile-change-header{
-    justify-content:center;
-    gap:10px;
-  }
-  .profile-change-header h2{
-    order: 2; /* visual only, DOM order unchanged */
-  }
-  .profile-change-header .current-diamonds{
-    order: 1;
-    width:100%;
-  }
-  #openExchangeButton{
-    order: 3;
-  }
-  #profileCloseButton, .profile-close-button{
-    order: 4;
-  }
-}
-
-/* Prevent any text from spilling out of containers */
-.profile-change-header *{min-width:0;}
-</style>
-
-
-<style id="nova-store-polish-close-fix">
-/* Ensure the close (X) stays perfectly centered and aligned */
-#profileCloseButton, .profile-close-button{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height: clamp(32px, 5.2vw, 40px);
-  min-width: clamp(32px, 5.2vw, 40px);
-  padding: 0 10px; /* if it's an icon only, width==height; if text, it grows */
-  margin: 0;
-  line-height: 1;
-  vertical-align: middle;
-  transform: translateY(0); /* reset any inherited transforms */
-  position: relative; top: 0; /* avoid accidental nudge */
-  box-sizing: border-box;
-}
-
-/* Keep the icon centered even if it's an <span> or text '✖' */
-#profileCloseButton > *, .profile-close-button > *{
-  pointer-events:none;
-  line-height:1;
-}
-
-/* On very small screens, keep it same row without dropping */
-@media (max-width: 600px){
-  #profileCloseButton, .profile-close-button{
-    order: 4;
-  }
-}
-</style>
-
-
-<style id="nova-store-polish-mobile-row">
-/* Force one-row layout on small screens; scale items to fit */
-@media (max-width: 600px){
-  .profile-change-header{
-    display:flex !important;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    padding:10px 8px;
-    flex-wrap:nowrap !important;   /* keep on one line */
-    overflow:hidden;
-  }
-  .profile-change-header *{min-width:0;} /* allow shrinking */
-  /* Diamonds */
-  .profile-change-header .current-diamonds{
-    padding:6px 10px;
-    border-radius:10px;
-    flex:0 1 auto;
-    white-space:nowrap;
-  }
-  .profile-change-header .current-diamonds .diamond-amount{
-    font-size:clamp(12px, 3.2vw, 16px);
-  }
-  /* Exchange button */
-  #openExchangeButton{
-    padding:6px 12px !important;
-    font-size:clamp(12px, 3.2vw, 15px) !important;
-    flex:0 1 auto;
-  }
-  /* Title chip */
-  .profile-change-header h2{
-    padding:6px 10px;
-    font-size:clamp(14px, 3.6vw, 18px);
-    flex:1 1 30%;
-    text-align:center;
-    margin:0;
-  }
-  /* Close chip */
-  #profileCloseButton, .profile-close-button{
-    height: clamp(30px, 5vw, 34px);
-    min-width: clamp(30px, 5vw, 34px);
-    padding:0 8px;
-    flex:0 0 auto;
-  }
-}
-</style>
-
-
-<style id="nova-store-polish-mobile-grid">
-@media (max-width: 600px){
-  /* Full-width header; one row grid */
-  .profile-change-header{
-    display:grid !important;
-    grid-template-columns: auto auto 1fr auto; /* diamonds | exchange | title flex | close */
-    align-items:center;
-    column-gap:8px;
-    row-gap:0;
-    width:100%;
-    box-sizing:border-box;
-    padding:10px 8px;
-  }
-  .profile-change-header *{min-width:0;}
-  /* Diamonds (cap width & no wrap) */
-  .profile-change-header .current-diamonds{
-    padding:6px 8px;
-    border-radius:10px;
-    white-space:nowrap;
-    max-width:28vw;
-  }
-  .profile-change-header .current-diamonds .diamond-amount{
-    font-size:clamp(12px, 3.4vw, 16px);
-  }
-  /* Exchange button (cap width, shrinkable) */
-  #openExchangeButton{
-    padding:6px 10px !important;
-    font-size:clamp(12px, 3.2vw, 15px) !important;
-    max-width:34vw;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    justify-self:start;
-  }
-  /* Title takes remaining space; center text; ellipsis if needed */
-  .profile-change-header h2{
-    padding:6px 8px;
-    font-size:clamp(13px, 3.6vw, 17px);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    justify-self:center;
-  }
-  /* Close chip, fixed square height */
-  #profileCloseButton, .profile-close-button{
-    height: clamp(28px, 5vw, 32px);
-    min-width: clamp(28px, 5vw, 32px);
-    padding:0 8px;
-    justify-self:end;
-  }
-}
-</style>
 
 </body>
 </html>
