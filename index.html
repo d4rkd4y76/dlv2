@@ -10219,5 +10219,37 @@ Emin misiniz?`);
 .profile-change-header *{min-width:0;}
 </style>
 
+
+<style id="nova-store-polish-close-fix">
+/* Ensure the close (X) stays perfectly centered and aligned */
+#profileCloseButton, .profile-close-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height: clamp(32px, 5.2vw, 40px);
+  min-width: clamp(32px, 5.2vw, 40px);
+  padding: 0 10px; /* if it's an icon only, width==height; if text, it grows */
+  margin: 0;
+  line-height: 1;
+  vertical-align: middle;
+  transform: translateY(0); /* reset any inherited transforms */
+  position: relative; top: 0; /* avoid accidental nudge */
+  box-sizing: border-box;
+}
+
+/* Keep the icon centered even if it's an <span> or text '✖' */
+#profileCloseButton > *, .profile-close-button > *{
+  pointer-events:none;
+  line-height:1;
+}
+
+/* On very small screens, keep it same row without dropping */
+@media (max-width: 600px){
+  #profileCloseButton, .profile-close-button{
+    order: 4;
+  }
+}
+</style>
+
 </body>
 </html>
