@@ -8,6 +8,67 @@
 <!-- Comfortaa Font -->
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&amp;display=swap" rel="stylesheet"/>
 <style>
+
+/* === Nova: Explanation Highlight (Single Player) === */
+.explanation-container{margin-top:14px;display:none;}
+.explanation-card{
+  background:#ecfdf5;             /* açık yeşil */
+  border:3px solid #166534;       /* koyu yeşil çerçeve */
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 10px 24px rgba(22,101,52,0.18);
+  animation: expCardIn .25s ease-out;
+}
+@keyframes expCardIn{from{transform:translateY(6px);opacity:0}to{transform:translateY(0);opacity:1}}
+.explanation-title{
+  display:inline-block;
+  font-weight:900;
+  font-size:1rem;
+  color:#065f46;
+  background:#d1fae5;
+  border:2px solid #065f46;
+  padding:4px 10px;
+  border-radius:999px;
+  letter-spacing:.3px;
+  margin-bottom:8px;
+}
+.explanation-correct{
+  font-size:1.1rem;
+  font-weight:800;
+  color:#065f46;
+  background:linear-gradient(0deg, rgba(5,150,105,.10), rgba(5,150,105,.10));
+  border-left:6px solid #10b981;
+  padding:8px 12px;
+  border-radius:10px;
+  margin:6px 0 8px 0;
+}
+.explanation-text{
+  font-size:.98rem;
+  color:#064e3b;
+  line-height:1.35;
+  background:#f0fdf4;
+  border-left:4px dashed #34d399;
+  padding:10px 12px;
+  border-radius:8px;
+}
+.next-question-button{
+  margin-top:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:#10b981;
+  color:#fff;
+  font-weight:700;
+  border:none;
+  border-radius:10px;
+  padding:10px 16px;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.next-question-button:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(16,185,129,.35);background:#059669}
+.next-question-button:active{transform:translateY(0);box-shadow:none}
+/* === End Nova === */
+
         /* CSS Kodları */
         * {
             box-sizing: border-box;
@@ -10475,7 +10536,7 @@ function showExplanationAndNext(){
     expl.innerHTML = `
       <div class="explanation-card">
         <div class="explanation-title">Açıklama</div>
-        <div class="explanation-correct"><strong>Doğru Cevap:</strong> ${escapeHTML(correctText)}</div>
+        <div class="explanation-correct">✅ <strong>Doğru Cevap:</strong> ${escapeHTML(correctText)}</div>
         ${maybeExplanation ? `<div class="explanation-text">${escapeHTML(maybeExplanation)}</div>` : ``}
         <button id="next-question-button" class="next-question-button">Sonraki Soru</button>
       </div>`;
