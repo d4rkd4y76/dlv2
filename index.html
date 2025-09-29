@@ -4518,6 +4518,16 @@ html, body {
 /* Lighter shadows (global pass) */
 </style>
 
+
+<style>
+.explanation-container{margin-top:12px;display:none;}
+.explanation-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+.explanation-title{font-weight:700;margin-bottom:8px;}
+.next-question-button{margin-top:12px;padding:10px 14px;border:none;border-radius:10px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer;}
+.next-question-button:hover{opacity:.92;transform:translateY(-1px);}
+.explanation-correct{margin-bottom:8px;}
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -4708,6 +4718,7 @@ html, body {
 <div class="question-text" id="question-text">Soru metni burada olacak.</div>
 </div>
 <div class="options-container" id="options-container"></div>
+<div class="explanation-container" id="explanation-container" style="display:none"></div>
 <div class="score-container" id="score-container">
 <span id="score"></span>
 <div class="score-message" id="score-message"></div>
@@ -6641,7 +6652,8 @@ const formattedQuestion = {
     question: questionData.question.text || questionData.question, // Düzeltilmiş
     correct: questionData.correct,
     wrong1: questionData.wrong1,
-    wrong2: questionData.wrong2
+    wrong2: questionData.wrong2,
+    explanation: (questionData.explanation || questionData.aciklama || questionData['açıklama'] || '')
 };
                 allQuestions.push(formattedQuestion);
             });
@@ -6685,6 +6697,9 @@ const formattedQuestion = {
         }
 
        function displayCurrentQuestion() {
+    // Nova: clear explanation on new question
+    (function(){var _e=document.getElementById('explanation-container'); if(_e){_e.style.display='none'; _e.innerHTML='';}})();
+
     if (currentQuestionIndex >= gameQuestions.length) {
         endGame();
         return;
@@ -6808,9 +6823,7 @@ questionContainer.appendChild(textContainer);
 
             clearInterval(timer);
 
-            setTimeout(() => {
-                proceedToNextQuestion();
-            }, 1000);
+            showExplanationAndNext();
         }
 
         function proceedToNextQuestion() {
@@ -6936,9 +6949,7 @@ questionContainer.appendChild(textContainer);
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     markQuestionAsWrong();
-                    setTimeout(() => {
-                        proceedToNextQuestion();
-                    }, 1000);
+                    showExplanationAndNext();
                 }
             }, 1000);
         }
@@ -10442,5 +10453,47 @@ async function novaSafeIncrementMatchCountOnce(){
 })();
 </script>
 
+<script>
+
+// === Nova: Single-player Explanation Feature (v2) ===
+function escapeHTML(str){
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function getTextIfNotUrl(s){
+  if(!s || typeof s !== 'string') return '';
+  if(/^https?:\/\/.*\.(png|jpg|jpeg|gif|webp|svg)$/i.test(s)) return '';
+  return s;
+}
+function showExplanationAndNext(){
+  try{
+    const currentQuestion = gameQuestions[currentQuestionIndex];
+    const expl = document.getElementById('explanation-container');
+    if(!expl){ proceedToNextQuestion(); return; }
+    const correctText = currentQuestion && currentQuestion.correct ? String(currentQuestion.correct) : '';
+    const maybeExplanation = getTextIfNotUrl(currentQuestion && (currentQuestion.explanation || currentQuestion.aciklama || currentQuestion["açıklama"] || currentQuestion.info));
+    expl.innerHTML = `
+      <div class="explanation-card">
+        <div class="explanation-title">Açıklama</div>
+        <div class="explanation-correct"><strong>Doğru Cevap:</strong> ${escapeHTML(correctText)}</div>
+        ${maybeExplanation ? `<div class="explanation-text">${escapeHTML(maybeExplanation)}</div>` : ``}
+        <button id="next-question-button" class="next-question-button">Sonraki Soru</button>
+      </div>`;
+    expl.style.display = 'block';
+    const nxt = document.getElementById('next-question-button');
+    if(nxt){
+      nxt.onclick = function(){
+        expl.style.display='none';
+        expl.innerHTML='';
+        proceedToNextQuestion();
+      };
+    }
+  }catch(e){
+    console.error('showExplanationAndNext error', e);
+    proceedToNextQuestion();
+  }
+}
+
+</script>
 </body>
 </html>
