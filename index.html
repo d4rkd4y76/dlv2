@@ -4589,6 +4589,47 @@ html, body {
 .explanation-correct{margin-bottom:8px;}
 </style>
 
+
+<style>
+/* === Nova: Ders Videosu Akışı (Single Player Result) === */
+.lesson-video-button{
+  display:inline-flex;align-items:center;gap:8px;
+  background: linear-gradient(135deg,#4338ca,#4f46e5);
+  color:#fff;border:none;border-radius:12px;padding:12px 18px;
+  font-weight:800;letter-spacing:.2px;cursor:pointer;
+  box-shadow:0 10px 24px rgba(79,70,229,.25);
+  transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+.lesson-video-button:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(79,70,229,.35);filter:brightness(1.05)}
+.lesson-video-button:active{transform:translateY(0);box-shadow:none}
+
+.lesson-video-screen{
+  display:none;flex-direction:column;gap:16px;
+  width:100%;max-width:1200px;margin:0 auto;
+  background:#fff;border-radius:20px;padding:24px 28px;
+  box-shadow:0 15px 35px rgba(0,0,0,.2);
+}
+.lesson-video-header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.lesson-pill{
+  background:#eef2ff;color:#3730a3;border:2px solid #3730a3;
+  border-radius:999px;padding:6px 12px;font-weight:800;font-size:.95rem
+}
+.video-title{font-size:1.25rem;font-weight:900;color:#111;text-align:left}
+.video-frame{width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.video-frame iframe{width:100%;height:100%;border:0;display:block}
+
+.lesson-video-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.lesson-video-back{background:#111827;color:#fff;border:none;border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:700}
+.lesson-video-back:hover{filter:brightness(1.1)}
+
+@media (max-width: 640px){
+  .video-title{font-size:1.05rem}
+  .lesson-video-button{width:100%;justify-content:center}
+  .lesson-video-screen{padding:18px}
+}
+/* === End Nova === */
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -4786,6 +4827,8 @@ html, body {
 <img alt="Sonuç Resmi" class="final-image" id="score-image" style="display:none;"/>
 <!-- "Geri Dön" butonu -->
 <button class="end-game-button" id="final-back-button">Geri Dön</button>
+<button class="lesson-video-button" id="lesson-video-button">🎬 Ders videosunu izle</button>
+
 </div>
 </div>
 <!-- Düello Seçim Ekranı -->
@@ -10556,5 +10599,263 @@ function showExplanationAndNext(){
 }
 
 </script>
+
+<!-- Nova: Ders Videosu Ekranı (Single Player) -->
+<div class="lesson-video-screen" id="lesson-video-screen">
+  <div class="lesson-video-header">
+    <div class="lesson-pill" id="lesson-video-breadcrumb">Ders & Konu</div>
+    <div class="video-title" id="lesson-video-title">Ders Videosu</div>
+  </div>
+  <div class="video-frame">
+    <iframe id="lesson-video-iframe" src="" title="Ders Videosu" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+  <div class="lesson-video-actions">
+    <button class="lesson-video-back" id="lesson-video-back">Geri</button>
+  </div>
+</div>
+
+
+
+<!-- Nova: RTDB Adapter for Lesson Video URL (supports Firebase v8 & v9) -->
+<script>
+(function(){
+  // Guard: don't overwrite if exists
+  if (window.DB && typeof window.DB.getLessonVideoUrl === 'function') return;
+
+  // helper to safely get selection texts
+  function getSel(){
+    var s = window.__novaSelection__ || {};
+    return {
+      classText: (s.classText || '').trim(),
+      subjectText: (s.subjectText || '').trim(),
+      topicText: (s.topicText || '').trim(),
+      topicId: (s.topicId || '').trim()
+    };
+  }
+
+  async function readWithV9(){
+    try{
+      if (!window.firebaseV9DatabaseLoaded) return null; // sentinel set below
+      const db = window.firebaseV9DatabaseLoaded;
+      const { get, ref } = window.firebaseV9DatabaseAPI;
+      const sel = getSel();
+
+      // 1) topicId araması: championData/headings/*/lessons/*/topics/$topicId/videoUrl
+      if (sel.topicId){
+        const hSnap = await get(ref(db, 'championData/headings'));
+        if (hSnap.exists()){
+          const headings = hSnap.val();
+          for (const hId in headings){
+            const lessons = (headings[hId] && headings[hId].lessons) || {};
+            for (const lId in lessons){
+              const topics = (lessons[lId] && lessons[lId].topics) || {};
+              if (topics[sel.topicId] && typeof topics[sel.topicId].videoUrl === 'string' && topics[sel.topicId].videoUrl){
+                return topics[sel.topicId].videoUrl;
+              }
+            }
+          }
+        }
+      }
+
+      // 2) isim tabanlı lookup
+      if (sel.subjectText && sel.topicText){
+        const p = `lessonVideoLookup/${sel.subjectText}/${sel.topicText}`;
+        const urlSnap = await get(ref(db, p));
+        if (urlSnap.exists() && typeof urlSnap.val() === 'string' && urlSnap.val()){
+          return urlSnap.val();
+        }
+      }
+      return null;
+    }catch(e){ console.warn('V9 adapter error:', e); return null; }
+  }
+
+  async function readWithV8(){
+    try{
+      if (!(window.firebase && firebase.database)) return null;
+      var rdb = firebase.database();
+      var sel = getSel();
+
+      if (sel.topicId){
+        var hSnap = await rdb.ref('championData/headings').get();
+        if (hSnap.exists()){
+          var headings = hSnap.val();
+          for (var hId in headings){
+            var lessons = (headings[hId] && headings[hId].lessons) || {};
+            for (var lId in lessons){
+              var topics = (lessons[lId] && lessons[lId].topics) || {};
+              if (topics[sel.topicId] && typeof topics[sel.topicId].videoUrl === 'string' && topics[sel.topicId].videoUrl){
+                return topics[sel.topicId].videoUrl;
+              }
+            }
+          }
+        }
+      }
+
+      if (sel.subjectText && sel.topicText){
+        var urlSnap = await rdb.ref('lessonVideoLookup/' + sel.subjectText + '/' + sel.topicText).get();
+        if (urlSnap.exists() && typeof urlSnap.val() === 'string' && urlSnap.val()){
+          return urlSnap.val();
+        }
+      }
+      return null;
+    }catch(e){ console.warn('V8 adapter error:', e); return null; }
+  }
+
+  // Expose adapter
+  window.DB = window.DB || {};
+  window.DB.getLessonVideoUrl = async function(classId, subjectId, topicId){
+    // try v9 then v8
+    var url = await readWithV9();
+    if (url) return url;
+    url = await readWithV8();
+    return url;
+  };
+
+  // Try to detect Firebase v9 Database from existing scripts (if imported as module elsewhere)
+  // Allow external code to set these globals:
+  //   window.firebaseV9DatabaseLoaded = getDatabase()
+  //   window.firebaseV9DatabaseAPI = { get, ref }
+})();
+</script>
+<script>
+// === Nova: Ders Videosu Akışı ===
+(function(){
+  const byId = (id)=>document.getElementById(id);
+  const screenSinglePlayer = byId('single-player-game-screen') || byId('single-player-screen');
+  const scoreContainer = byId('score-container');
+  const videoScreen = byId('lesson-video-screen');
+  const videoIframe = byId('lesson-video-iframe');
+  const btnOpen = byId('lesson-video-button');
+  const btnBack = byId('lesson-video-back');
+
+  // Persist the selected class/subject/topic at game start (non-invasive, additive)
+  const startBtn = byId('start-game-button');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      try {
+        const cls = byId('class-select'); const sub = byId('subject-select'); const top = byId('topic-select');
+        window.__novaSelection__ = {
+          classId: cls && cls.value || '',
+          subjectId: sub && sub.value || '',
+          topicId: top && top.value || '',
+          classText: cls && cls.options && cls.selectedIndex >= 0 ? cls.options[cls.selectedIndex].textContent.trim() : '',
+          subjectText: sub && sub.options && sub.selectedIndex >= 0 ? sub.options[sub.selectedIndex].textContent.trim() : '',
+          topicText: top && top.options && top.selectedIndex >= 0 ? top.options[top.selectedIndex].textContent.trim() : ''
+        };
+      } catch(e){ /* noop */ }
+    }, { passive: true });
+  }
+
+  // Demo resolver — replace with DB integration later
+  async function resolveLessonVideoUrl() {
+    // 1) If an external DB adapter exists, prefer it
+    if (window.DB && typeof window.DB.getLessonVideoUrl === 'function') {
+      try {
+        const s = window.__novaSelection__ || {};
+        const url = await window.DB.getLessonVideoUrl(s.classId, s.subjectId, s.topicId);
+        if (url) return url;
+      } catch(e){ console.warn('DB.getLessonVideoUrl error:', e); }
+    }
+    // 2) Optional: look for a data attribute on topic-select option (e.g., data-video)
+    try {
+      const top = byId('topic-select');
+      if (top && top.selectedIndex >= 0) {
+        const opt = top.options[top.selectedIndex];
+        const dataUrl = opt ? (opt.getAttribute('data-video') || opt.dataset.video) : '';
+        if (dataUrl) return dataUrl;
+      }
+    } catch(e){ /* ignore */ }
+
+    // 3) Demo static mapping (placeholder). Update/remove when DB is ready.
+    const s = window.__novaSelection__ || {};
+    const key = [s.classText, s.subjectText, s.topicText].map(v => (v||'').trim()).join(' | ');
+    const DEMO = {
+      "3. Sınıf | Matematik | Kesirler": "https://www.youtube.com/embed/AF8sDRXk2eY",
+      "3. Sınıf | Türkçe | Noktalama İşaretleri": "https://www.youtube.com/embed/0B6l8yJqVnA"
+    };
+    return DEMO[key] || null;
+  }
+
+  function showOnly(el){
+    // Hide main containers we might be in
+    const ids = [
+      'single-player-screen','single-player-game-screen',
+      'duel-selection-screen','duel-game-screen','rankingPanel'
+    ];
+    ids.forEach(i => { const e = byId(i); if (e) e.style.display = 'none'; });
+    if (el) el.style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeVideoScreen(){
+    // Return user back to the results (score) screen if available, else main single-player screen
+    if (videoIframe) videoIframe.src = '';
+    if (scoreContainer && screenSinglePlayer) {
+      // Show results container within the single player game screen
+      const sp = byId('single-player-game-screen');
+      if (sp) sp.style.display = 'flex';
+      if (scoreContainer) scoreContainer.style.display = 'flex';
+    } else {
+      const spScreen = byId('single-player-screen');
+      if (spScreen) spScreen.style.display = 'flex';
+    }
+    if (videoScreen) videoScreen.style.display = 'none';
+  }
+
+  async function openVideo(){
+    try{
+      const url = await resolveLessonVideoUrl();
+      const sel = window.__novaSelection__ || {};
+      const crumb = byId('lesson-video-breadcrumb');
+      const title = byId('lesson-video-title');
+      if (crumb) {
+        const parts = [sel.classText, sel.subjectText, sel.topicText].filter(Boolean);
+        crumb.textContent = parts.length ? parts.join(' • ') : 'Ders & Konu';
+      }
+      if (title) title.textContent = 'Ders Videosu';
+      if (!url){
+        if (typeof window.showAlert === 'function') {
+          window.showAlert('Bu ders için video URL’si henüz tanımlı değil. Veritabanına eklendiğinde buradan izlenebilecek.');
+        } else {
+          alert('Bu ders için video URL’si henüz tanımlı değil. Veritabanına eklendiğinde buradan izlenebilecek.');
+        }
+        return;
+      }
+      // Ensure it is an embeddable YouTube URL
+      let embedUrl = url.trim();
+      if (embedUrl.includes('watch?v=')) {
+        embedUrl = embedUrl.replace('watch?v=', 'embed/');
+      }
+      // Basic safety: only allow youtube/embed for now
+      const ok = /^https:\/\/www\.youtube\.com\/embed\//.test(embedUrl) || /^https:\/\/youtube\.com\/embed\//.test(embedUrl);
+      if (!ok){
+        // attempt to coerce youtu.be
+        if (embedUrl.includes('youtu.be/')) {
+          const vid = embedUrl.split('youtu.be/')[1].split(/[?&#]/)[0];
+          embedUrl = 'https://www.youtube.com/embed/' + vid;
+        }
+      }
+      if (videoIframe) videoIframe.src = embedUrl;
+      showOnly(videoScreen);
+    }catch(err){
+      console.error(err);
+      if (typeof window.showAlert === 'function') window.showAlert('Video yüklenirken bir hata oluştu.');
+      else alert('Video yüklenirken bir hata oluştu.');
+    }
+  }
+
+  if (btnOpen) btnOpen.addEventListener('click', openVideo);
+  if (btnBack) btnBack.addEventListener('click', closeVideoScreen);
+
+  // Expose minimal API for future DB wiring
+  window.NovaLessonVideo = {
+    open: openVideo,
+    close: closeVideoScreen,
+    setUrl: (url)=>{ if (videoIframe) videoIframe.src = url; }
+  };
+})();
+// === End Nova ===
+</script>
+
 </body>
 </html>
