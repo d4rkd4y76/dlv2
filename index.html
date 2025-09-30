@@ -11,6 +11,86 @@
 
 /* === Nova: Explanation Highlight (Single Player) === */
 .explanation-container{margin-top:14px;display:none;}
+
+/** Mağaza kategori butonlarını DB'deki adlarla render eder. */
+
+function renderStoreCategoryButtons() {
+  const area = document.querySelector('.profile-categories');
+  if (!area) return;
+  area.style.display = 'flex';
+  area.innerHTML = '';
+
+  // Tüm mevcut anahtarları çıkar
+  const keys = [];
+  try {
+    for (const k of Object.keys(photoCategories || {})) { keys.push(k); }
+  } catch(_){}
+
+  // Hiç yoksa yine de bilinen varsayılanları öner
+  if (!keys.length) keys.push('acemi','cesur','sampiyon');
+
+  // Tekrarsızlaştır
+  const seen = new Set(); const finalKeys = [];
+  keys.forEach(k => { if (k && !seen.has(k)) { seen.add(k); finalKeys.push(k); } });
+
+  finalKeys.forEach((k, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'category-button' + (i===0 ? ' active' : '');
+    btn.dataset.category = k;
+    btn.textContent = k;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const duelStore = document.getElementById('duelCreditsStore');
+      const photosContainer = document.getElementById('profilePhotosContainer');
+      if (duelStore && photosContainer) {
+        if (k === 'duel') { duelStore.style.display='block'; photosContainer.style.display='none'; }
+        else { duelStore.style.display='none'; photosContainer.style.display='grid'; }
+      }
+      loadProfilePhotos(k);
+    });
+    area.appendChild(btn);
+  });
+}
+);
+    // Ekstra bilinmeyen anahtarlar için:
+    try {
+      const allKeys = Object.keys({acemi:photoCategories.acemi, cesur:photoCategories.cesur, sampiyon:photoCategories.sampiyon}).filter(Boolean);
+      allKeys.forEach(k => set.add(k));
+    } catch(_) {}
+    cats.push(...Array.from(set));
+  }
+
+  // Butonları oluştur
+  cats.forEach((k, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'category-button' + (i===0 ? ' active' : '');
+    btn.dataset.category = k;
+    // Görünen isim DB anahtarı olsun (ör: 'acemi', 'cesur'...), istersen burada displayName eşlemesi yapabiliriz
+    btn.textContent = k;
+    area.appendChild(btn);
+  });
+
+  // Event binding
+  document.querySelectorAll('.category-button').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+
+      const duelStore = document.getElementById('duelCreditsStore');
+      const photosContainer = document.getElementById('profilePhotosContainer');
+
+      if (button.dataset.category === 'duel') {
+        duelStore.style.display = 'block';
+        photosContainer.style.display = 'none';
+      } else {
+        duelStore.style.display = 'none';
+        photosContainer.style.display = 'grid';
+        loadProfilePhotos(button.dataset.category);
+      }
+    });
+  });
+}
 .explanation-card{
   background:#ecfdf5;             /* açık yeşil */
   border:3px solid #166534;       /* koyu yeşil çerçeve */
@@ -5021,9 +5101,7 @@ html, body {
 </div>
 
 <div class="profile-categories">
-<button class="category-button active" data-category="acemi">Klasik Nişanlar</button>
-<button class="category-button" data-category="cesur">⭐Koleksiyoner Nişanlar⭐</button>
-<button class="category-button" data-category="sampiyon">👑Şampiyon👑</button>
+<!-- Buttons will be rendered from DB by renderStoreCategoryButtons() -->
 </div>
 <!-- Düello Hakları Mağazası -->
 <div class="duel-credits-store" id="duelCreditsStore" style="display: none;">
@@ -9390,306 +9468,36 @@ function getFromCache(key) {
 
 
 // Main photo categories with added cache handling
-const photoCategories = {
-   acemi: [
-       {
-           url: 'https://cdn.pixabay.com/photo/2013/07/13/13/14/tiger-160601_1280.png',
-           price: 50,
-           id: 'photo1'
-       },
-       {
-           url: 'https://cdn.pixabay.com/photo/2016/05/12/23/03/lamb-1388937_1280.png', 
-           price: 50,
-           id: 'photo2'
-       },
-       {
-           url: 'https://cdn.pixabay.com/photo/2016/08/16/16/39/elephant-1598359_1280.png',
-           price: 50,
-           id: 'photo3'
-       },
-       {
-           url: 'https://cdn.pixabay.com/photo/2012/04/12/22/04/goldfish-30837_1280.png',
-           price: 50,
-           id: 'photo103'
-       },
-       {
-           url: 'https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_400/ncom/software/switch/70010000062008/desc/bf8a722d69cb3e3816b77626537d9e1a97b197e75cbbbdb04275d826dd8a03cb',
-           price: 50,
-           id: 'photo104'
-       },
-       {
-           url: 'https://assets.vogue.com/photos/58920113186d7c1b6493ce40/master/pass/frozen-elsa-lesbian-girlfirend.jpg',
-           price: 50,
-           id: 'photo105'
-       }
-   ],
-   cesur: [
-       {
-           url: 'https://media.tenor.com/H_O_BxpiM0UAAAAj/besiktas-logo.gif',
-           price: 500,
-           id: 'photo4'
-       },
-       {
-           url: 'https://media.tenor.com/Uoxot7sqtkkAAAAM/galatasaray-galatasaray-sk.gif',
-           price: 500,
-           id: 'photo5'
-       },
-       {
-           url: 'https://steamuserimages-a.akamaihd.net/ugc/915786698278004854/E1D44978A7692A298883D6589A5098B1D55882C0/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false',
-           price: 500,
-           id: 'photo209'
-       },
-       {
-           url: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjnIZebXnwkdRDTpUVoXbixRIbNfpAdDShMdCkYD9K-LDbcRvliD3j4TkBhi5zQhdZwDYPqkTDXPEuar3CSb_JmvlYI6kmECzzl_DFEqMBrwuz2PtHRbvTwNVG8wcR0Ou6a9aR6sdci77E/s0/Trabzonspor_flag.gif',
-           price: 500,
-           id: 'photo532'
-       },
-       {
-           url: 'https://www.gifservice.fr/img/gif-vignette-small/5573dd323936c9b8dfaf3b5641f181bc/192330-sports-soccer-club-asia-logo-turkey-bb-erzurumspor.gif',
-           price: 500,
-           id: 'photo2315'
-       },
-       {
-           url: 'https://giffiles.alphacoders.com/988/98813.gif',
-           price: 500,
-           id: 'photo204'
-       },
-       {
-           url: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExc250NzEycWR6bXR3YWFkZDExa2cxbzd4OWN3bGxmbTJ1Nmt2cWQ2dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OPYTbaVn5wTEJmfFCp/giphy.gif',
-           price: 500,
-           id: 'photo205'
-       },
-       {
-           url: 'https://img1.picmix.com/output/stamp/normal/3/8/7/0/1750783_abb57.gif',
-           price: 500,
-           id: 'photo206'
-       },
-       {
-           url: 'https://i.pinimg.com/originals/1d/b8/f3/1db8f34ba95f890d60bf529436045039.gif',
-           price: 500,
-           id: 'photo207'
-       },
-       {
-           url: 'https://i.gifer.com/BAL5.gif',
-           price: 500,
-           id: 'photo208'
-       },
-       {
-           url: 'https://www.icegif.com/wp-content/uploads/2024/04/roblox-icegif.gif',
-           price: 500,
-           id: 'photo7'
-       },
-       {
-           url: 'https://www.icegif.com/wp-content/uploads/2024/09/brawl-stars-icegif-11.gif',
-           price: 500,
-           id: 'photo8'
-       },
-       {
-           url: 'https://i.ibb.co/542sFk3/r123-1.gif',
-           price: 500,
-           id: 'photo9'
-       },
-       {
-           url: 'https://i.ibb.co/S5yRj84/muslera-1.gif',
-           price: 600,
-           id: 'photo10'
-       },
-       {
-           url: 'https://i.pinimg.com/originals/73/04/11/7304113990f00f2db06a8c2dc3889516.gif',
-           price: 500,
-           id: 'photo10'
-       },
-       {
-           url: 'https://media.tenor.com/BMo5P2ZyWB0AAAAM/tweety-bird-cute.gif',
-           price: 500,
-           id: 'photo10'
-       },
-       {
-           url: 'https://img1.picmix.com/output/stamp/normal/2/3/3/9/1199332_5ed59.gif',
-           price: 500,
-           id: 'photo1612'
-       }
+let photoCategories = { acemi: [], cesur: [], sampiyon: [] };
 
-   ],
-   lider: [
-       {
-           url: 'https://www.icegif.com/wp-content/uploads/2024/04/roblox-icegif.gif',
-           price: 500,
-           id: 'photo7'
-       },
-       {
-           url: 'https://www.icegif.com/wp-content/uploads/2024/09/brawl-stars-icegif-11.gif',
-           price: 500,
-           id: 'photo8'
-       },
-       {
-           url: 'https://i.ibb.co/542sFk3/r123-1.gif',
-           price: 500,
-           id: 'photo9'
-       },
-       {
-           url: 'https://i.ibb.co/S5yRj84/muslera-1.gif',
-           price: 600,
-           id: 'photo10'
-       },
-       {
-           url: 'https://cdn.pixabay.com/animation/2024/04/27/19/29/19-29-06-468_512.gif',
-           price: 2000,
-           id: 'photo11'
-       }
-   ],
-   sampiyon: []
-};
-
-
-async function loadChampionPhotos() {
-   try {
-       // Firebase'den şampiyon fotoğraflarını çek
-       const championPhotoRef = database.ref(
-           `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/championPhoto`
-       );
-       const snapshot = await championPhotoRef.once('value');
-       const championPhoto = snapshot.val();
-
-       // Şampiyon butonunu seç
-       const championButton = document.querySelector('[data-category="sampiyon"]');
-       
-       if (championPhoto) {
-           // Butonu göster
-           championButton.style.display = 'block';
-           
-           // Fotoğrafları yapılandır
-           const photos = Array.isArray(championPhoto) 
-               ? championPhoto.map((url, index) => ({
-                   url: url,
-                   price: 5,
-                   id: 'championSpecial' + index
-               }))
-               : [{
-                   url: championPhoto,
-                   price: 5,
-                   id: 'championSpecial'
-               }];
-
-           // photoCategories'e ekle
-           photoCategories.sampiyon = photos;
-           
-           // Cache'e kaydet
-           const userCacheKey = `${CACHE_KEYS.CHAMPION}_${selectedStudent.studentId}`;
-           localStorage.setItem(userCacheKey, JSON.stringify(photos));
-       } else {
-           // Şampiyon fotoğrafı yoksa butonu gizle
-           championButton.style.display = 'none';
-           photoCategories.sampiyon = [];
-           
-           const userCacheKey = `${CACHE_KEYS.CHAMPION}_${selectedStudent.studentId}`;
-           localStorage.setItem(userCacheKey, '[]');
-       }
-   } catch (error) {
-       console.error('Champion photo load error:', error);
-       const championButton = document.querySelector('[data-category="sampiyon"]');
-       championButton.style.display = 'none';
-   }
+/**
+ * Mağaza kategorilerini Firebase Realtime Database üzerinden çeker.
+ * Path: store/profilePhotos/{acemi|cesur|sampiyon}/{photoId} -> { url, price, name?, allowedStudents? }
+ * Not: championsphoto kısmı ve diğer mağaza işlevleri olduğu gibi korunmuştur.
+ */
+async function fetchStoreCategoriesFromDB() {
+  try {
+    const snap = await database.ref('store/profilePhotos').once('value');
+    const data = snap.val() || {};
+    const norm = (cat) => {
+      const o = cat || {};
+      return Object.keys(o).map(id => ({
+        id,
+        url: o[id].url,
+        price: o[id].price,
+        name: o[id].name || id,
+        allowedStudents: o[id].allowedStudents || null
+      }));
+    };
+    photoCategories.acemi = norm(data.acemi);
+    photoCategories.cesur = norm(data.cesur);
+    photoCategories.sampiyon = norm(data.sampiyon);
+    try{ renderStoreCategoryButtons(); }catch(e){}
+renderStoreCategoryButtons();
+  } catch (e) {
+    console.error('Store categories fetch error:', e);
+  }
 }
-
-function updateChampionButton(show) {
-    const championButton = document.querySelector('[data-category="sampiyon"]');
-    if (championButton) {
-        championButton.style.display = show ? 'flex' : 'none';
-    }
-}
-
-function updateProfileIcon() {
-    const profileIcon = document.getElementById('profile-icon');
-    if (!selectedStudent?.studentId) return;
-
-    const cached = getFromCache('currentUserPhoto');
-    if (cached) {
-        profileIcon.src = cached;
-    }
-
-    database
-        .ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/photo`)
-        .once('value')
-        .then(snapshot => {
-            if (snapshot.exists()) {
-                const photoUrl = snapshot.val();
-                profileIcon.src = photoUrl;
-                saveToCache('currentUserPhoto', photoUrl);
-            }
-        });
-}
-
-document.getElementById('profile-icon').addEventListener('click', async () => {
-    document.getElementById('profileChangeOverlay').style.display = 'flex';
-    await loadChampionPhotos();
-    loadProfilePhotos('acemi');
-});
-
-document.querySelectorAll('.category-button').forEach(button => {
-    button.addEventListener('click', () => {
-        // Tüm butonları soluklaştır
-        document.querySelectorAll('.category-button').forEach(b => {
-            b.classList.remove('active');
-            b.style.opacity = '0.7';
-        });
-        
-        // Tıklanan butonu aktifleştir
-        button.classList.add('active');
-        button.style.opacity = '1';
-        
-        loadProfilePhotos(button.dataset.category);
-    });
-});
-
-async function buyProfilePhoto(photo) {
-    // Satın almaya başlamadan önce onay sorusu ekliyoruz
-    const confirmed = await showConfirmation("Bu profil fotoğrafını satın almak istediğinizden emin misiniz?");
-    if (!confirmed) return;
-    
-    try {
-        const studentRef = database.ref(
-            `classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`
-        );
-        const diamondSnapshot = await studentRef.child('diamond').once('value');
-        const currentDiamonds = diamondSnapshot.val() || 0;
-
-        if (currentDiamonds >= photo.price) {
-            const updates = {
-                diamond: currentDiamonds - photo.price,
-                [`purchasedPhotos/${btoa(photo.url)}`]: {
-                    url: photo.url,
-                    purchaseDate: Date.now()
-                }
-            };
-
-            await studentRef.update(updates);
-            // Elmas miktarını hemen güncelle
-            document.getElementById('diamond-value').textContent = currentDiamonds - photo.price;
-            
-            // Cache güncellemesi
-            const purchasedPhotos = getFromCache(CACHE_KEYS.PURCHASED) || {};
-            purchasedPhotos[btoa(photo.url)] = {
-                url: photo.url,
-                purchaseDate: Date.now()
-            };
-            saveToCache(CACHE_KEYS.PURCHASED, purchasedPhotos);
-            
-            await showAlert('✨ Profil fotoğrafı başarıyla satın alındı!');
-            
-            // Mağaza ekranı yeniden yükleniyor; böylece ilgili fotoğrafın kartı "Satın Al" yerine "Kullan" butonu gösterecek
-            const activeCategory = document.querySelector('.category-button.active').dataset.category;
-            loadProfilePhotos(activeCategory);
-        } else {
-            await showAlert('💎 Yeterli elmasınız yok!');
-        }
-    } catch (error) {
-        console.error('Satın alma hatası:', error);
-        await showAlert('❌ Satın alma işlemi başarısız oldu: ' + error.message);
-    }
-}
-
-
 async function useProfilePhoto(photoUrl) {
     try {
         await database
@@ -9710,7 +9518,20 @@ async function useProfilePhoto(photoUrl) {
 }
 
 async function loadProfilePhotos(category = 'acemi') {
-   const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+  if (!window.selectedStudent) {
+    // localStorage fallback
+    try { window.selectedStudent = JSON.parse(localStorage.getItem('selectedStudent') || 'null'); } catch(_) {}
+  }
+  if (!window.selectedStudent || !window.selectedStudent.classId || !window.selectedStudent.studentId) {
+    const c = document.getElementById('profilePhotosContainer');
+    if (c) c.innerHTML = '<div class="error">Öğrenci seçimi bulunamadı. Lütfen giriş yapın.</div>';
+    return;
+  }
+
+  // Kategori verileri boşsa DB'den çek
+  if ((!photoCategories.acemi.length && !photoCategories.cesur.length && !photoCategories.sampiyon.length)) {
+    await fetchStoreCategoriesFromDB(); try{ renderStoreCategoryButtons(); }catch(e){} }
+const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
    const studentSnapshot = await studentRef.once('value');
    const userData = studentSnapshot.val();
    
@@ -9766,7 +9587,11 @@ async function loadProfilePhotos(category = 'acemi') {
            return;
        }
 
-       photoCategories[category].forEach((photo, index) => {
+       // Kişiye özel görünürlük filtresi
+       const visKey = `${selectedStudent.classId}:${selectedStudent.studentId}`;
+       photoCategories[category]
+         .filter(p => !p.allowedStudents || p.allowedStudents[visKey])
+         .forEach((photo, index) => {
            createPhotoCard(photo, purchasedPhotos, category, container, index);
        });
    } catch (error) {
@@ -9784,7 +9609,7 @@ function createPhotoCard(photo, purchasedPhotos, category, container, index) {
     const isPurchased = purchasedPhotos[encodedUrl];
 
     div.innerHTML = `
-        <img src="${photo.url}" class="profile-photo" alt="Avatar">
+        <img src="${photo.url}" class="profile-photo" alt="${photo.name || 'Avatar'}" onerror="this.style.opacity=0.3">
         <div class="profile-photo-price">
             ${isPurchased 
                 ? '<span class="purchased-badge">✓ Satın Alındı</span>'
@@ -9801,7 +9626,52 @@ function createPhotoCard(photo, purchasedPhotos, category, container, index) {
         ? useProfilePhoto(photo.url) 
         : buyProfilePhoto(photo);
 
+    
     container.appendChild(div);
+}
+
+/**
+ * Satın alma akışı – DB'den kullanıcıyı okur, elması yeterliyse düşer ve purchasedPhotos'a işaretler.
+ */
+async function buyProfilePhoto(photo){
+  try {
+    const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+    const snapshot = await studentRef.once('value');
+    const userData = snapshot.val() || {};
+    const currentDiamonds = userData.diamond || 0;
+    const cost = Number(photo.price) || 0;
+    if (currentDiamonds < cost){
+      await showAlert('Yeterli elmasınız yok!');
+      return;
+    }
+    // Onay
+    const ok = await showConfirmation(`${cost} 💎 karşılığında bu görseli satın almak istediğinize emin misiniz?`);
+    if(!ok) return;
+
+    // purchasedPhotos anahtarını URL üzerinden btoa ile tutuyoruz (mevcut sistemle uyumlu)
+    const encodedUrl = btoa(photo.url);
+    const purchasedRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}/purchasedPhotos/${encodedUrl}`);
+
+    // Bakiyeden düş ve satın alındı olarak işaretle
+    await studentRef.update({ diamond: currentDiamonds - cost });
+    await purchasedRef.set(true);
+
+    // Cache güncelle
+    const purchasedCache = getFromCache(CACHE_KEYS.PURCHASED) || {};
+    purchasedCache[encodedUrl] = true;
+    saveToCache(CACHE_KEYS.PURCHASED, purchasedCache);
+
+    document.getElementById('currentDiamonds').textContent = currentDiamonds - cost;
+    await showAlert('✅ Satın alındı! Artık bu resmi kullanabilirsiniz.');
+
+    // Bulunduğumuz kategori butonu aktifse yeniden yükleyelim
+    const activeBtn = document.querySelector('.category-button.active');
+    const cat = activeBtn ? activeBtn.dataset.category : 'acemi';
+    await loadProfilePhotos(cat);
+  } catch(e){
+    console.error('Satın alma hatası:', e);
+    await showAlert('❌ Satın alma sırasında bir hata oluştu.');
+  }
 }
 
 document.getElementById('profileCloseButton').addEventListener('click', () => {
@@ -9815,6 +9685,112 @@ document.getElementById('profileCloseButton').addEventListener('click', () => {
 
 
 
+
+
+// === NOVA: Mağaza açılış yardımcıları ===
+async function novaOpenStore() {
+  const overlay = document.getElementById('profileChangeOverlay');
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  try { await novaOpenStoreFlow(); } catch(e) { console.error('Store init error', e); }
+  try { renderStoreCategoryButtons(); } catch(e) {}
+  try { loadProfilePhotos('acemi'); } catch(e) { console.warn('loadProfilePhotos yok:', e); } // flex: ortalama aktif
+  try { loadProfilePhotos('acemi'); } catch(e) { console.warn('loadProfilePhotos çağrısı bulunamadı:', e); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) Doğrudan profil küçük görseli varsa ona tıklandığında aç
+  const pi = document.getElementById('profile-icon');
+  if (pi) {
+    pi.style.cursor = 'pointer';
+    pi.addEventListener('click', novaOpenStore);
+  }
+
+  // 2) Eğer sağ üst mağaza ikonunun spesifik ID'si yoksa,
+  //    görünmez bir butonla aynı bölgeyi "tıklanır" hâle getir (UI'ye dokunmadan).
+  const ms = document.getElementById('main-screen');
+  if (ms) {
+    const btn = document.createElement('button');
+    btn.setAttribute('aria-label', 'Mağaza');
+    btn.style.position = 'absolute';
+    btn.style.top = '12px';
+    btn.style.right = '12px';
+    btn.style.width = '56px';
+    btn.style.height = '56px';
+    btn.style.borderRadius = '50%';
+    btn.style.background = 'transparent';
+    btn.style.border = 'none';
+    btn.style.cursor = 'pointer';
+    btn.style.zIndex = '1000';
+    btn.addEventListener('click', novaOpenStore);
+    ms.appendChild(btn);
+  }
+});
+// === /NOVA ===
+
+
+// === NOVA FIX: Dynamic store categories ===
+let NOVA_STORE_KEYS = [];
+
+/** Fetch categories and normalize as {cat: [items...]} plus keys array. */
+async function novaFetchStoreCategories() {
+  const snap = await database.ref('store/profilePhotos').once('value');
+  const data = snap.val() || {};
+  const norm = (catObj) => {
+    const o = catObj || {};
+    return Object.keys(o).map(id => ({
+      id,
+      url: o[id].url,
+      price: o[id].price,
+      name: o[id].name || id,
+      allowedStudents: o[id].allowedStudents || null
+    }));
+  };
+
+  // Build keys directly from DB to respect custom names
+  NOVA_STORE_KEYS = Object.keys(data);
+  // Fill photoCategories map used by existing rendering
+  photoCategories = {};
+  NOVA_STORE_KEYS.forEach(k => { photoCategories[k] = norm(data[k]); });
+}
+
+/** Render category buttons using NOVA_STORE_KEYS. */
+function novaRenderCategoryButtons() {
+  const holder = document.querySelector('.profile-categories');
+  if (!holder) return;
+  holder.innerHTML = '';
+  holder.style.display = 'flex';
+
+  if (!NOVA_STORE_KEYS.length) {
+    // fallback visible info
+    const span = document.createElement('span');
+    span.textContent = 'Kategori bulunamadı';
+    holder.appendChild(span);
+    return;
+  }
+
+  NOVA_STORE_KEYS.forEach((k, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'category-button' + (idx === 0 ? ' active' : '');
+    btn.dataset.category = k;
+    btn.textContent = k; // show exact DB key
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadProfilePhotos(k);
+    });
+    holder.appendChild(btn);
+  });
+}
+
+/** Open store flow: fetch -> buttons -> first category list. */
+async function novaOpenStoreFlow() {
+  await novaFetchStoreCategories();
+  novaRenderCategoryButtons();
+  const first = NOVA_STORE_KEYS[0] || 'acemi';
+  await loadProfilePhotos(first);
+}
+// === /NOVA FIX ===
 
 // Kayıt sistemi için gerekli DOM elementleri
 const registerButton = document.getElementById('register-button');
