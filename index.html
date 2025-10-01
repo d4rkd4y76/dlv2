@@ -484,7 +484,7 @@ select {
 .player-photo {
     width: 50px;
     height: 50px;
-    border-radius: 50%;
+    border-radius: 12px;
     object-fit: cover;
     border: 2px solid #ff8a00;
 }
@@ -530,7 +530,7 @@ select {
 .friend-photo {
     width: 50px;
     height: 50px;
-    border-radius: 50%;
+    border-radius: 12px;
     object-fit: cover;
 }
 
@@ -691,7 +691,7 @@ option {
         .student-photo {
             width: 160px;
             height: 160px;
-            border-radius: 50%;
+            border-radius: 12px;
             object-fit: cover;
             border: 4px solid #ff8a00;
             margin-bottom: 20px;
@@ -1575,7 +1575,7 @@ option {
 .duel-player-photo {
     width: 80px; /* Resim genişliği */
     height: 80px; /* Resim yüksekliği */
-    border-radius: 50%; /* Yuvarlak resim */
+    border-radius: 12px; /* Yuvarlak resim */
     object-fit: cover; /* Resmi çerçeveye sığdır */
     border: 3px solid #ff8a00; /* Çerçeve rengi */
     margin-bottom: 5px; /* Resim ile isim arasındaki boşluk */
@@ -1678,7 +1678,7 @@ option {
         .duel-player-score img {
             width: 70px;
             height: 70px;
-            border-radius: 50%;
+            border-radius: 12px;
             border: 3px solid #ff8a00;
             object-fit: cover;
             margin-bottom: 10px;
@@ -1853,7 +1853,7 @@ option {
         .players-list img {
             width:50px;
             height:50px;
-            border-radius:50%;
+            border-radius: 12px;
             object-fit:cover;
             border:3px solid #ff8a00;
         }
@@ -2148,7 +2148,7 @@ option {
         .ranking-player-photo {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
+            border-radius: 12px;
             object-fit: cover;
             border: 3px solid #ff8a00;
             transition: transform 0.3s;
@@ -2339,7 +2339,7 @@ option {
     height: 100px;
     border: 5px solid #f3f3f3;
     border-top: 5px solid #ff4e50;
-    border-radius: 50%;
+    border-radius: 12px;
     animation: spin 1s linear infinite;
 }
 
@@ -2404,7 +2404,7 @@ option {
     height: 80px;
     border: 5px solid #f3f3f3;
     border-top: 5px solid #ff4e50;
-    border-radius: 50%;
+    border-radius: 12px;
     margin: 20px auto;
     animation: spin 1s linear infinite;
 }
@@ -2673,7 +2673,7 @@ option {
 .profile-icon {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
+    border-radius: 12px;
     object-fit: cover;
     border: 2px solid #ff8a00;
     box-shadow: none; /* Gölgeyi kaldırıyoruz */
@@ -2769,7 +2769,7 @@ option {
 .profile-photo {
    width: 120px;  
    height: 120px;
-   border-radius: 50%;
+   border-radius: 12px;
    object-fit: cover;
    display: block; /* Block görünüme al */
    margin: 0 auto; /* Yatayda otomatik margin ile ortalar */
@@ -3967,7 +3967,7 @@ animation: floatButton 1s ease infinite;
 .duel-player-photo {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
+  border-radius: 12px;
   object-fit: cover;
   border: 3px solid #ffeb3b;
   transition: transform 0.4s ease;
@@ -4145,7 +4145,7 @@ animation: floatButton 1s ease infinite;
     content: ''; position:absolute; top:-6px; left:50%; width:6px; height:10px; transform:translateX(-50%);
     background: radial-gradient(circle at 50% 100%, rgba(255,140,0,.9), rgba(255,69,0,.6) 60%, rgba(255,0,0,0) 70%);
     filter: blur(1px);
-    border-radius: 50% 50% 40% 40%;
+    border-radius: 12px 50% 40% 40%;
     opacity:.8;
 }
 @keyframes starPulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.12);} }
@@ -4708,6 +4708,40 @@ html, body {
   .lesson-video-screen{padding:18px}
 }
 /* === End Nova === */
+</style>
+
+
+<style id="nova-profile-frame-override">
+/* === Nova Override: 440x550 oranlı dikdörtgen (köşeleri yuvarlatılmış) çerçeve === */
+/* Tüm görseller aynı oran ve stil: */
+.student-photo,
+.player-photo,
+.friend-photo,
+.duel-player-photo,
+.duel-player-score img,
+.ranking-player-photo,
+.players-list img {
+  border-radius: 12px !important;
+  object-fit: cover !important;
+  display: block;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Orana göre her ekrandaki boyutlar (genişlik sabit, yükseklik = genişlik * 1.25) */
+.student-photo { width: 160px !important; height: 200px !important; }          /* 160 * 1.25 = 200 */
+.player-photo { width: 50px !important; height: 62px !important; }
+.friend-photo { width: 50px !important; height: 62px !important; }
+.players-list img { width: 50px !important; height: 62px !important; }
+.duel-player-photo { width: 80px !important; height: 100px !important; }
+.duel-player-score img { width: 70px !important; height: 88px !important; }
+.ranking-player-photo { width: 60px !important; height: 75px !important; }
+
+/* İsteğe bağlı: ana/duel/ranking kutuları içinde taşmayı gizle */
+.duel-player-score,
+.players-list li {
+  overflow: hidden;
+}
 </style>
 
 </head>
@@ -6198,7 +6232,7 @@ async function loadFriendsList() {
                 background-color: #dc3545;
                 color: white;
                 border: none;
-                border-radius: 50%;
+                border-radius: 12px;
                 width: 25px;
                 height: 25px;
                 line-height: 25px;
