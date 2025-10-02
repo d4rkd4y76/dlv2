@@ -4351,6 +4351,107 @@ html, body {
 }
 /* === /NOVA Sürpriz Kutu Stil === */
 
+
+/* === NOVA PATCH: Mağaza kategori rengi override (kızlarköşesi = pembe, TemelKarakterler = mavi) === */
+.profile-categories .category-button[data-category="TemelKarakterler"],
+.profile-categories .category-button[data-category="temelkarakterler"] {
+  background-image: linear-gradient(135deg, #2f80ed, #56ccf2);
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 8px 18px rgba(47,128,237,0.35), inset 0 0 0 1px rgba(255,255,255,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.profile-categories .category-button[data-category="TemelKarakterler"]::before,
+.profile-categories .category-button[data-category="temelkarakterler"]::before {
+  content: "";
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), transparent 45%);
+  animation: novaShine 2.4s linear infinite;
+  pointer-events: none;
+}
+.profile-categories .category-button[data-category="TemelKarakterler"]:hover,
+.profile-categories .category-button[data-category="temelkarakterler"]:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.profile-categories .category-button[data-category="TemelKarakterler"].active,
+.profile-categories .category-button[data-category="temelkarakterler"].active {
+  box-shadow: 0 10px 24px rgba(47,128,237,0.45);
+}
+
+/* Türkçe karakter olasılıklarının tamamı için geniş seçiciler */
+.profile-categories .category-button[data-category="KizlarKösesi"],
+.profile-categories .category-button[data-category="KizlarKöşesi"],
+.profile-categories .category-button[data-category="KızlarKösesi"],
+.profile-categories .category-button[data-category="KızlarKöşesi"],
+.profile-categories .category-button[data-category="KIZLARKÖŞESİ"],
+.profile-categories .category-button[data-category="kızlarköşesi"],
+.profile-categories .category-button[data-category="KizlarKosesi"],
+.profile-categories .category-button[data-category="KIZLARKOSESİ"],
+.profile-categories .category-button[data-category="kizlarkosesi"] {
+  background-image: linear-gradient(135deg, #ff4db8, #ff8bd7);
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 8px 18px rgba(255, 77, 184, 0.35), inset 0 0 0 1px rgba(255,255,255,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.profile-categories .category-button[data-category="KizlarKösesi"]::before,
+.profile-categories .category-button[data-category="KizlarKöşesi"]::before,
+.profile-categories .category-button[data-category="KızlarKösesi"]::before,
+.profile-categories .category-button[data-category="KızlarKöşesi"]::before,
+.profile-categories .category-button[data-category="KIZLARKÖŞESİ"]::before,
+.profile-categories .category-button[data-category="kızlarköşesi"]::before,
+.profile-categories .category-button[data-category="KizlarKosesi"]::before,
+.profile-categories .category-button[data-category="KIZLARKOSESİ"]::before,
+.profile-categories .category-button[data-category="kizlarkosesi"]::before {
+  content: "";
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), transparent 45%);
+  animation: novaShine 2.4s linear infinite;
+  pointer-events: none;
+}
+.profile-categories .category-button[data-category="KizlarKösesi"]:hover,
+.profile-categories .category-button[data-category="KizlarKöşesi"]:hover,
+.profile-categories .category-button[data-category="KızlarKösesi"]:hover,
+.profile-categories .category-button[data-category="KızlarKöşesi"]:hover,
+.profile-categories .category-button[data-category="KIZLARKÖŞESİ"]:hover,
+.profile-categories .category-button[data-category="kızlarköşesi"]:hover,
+.profile-categories .category-button[data-category="KizlarKosesi"]:hover,
+.profile-categories .category-button[data-category="KIZLARKOSESİ"]:hover,
+.profile-categories .category-button[data-category="kizlarkosesi"]:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.profile-categories .category-button[data-category="KizlarKösesi"].active,
+.profile-categories .category-button[data-category="KizlarKöşesi"].active,
+.profile-categories .category-button[data-category="KızlarKösesi"].active,
+.profile-categories .category-button[data-category="KızlarKöşesi"].active,
+.profile-categories .category-button[data-category="KIZLARKÖŞESİ"].active,
+.profile-categories .category-button[data-category="kızlarköşesi"].active,
+.profile-categories .category-button[data-category="KizlarKosesi"].active,
+.profile-categories .category-button[data-category="KIZLARKOSESİ"].active,
+.profile-categories .category-button[data-category="kizlarkosesi"].active {
+  box-shadow: 0 10px 24px rgba(255, 77, 184, 0.45);
+}
+
+/* Hafif parıltı animasyonu */
+@keyframes novaShine {
+  0%   { transform: translate(0,0) rotate(0deg); opacity: 0.9; }
+  50%  { transform: translate(15%,15%) rotate(45deg); opacity: 1; }
+  100% { transform: translate(30%,30%) rotate(90deg); opacity: 0.9; }
+}
+/* === NOVA PATCH SONU === */
+
 </style>
 
 <style>
@@ -11247,6 +11348,181 @@ function showExplanationAndNext(){
   }, 300);
 })();
 </script>
+
+
+<script>
+// === Nova Patch: Store Category Ordering & Colors ===
+(function() {
+  // Normalize Turkish variants and DB keys to display names we want
+  function normalize(name) {
+    if (!name) return "";
+    const n = (""+name).trim();
+    // Map common variants -> canonical labels
+    const map = {
+      "KizlarKösesi": "Kızlarköşesi",
+      "KizlarKosesi": "Kızlarköşesi",
+      "KızlarKösesi": "Kızlarköşesi",
+      "KIZLARKÖŞESİ": "Kızlarköşesi",
+      "KızlarKöşesi": "Kızlarköşesi",
+      "KIZLARKOŞESİ": "Kızlarköşesi",
+      "SüperLig": "Süperlig",
+      "SÜPERLİG": "Süperlig",
+      "SÜPERLİG": "Süperlig",
+      "Dünya Devleri": "DünyaDevleri",
+      "DÜNYADEVLERİ": "DünyaDevleri"
+    };
+    return map[n] || n;
+  }
+
+  const DESIRED_ORDER = ["TemelKarakterler","Kızlarköşesi","Süperlig","DünyaDevleri","EFSANE"];
+
+  // Keep a reference to existing function (if any)
+  const _oldRender = (typeof window.renderStoreCategoryButtons === "function") ? window.renderStoreCategoryButtons : null;
+
+  // Override with strict deterministic renderer
+  window.renderStoreCategoryButtons = function renderStoreCategoryButtons() {
+    const area = document.querySelector('.profile-categories');
+    if (!area) return;
+
+    // Determine available categories from global photoCategories if present, otherwise use a fallback set
+    let available = [];
+    try {
+      if (window.photoCategories && typeof window.photoCategories === 'object') {
+        available = Object.keys(window.photoCategories);
+      }
+    } catch (e) {}
+
+    if (!available.length) {
+      available = ["TemelKarakterler","Kızlarköşesi","Süperlig","DünyaDevleri","EFSANE"];
+    }
+
+    // Build a normalized lookup: normalizedName -> originalKey
+    const normToOrig = new Map();
+    available.forEach(k => {
+      const norm = normalize(k);
+      if (!normToOrig.has(norm)) normToOrig.set(norm, k);
+    });
+
+    // Compose the final ordered list:
+    // 1) take desired ones in the exact order if present
+    const final = [];
+    DESIRED_ORDER.forEach(label => {
+      if (normToOrig.has(label)) final.push({display: label, key: normToOrig.get(label)});
+    });
+
+    // 2) append any other categories except duplicates, with EFSANE guaranteed last
+    const used = new Set(final.map(x => x.key));
+    const extras = [];
+    normToOrig.forEach((orig, norm) => {
+      if (!used.has(orig) && DESIRED_ORDER.indexOf(norm) === -1) {
+        // keep extras for later (after EFSANE)
+        extras.push({display: norm, key: orig});
+      }
+    });
+
+    // If EFSANE was included earlier, ensure it's the last item by moving it to the end
+    const eIndex = final.findIndex(x => normalize(x.display) === "EFSANE");
+    if (eIndex > -1) {
+      const e = final.splice(eIndex,1)[0];
+      // push extras first, then efsane
+      // But the user's spec says EFSANE should appear last overall; keep extras before it.
+      final.push(...extras, e);
+    } else {
+      // No EFSANE among desired—append extras at end
+      final.push(...extras);
+    }
+
+    // Render buttons
+    area.style.display = 'flex';
+    area.innerHTML = '';
+
+    final.forEach((item, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'category-button' + (idx === 0 ? ' active' : '');
+      // Use display label for consistency, but keep original key for data-category-raw
+      btn.dataset.category = item.display;           // for styling via attribute
+      btn.dataset.categoryRaw = item.key;            // for loader
+      btn.textContent = item.display;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const duelStore = document.getElementById('duelCreditsStore');
+        const photosContainer = document.getElementById('profilePhotosContainer');
+        const target = btn.dataset.categoryRaw || btn.dataset.category;
+        if (duelStore && photosContainer) {
+          if (target === 'duel') {
+            duelStore.style.display='block'; 
+            photosContainer.style.display='none';
+          } else {
+            duelStore.style.display='none'; 
+            photosContainer.style.display='grid';
+          }
+        }
+        // call existing loader if present
+        if (typeof window.loadProfilePhotos === 'function') {
+          window.loadProfilePhotos(target);
+        }
+      });
+      area.appendChild(btn);
+    });
+  };
+
+  // Style hook: add a mutation after DOM ready to ensure colors apply even if app lazy-renders
+  document.addEventListener('DOMContentLoaded', function(){
+    try { window.renderStoreCategoryButtons(); } catch(e){ if (typeof _oldRender === 'function') try{ _oldRender(); }catch(_){} }
+  });
+})();
+</script>
+<style>
+/* === Nova Patch: Category Button Visuals === */
+.profile-categories {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 6px 2px;
+}
+.profile-categories::-webkit-scrollbar { height: 8px; }
+.profile-categories::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 8px; }
+
+.category-button {
+  background: #f3f4f6;
+  color: #111827;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .25s ease, background .2s ease, color .2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  white-space: nowrap;
+}
+.category-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+.category-button.active { outline: none; border-color: rgba(0,0,0,.15); transform: translateY(-1px) scale(1.02); }
+
+/* Kızlarköşesi -> pembe */
+.category-button[data-category="Kızlarköşesi"] {
+  background: #ff69b4;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0,0,0,.2);
+}
+
+/* Süperlig & varyasyonları ile DünyaDevleri -> futbol yeşili */
+.category-button[data-category="Süperlig"],
+.category-button[data-category="SüperLig"],
+.category-button[data-category="DünyaDevleri"] {
+  background: #228B22; /* forest green */
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0,0,0,.25);
+}
+
+/* EFSANE özel: hafif vurgu ama kullanıcı istemediği için animasyon eklemedik */
+.category-button[data-category="EFSANE"] {
+  background: linear-gradient(135deg, #111827, #374151);
+  color: #fff;
+}
+</style>
 
 </body>
 </html>
