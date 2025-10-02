@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Şampiyonlar Düellosu</title>
 <!-- Comfortaa Font -->
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&amp;display=swap" rel="stylesheet"/>
@@ -4451,6 +4451,75 @@ html, body {
   100% { transform: translate(30%,30%) rotate(90deg); opacity: 0.9; }
 }
 /* === NOVA PATCH SONU === */
+
+
+/* === Nova Responsive Patch v1 === */
+:root{
+  --q-max-w: min(95vw, 900px);
+  --q-min-h: min(60vh, 520px);
+  --qpad: clamp(10px, 2.2vw, 20px);
+  --q-font: clamp(16px, 2.2vw, 22px);
+  --opt-font: clamp(14px, 2vw, 20px);
+  --timer-font: clamp(16px, 2.5vw, 22px);
+}
+.single-player-game-container,
+.duel-game-container{
+  width: 100%;
+  max-width: 1200px;
+  padding: clamp(12px, 2.5vw, 30px);
+}
+.question-container{
+  width: 100%;
+  max-width: var(--q-max-w);
+  min-height: var(--q-min-h);
+  padding: var(--qpad);
+}
+.question-text{
+  font-size: var(--q-font);
+  line-height: 1.3;
+  padding: 6px 0;
+}
+.timer{ font-size: var(--timer-font); }
+.options-container{
+  width: 100%;
+  max-width: var(--q-max-w);
+  gap: clamp(8px, 2vw, 18px);
+}
+.option-button{
+  flex: 1 1 calc(50% - 12px);
+  min-width: clamp(140px, 40vw, 360px);
+  font-size: var(--opt-font);
+  padding: clamp(10px, 2vw, 16px) clamp(12px, 2.2vw, 18px);
+}
+@media (max-width: 640px){
+  .option-button{ flex: 1 1 100%; min-width: 0; }
+}
+.question-image{
+  max-width: 100%;
+  max-height: 50vh;
+  height: auto;
+  object-fit: contain;
+}
+/* Duel top info row width guard */
+.players-info-row{
+  width: 100%;
+  max-width: var(--q-max-w);
+}
+/* Make score/winner messages wrap safely on mobile */
+.winner-message,.score-message{
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+/* === End Nova Responsive Patch v1 === */
+
+
+/* Ensure game containers expand full width when visible */
+.single-player-game-container[style*="display: block"],
+.duel-game-container[style*="display: block"],
+.single-player-game-container.active,
+.duel-game-container.active{
+  display:flex !important;
+}
 
 </style>
 
@@ -11523,6 +11592,64 @@ function showExplanationAndNext(){
   color: #fff;
 }
 </style>
+
+
+<script>
+// === Nova Audio Guard v1 ===
+(function(){
+  try{
+    window.__novaAudios = window.__novaAudios || new Set();
+
+    const _Audio = window.Audio;
+    if (_Audio && !_Audio.__novaWrapped){
+      const NovaAudio = function(...args){
+        const inst = new _Audio(...args);
+        try { window.__novaAudios.add(inst); } catch(_){}
+        return inst;
+      };
+      NovaAudio.prototype = _Audio.prototype;
+      Object.setPrototypeOf(NovaAudio, _Audio);
+      window.Audio = NovaAudio;
+      window.Audio.__novaWrapped = true;
+    }
+
+    // Track <audio> elements too
+    function collectTagAudios(){
+      document.querySelectorAll('audio').forEach(a=>{ try{ window.__novaAudios.add(a); }catch(_){} });
+    }
+    collectTagAudios();
+    const obs = new MutationObserver(collectTagAudios);
+    obs.observe(document.documentElement, {subtree:true, childList:true});
+
+    window.stopAllGameAudio = function(){
+      collectTagAudios();
+      (window.__novaAudios ? Array.from(window.__novaAudios) : []).forEach(a=>{
+        try{ a.pause(); a.currentTime = 0; }catch(_){}
+      });
+    };
+
+    // When single player "score-container" is shown, stop audio
+    function installResultObserver(){
+      const target = document.querySelector('.single-player-game-container') || document.body;
+      const mo = new MutationObserver(()=>{
+        document.querySelectorAll('.score-container').forEach(el=>{
+          const style = window.getComputedStyle(el);
+          if (style.display !== 'none' && el.offsetParent !== null){
+            window.stopAllGameAudio();
+          }
+        });
+      });
+      mo.observe(target, {subtree:true, attributes:true, attributeFilter:['style','class'], childList:true});
+    }
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', installResultObserver);
+    } else {
+      installResultObserver();
+    }
+  }catch(e){ console.warn('Nova Audio Guard init error', e); }
+})();
+// === End Nova Audio Guard v1 ===
+</script>
 
 </body>
 </html>
