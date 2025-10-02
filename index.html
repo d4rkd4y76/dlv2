@@ -618,7 +618,7 @@ option {
     gap: 20px; /* Elemanlar arasındaki boşluk */
     position: relative; /* Efektler için gerekli */
     padding: 30px;
-    width: 950%; /* Genişlik (ekranın %80'i) */
+    width: 95%; /* Genişlik (ekranın %80'i) */
     max-width: 1400px; /* Maksimum genişlik */
     min-height: 300px; /* Minimum yükseklik */
     background: url('https://i.ibb.co/2FVVr25/Yeni-proje-2.gif') center center;
@@ -11069,6 +11069,159 @@ document.addEventListener('DOMContentLoaded', function(){
   try{ if(typeof onMainScreenLoad==='function') onMainScreenLoad(); }catch(e){}
 });
 </script>
+
+
+<!-- === NOVA HOTFIX PATCH v2025.10.02 === -->
+<script>
+(function(){
+  // Ensure DOM ready
+  function onReady(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  onReady(function(){
+
+    /* ---------- A) MAIN SCREEN PHOTO & NAME CENTERING (Mobile Safe) ---------- */
+    try {
+      var main = document.getElementById('main-screen');
+      if (main) {
+        main.style.width = '95%';
+        main.style.margin = '0 auto';
+      }
+      document.querySelectorAll('.student-info').forEach(function(el){
+        el.style.display = 'flex';
+        el.style.flexDirection = 'column';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.textAlign = 'center';
+        el.style.width = '100%';
+      });
+      document.querySelectorAll('.student-photo').forEach(function(img){
+        img.style.display = 'block';
+        img.style.margin = '0 auto';
+        img.style.objectFit = 'cover';
+      });
+      document.querySelectorAll('.student-name').forEach(function(n){
+        n.style.textAlign = 'center';
+        n.style.marginTop = '8px';
+      });
+    } catch(e){ console.warn('Centering patch warning:', e); }
+
+    /* ---------- Helpers for diamonds ---------- */
+    function getDiamondEl(){
+      return document.getElementById('currentDiamonds') || document.querySelector('.diamond-count') || document.querySelector('.diamond-amount');
+    }
+    function getDiamonds(){
+      var el = getDiamondEl();
+      if(!el) return 0;
+      var val = parseInt((el.textContent || el.innerText || '0').replace(/\D+/g,''), 10);
+      return isNaN(val) ? 0 : val;
+    }
+    function setDiamonds(v){
+      var el = getDiamondEl();
+      if(el){ el.textContent = String(v); }
+      // also reflect HUD diamond if exists
+      document.querySelectorAll('.diamond-count, .diamond-amount').forEach(function(e){
+        if(e !== el){ e.textContent = String(v); }
+      });
+    }
+
+    /* ---------- B) DUEL CREDITS PURCHASE (fallback) ---------- */
+    window.purchaseCredits = async function(amount, price){
+      try {
+        var current = getDiamonds();
+        if(current < price){
+          await showAlertSafe('💎 Elmas yetersiz. Gerekli: ' + price + ', mevcut: ' + current);
+          return;
+        }
+        setDiamonds(current - price);
+
+        // Try to increment local duel credits if there is a counter
+        var creditEl = document.getElementById('userDuelCredits') || document.querySelector('#duelCreditsInfo .credit-amount');
+        if(creditEl){
+          var c = parseInt((creditEl.textContent || '0').replace(/\D+/g,''), 10) || 0;
+          creditEl.textContent = String(c + amount);
+        }
+        await showAlertSafe('🎫 ' + amount + ' düello bileti eklendi. Kalan elmas: ' + (current - price));
+      } catch (err){
+        console.error('purchaseCredits fallback error:', err);
+        await showAlertSafe('Bir sorun oluştu. Lütfen tekrar deneyin.');
+      }
+    };
+
+    /* ---------- C) PROFILE PHOTO BUY/USE FLOW (fallback) ---------- */
+    function findPriceFromCard(btn){
+      var card = btn.closest('.profile-card, .photo-card, .profile-item, .credit-package');
+      if(!card) return null;
+      var amt = card.querySelector('.diamond-amount, .price, [data-price]');
+      if(amt && amt.dataset && amt.dataset.price) return parseInt(amt.dataset.price, 10);
+      if(amt && (amt.textContent||'').trim()) {
+        var n = parseInt(amt.textContent.replace(/\D+/g,''), 10);
+        if(!isNaN(n)) return n;
+      }
+      var ds = btn.dataset && btn.dataset.price ? parseInt(btn.dataset.price, 10) : null;
+      return ds;
+    }
+    function findPhotoURL(btn){
+      var dsUrl = btn.dataset && (btn.dataset.photo || btn.dataset.url || btn.dataset.src);
+      if(dsUrl) return dsUrl;
+      var card = btn.closest('.profile-card, .photo-card, .profile-item');
+      var img = card ? card.querySelector('img') : null;
+      return img ? img.src : null;
+    }
+    function setActiveProfile(url){
+      if(!url) return;
+      try { localStorage.setItem('activeProfilePhoto', url); } catch(_){}
+      document.querySelectorAll('.student-photo, .duel-player-score img, .duel-player-photo').forEach(function(img){
+        img.src = url;
+      });
+    }
+    function markPurchased(btn){
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+      btn.textContent = 'Kullanılıyor';
+    }
+
+    async function showAlertSafe(msg){
+      try {
+        if (typeof showAlert === 'function') return await showAlert(msg);
+      } catch(_){}
+      alert(msg);
+    }
+
+    document.addEventListener('click', async function(ev){
+      var t = ev.target;
+      // Handle "Satın Al" under profile photos
+      if(t.matches('.profile-photo-button, .buy-button') && /Satın Al/i.test(t.textContent)){
+        var price = findPriceFromCard(t);
+        var url = findPhotoURL(t);
+        var current = getDiamonds();
+        if(price == null){ return; }
+        if(current < price){
+          await showAlertSafe('💎 Elmas yetersiz.');
+          return;
+        }
+        setDiamonds(current - price);
+        if(url) setActiveProfile(url);
+        markPurchased(t);
+        await showAlertSafe('✅ Satın alındı ve aktif edildi.');
+      }
+      // Handle "Kullan" buttons
+      if(t.matches('.use-button, .profile-photo-button') && /Kullan/i.test(t.textContent)){
+        var url2 = findPhotoURL(t);
+        if(url2){ setActiveProfile(url2); await showAlertSafe('🖼️ Profil resmi güncellendi.'); }
+      }
+    });
+
+    // On load: restore active profile if saved
+    try {
+      var saved = localStorage.getItem('activeProfilePhoto');
+      if(saved){ setActiveProfile(saved); }
+    } catch(_){}
+
+  }); // onReady
+})();
+</script>
+<!-- === /NOVA HOTFIX PATCH === -->
 
 </body>
 </html>
