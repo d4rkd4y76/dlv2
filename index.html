@@ -27,9 +27,33 @@ function renderStoreCategoryButtons() {
   } catch(_){}
 
   // Hiç yoksa yine de bilinen varsayılanları öner
-  if (!keys.length) keys.push('acemi','cesur','sampiyon');
+  if (!keys.length) keys.push('DünyaDevleri','cesur','TemelKarakterler','SüperLig','DünyaFutbolcuları','KizlarKösesi','EFSANE');
 
   // Tekrarsızlaştır
+  /*NOVA_RENDER_ORDER_ENFORCED*/
+  // 'EFSANE' butonunu DOM'da en sona yazmak için listeyi böl
+  const otherKeys = keys.filter(k => k !== 'EFSANE' && k !== 'duel');
+  const ordered = [...(keys.includes('duel') ? ['duel'] : []), ...otherKeys, 'EFSANE'];
+  // tekrarlı 'EFSANE' eklemelerini temizle
+  const seen = new Set();
+  const finalKeys = ordered.filter(k => (k==='EFSANE' ? (!seen.has('EFSANE') && (seen.add('EFSANE')||true)) : (!seen.has(k) && (seen.add(k)||true))));
+
+  /*NOVA_FORCE_ORDER*/
+  try {
+    // 'EFSANE'yi sona taşı (güçlü garanti)
+    const ix = keys.indexOf('EFSANE');
+    if (ix > -1) { keys.splice(ix,1); }
+    // ayrıca 'duel' varsa onu en başa çekme/yerinde bırakma
+    // diğerlerini sırayla yaz, sonra EFSANE'yi ekle
+    keys.push('EFSANE');
+  } catch(_){}
+
+  // 'EFSANE'yi en sona al
+  try {
+    const idx = keys.indexOf('EFSANE');
+    if (idx > -1) { keys.splice(idx, 1); keys.push('EFSANE'); }
+  } catch(_){}
+
   const seen = new Set(); const finalKeys = [];
   keys.forEach(k => { if (k && !seen.has(k)) { seen.add(k); finalKeys.push(k); } });
 
@@ -55,7 +79,7 @@ function renderStoreCategoryButtons() {
 );
     // Ekstra bilinmeyen anahtarlar için:
     try {
-      const allKeys = Object.keys({acemi:photoCategories.acemi, cesur:photoCategories.cesur, sampiyon:photoCategories.sampiyon}).filter(Boolean);
+      const allKeys = Object.keys({DünyaDevleri:photoCategories.DünyaDevleri, cesur:photoCategories.cesur, sampiyon:photoCategories.sampiyon}).filter(Boolean);
       allKeys.forEach(k => set.add(k));
     } catch(_) {}
     cats.push(...Array.from(set));
@@ -66,7 +90,7 @@ function renderStoreCategoryButtons() {
     const btn = document.createElement('button');
     btn.className = 'category-button' + (i===0 ? ' active' : '');
     btn.dataset.category = k;
-    // Görünen isim DB anahtarı olsun (ör: 'acemi', 'cesur'...), istersen burada displayName eşlemesi yapabiliriz
+    // Görünen isim DB anahtarı olsun (ör: 'DünyaDevleri', 'cesur'...), istersen burada displayName eşlemesi yapabiliriz
     btn.textContent = k;
     area.appendChild(btn);
   });
@@ -618,7 +642,7 @@ option {
     gap: 20px; /* Elemanlar arasındaki boşluk */
     position: relative; /* Efektler için gerekli */
     padding: 30px;
-    width: 95%; /* Genişlik (ekranın %80'i) */
+    width: 950%; /* Genişlik (ekranın %80'i) */
     max-width: 1400px; /* Maksimum genişlik */
     min-height: 300px; /* Minimum yükseklik */
     background: url('https://i.ibb.co/2FVVr25/Yeni-proje-2.gif') center center;
@@ -2707,7 +2731,7 @@ option {
     border-radius: 20px;
     padding: 30px;
     width: 90%;
-    max-width: 960px; /* Panel genişliğini sınırla */
+    max-width: 600px; /* Panel genişliğini sınırla */
     position: relative;
     animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
 }
@@ -2731,10 +2755,10 @@ option {
 /* Profil Fotoğrafları Grid Düzeni */
 .profile-photos-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     padding: 10px;
-    max-height: 72vh;
+    max-height: 500px;
     overflow-y: auto;
 }
 
@@ -2766,22 +2790,19 @@ option {
 }
 
 /* Profil Fotoğrafı */
-.profile-photo {aspect-ratio: 4 / 5;
-
-   width: 100%;  
-   height: auto;
-   border-radius: 14px;
-   object-fit: contain;
+.profile-photo {
+   width: 120px;  
+   height: 120px;
+   border-radius: 12px;
+   object-fit: cover;
    display: block; /* Block görünüme al */
    margin: 0 auto; /* Yatayda otomatik margin ile ortalar */
-   border: 4px solid #cbd5e1;
-   box-shadow: 0 6px 14px rgba(30, 64, 175, 0.15);
+   border: 3px solid #ff8a00;
+   box-shadow: 0 0 15px rgba(255, 138, 0, 0.3);
    transition: transform 0.3s ease;
 }
 
-.profile-photo-item:hover .profile-photo {object-fit: contain;
-aspect-ratio: 4 / 5;
-
+.profile-photo-item:hover .profile-photo {
     transform: scale(1.05);
 }
 
@@ -4330,25 +4351,6 @@ html, body {
 }
 /* === /NOVA Sürpriz Kutu Stil === */
 
-
-/* === Nova pf-frame (4:5 portrait frame for 440x550 images) === */
-.pf-frame{
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  border: 4px solid #cbd5e1;
-  border-radius: 14px;
-  overflow: hidden;
-  background: linear-gradient(180deg, #eef2ff, #f8fafc);
-  display: block;
-}
-.pf-frame > img.profile-photo{
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-/* === /Nova pf-frame === */
-
 </style>
 
 <style>
@@ -4411,7 +4413,7 @@ html, body {
   100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
 }
 /* Per-rank styles */
-/* --- Nova update: clearer visual separation for acemi/binbaşı, upgraded albay --- */
+/* --- Nova update: clearer visual separation for Acemi/binbaşı, upgraded albay --- */
 .rank-0{
   color:#666;
   background: linear-gradient(180deg,#f7f7f9,#ececf1);
@@ -4500,7 +4502,7 @@ html, body {
 
 
 
-/* --- Nova update: clearer visual separation for acemi/binbaşı, upgraded albay --- */
+/* --- Nova update: clearer visual separation for Acemi/binbaşı, upgraded albay --- */
 .rank-0{
   color:#666;
   background: linear-gradient(180deg,#f7f7f9,#ececf1);
@@ -4798,12 +4800,11 @@ html, body {
 
 <style id="nova-store-fix">
 /* Mağaza kartlarındaki görsel oranını 440x550 (w:h=1:1.25) yap */
-.profile-photo {aspect-ratio: 4 / 5;
-
-  width: 100%;
-  height: auto; /* 120 * 1.25 */
-  border-radius: 14px;
-  object-fit: contain;
+.profile-photo {
+  width: 120px !important;
+  height: 150px !important; /* 120 * 1.25 */
+  border-radius: 12px !important;
+  object-fit: cover !important;
 }
 /* Güvenlik: grid içindeki tüm img'lere de uygula */
 .profile-photos-container img {
@@ -4812,7 +4813,192 @@ html, body {
 }
 </style>
 
+<style>
+/* --- NOVA: EFSANE özel buton stili --- */
+.category-button.legendary{
+  position: relative;
+  font-weight: 800;
+  letter-spacing: .5px;
+  border: 0;
+  outline: 0;
+  background: linear-gradient(180deg,#ff8a00 0%, #ff3d00 60%, #8b0000 100%);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(255,61,0,.35), inset 0 0 12px rgba(255,255,255,.15);
+}
+.category-button.legendary::before,
+.category-button.legendary::after{
+  content: '';
+  position: absolute;
+  left: -6px; right: -6px;
+  height: 55%;
+  top: -10px;
+  background: radial-gradient(ellipse at bottom, rgba(255,200,0,.75), rgba(255,0,0,.0) 60%);
+  filter: blur(6px);
+  animation: flame-flicker 1.2s infinite ease-in-out alternate;
+  pointer-events: none;
+}
+.category-button.legendary::after{
+  top: auto; bottom: -12px;
+  background: radial-gradient(ellipse at top, rgba(255,120,0,.6), rgba(255,0,0,0) 60%);
+  height: 45%;
+}
+@keyframes flame-flicker{
+  0%{ transform: translateY(0) scale(1); opacity:.9;}
+  100%{ transform: translateY(-2px) scale(1.03); opacity:1;}
+}
+.category-button.legendary:hover{
+  box-shadow: 0 10px 24px rgba(255,61,0,.55), inset 0 0 20px rgba(255,255,255,.25);
+  transform: translateY(-1px);
+}
 
+</style>
+<style>
+/* --- NOVA: Store header responsive layout --- */
+.profile-change-header{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin-bottom:10px;
+}
+.store-title{ margin:0; font-size:1.15rem; font-weight:800; letter-spacing:.2px; display:flex; align-items:center; gap:6px; }
+.store-controls{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.current-diamonds{ display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:12px;
+  background:rgba(255,255,255,.6); backdrop-filter: blur(4px); font-weight:700; }
+#openExchangeButton{ padding:8px 12px; border-radius:10px; border:0; cursor:pointer;
+  background:#2d6cdf; color:#fff; font-weight:700; }
+#profileCloseButton{ padding:8px 10px; border-radius:10px; border:0; cursor:pointer;
+  background:#f6465d; color:#fff; font-weight:800; }
+@media(max-width:600px){
+  .profile-change-header{ flex-direction:column; align-items:stretch; gap:8px; }
+  .store-controls{ justify-content:space-between; }
+  .store-title{ font-size:1.05rem; justify-content:center; }
+}
+</style>
+<style>
+/* === NOVA v7: Store header layout update === */
+.profile-change-content{ position:relative; }
+
+.profile-change-header{
+  display:grid;
+  grid-template-columns: 1fr;
+  row-gap: 10px;
+  align-items:center;
+  justify-items:center;
+  margin-bottom: 12px;
+  padding-top: 8px;
+}
+
+.store-title{
+  margin:0;
+  text-align:center;
+  font-weight:800;
+  letter-spacing:.3px;
+  display:flex; align-items:center; gap:8px; justify-content:center;
+  font-size: clamp(20px, 2.6vw, 32px);
+}
+
+.store-controls{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.current-diamonds{
+  display:flex; align-items:center; gap:8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.65);
+  backdrop-filter: blur(6px);
+  font-weight: 800;
+  font-size: clamp(14px, 1.6vw, 16px);
+}
+
+#openExchangeButton{
+  padding: 10px 14px;
+  border-radius: 12px; border:0; cursor:pointer;
+  background:#2d6cdf; color:#fff; font-weight:800;
+  font-size: clamp(13px, 1.4vw, 15px);
+  box-shadow: 0 4px 12px rgba(45,108,223,.28);
+}
+
+#profileCloseButton{
+  position:absolute; top:12px; right:12px;
+  width: clamp(32px, 4vw, 40px); height: clamp(32px, 4vw, 40px);
+  display:flex; align-items:center; justify-content:center;
+  border-radius: 12px; border:0; cursor:pointer; z-index:5;
+  background:#f6465d; color:#fff; font-weight:900; font-size: clamp(14px, 2vw, 18px);
+  box-shadow: 0 6px 14px rgba(246,70,93,.35);
+}
+
+@media (min-width: 920px){
+  .profile-change-header{ row-gap: 12px; }
+  .store-controls{ gap: 14px; }
+}
+
+/* keep category bar spacing consistent after new header */
+.profile-categories{ margin-top: 8px; }
+</style>
+
+<style id="nova-storebar-fix-20251002">
+/* === Nova Single-Row Store Header Fix (2025-10-02) === */
+.profile-change-header{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:clamp(6px,1.5vw,14px) !important;
+  flex-wrap:nowrap !important;
+}
+.store-title{
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  font-size:clamp(16px,4vw,22px) !important;
+  line-height:1.1 !important;
+  margin:0 !important;
+}
+.store-controls{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:clamp(6px,1.2vw,12px) !important;
+  flex-wrap:nowrap !important;
+  overflow:hidden !important;
+}
+.store-controls > *{
+  flex:0 1 auto !important;
+  min-width:0 !important;
+}
+.current-diamonds{
+  margin:0 !important;
+  padding:clamp(6px,1.2vw,10px) clamp(10px,2vw,14px) !important;
+  gap:clamp(6px,1.2vw,10px) !important;
+}
+.current-diamonds .diamond-icon,
+.store-title .cart-icon{
+  font-size:clamp(14px,4vw,18px) !important;
+  line-height:1 !important;
+}
+#openExchangeButton{
+  white-space:nowrap !important;
+  font-size:clamp(12px,3.4vw,14px) !important;
+  padding:clamp(6px,1.2vw,8px) clamp(10px,2vw,14px) !important;
+}
+#profileCloseButton{
+  white-space:nowrap !important;
+  font-size:clamp(14px,4vw,18px) !important;
+  padding:clamp(6px,1.2vw,8px) clamp(8px,2vw,10px) !important;
+  line-height:1 !important;
+}
+/* Ensure icons/buttons never overlap */
+#openExchangeButton, #profileCloseButton, .current-diamonds{ max-width:100%; }
+@media (max-width: 400px){
+  /* On very small screens, slightly tighten paddings to keep single row */
+  #openExchangeButton{ padding:4px 10px !important; }
+  .current-diamonds{ padding:4px 10px !important; }
+}
+</style>
 
 </head>
 <body>
@@ -4860,7 +5046,7 @@ html, body {
   <!-- === /NOVA Sürpriz Kutu === -->
 
 <div class="student-info">
-<img alt="Öğrenci Fotoğrafı" class="profile-photo student-photo" id="student-photo" src=""  style="display: none;"/>
+<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;"/>
 <div class="student-name" id="student-name"></div>
 <div class="star-frame" id="student-stars"></div>
 <div class="rank-label" id="student-rank"></div>
@@ -5000,7 +5186,7 @@ html, body {
 <div class="timer" id="timer">45</div>
 </div>
 <div class="question-container">
-<img alt="Soru Resmi" class="profile-photo question-image" id="question-image" src=""  style="display: none;"/>
+<img alt="Soru Resmi" class="question-image" id="question-image" src="" style="display: none;"/>
 <div class="question-text" id="question-text">Soru metni burada olacak.</div>
 </div>
 <div class="options-container" id="options-container"></div>
@@ -5008,7 +5194,7 @@ html, body {
 <div class="score-container" id="score-container">
 <span id="score"></span>
 <div class="score-message" id="score-message"></div>
-<img alt="Sonuç Resmi" class="profile-photo final-image" id="score-image"  style="display:none;"/>
+<img alt="Sonuç Resmi" class="final-image" id="score-image" style="display:none;"/>
 <!-- "Geri Dön" butonu -->
 <button class="end-game-button" id="final-back-button">Geri Dön</button>
 <button class="lesson-video-button" id="lesson-video-button">🎬 Ders videosunu izle</button>
@@ -5111,7 +5297,7 @@ html, body {
 <div class="timer" id="duel-timer">45</div>
 </div>
 <div class="question-container">
-<img alt="Soru Resmi" class="profile-photo question-image" id="duel-question-image" src=""  style="display: none;"/>
+<img alt="Soru Resmi" class="question-image" id="duel-question-image" src="" style="display: none;"/>
 <div class="question-text" id="duel-question-text">Soru metni burada olacak.</div>
 </div>
 <div class="options-container" id="duel-options-container"></div>
@@ -5776,16 +5962,16 @@ async function updateDiamondCount() {
                     lastDiamondUpdate: currentTime
                 });
                 
-                setDiamondUI(newDiamonds);
+                document.getElementById('diamond-value').textContent = newDiamonds;
             } else {
                 // Elmas sayısı zaten 30 veya üzerindeyse mevcut değeri koru
-                setDiamondUI(currentDiamonds);
+                document.getElementById('diamond-value').textContent = currentDiamonds;
                 await studentRef.update({
                     lastDiamondUpdate: currentTime
                 });
             }
         } else {
-            setDiamondUI(userData.diamond || 0);
+            document.getElementById('diamond-value').textContent = userData.diamond || 0;
         }
     } catch (error) {
         console.error("Elmas güncelleme hatası:", error);
@@ -9572,11 +9758,11 @@ function getFromCache(key) {
 
 
 // Main photo categories with added cache handling
-let photoCategories = { acemi: [], cesur: [], sampiyon: [] };
+let photoCategories = { 'DünyaDevleri': [], cesur: [],  TemelKarakterler: [], SüperLig: [], DünyaFutbolcuları: [], KizlarKösesi: [], 'EFSANE': [] };
 
 /**
  * Mağaza kategorilerini Firebase Realtime Database üzerinden çeker.
- * Path: store/profilePhotos/{acemi|cesur|sampiyon}/{photoId} -> { url, price, name?, allowedStudents? }
+ * Path: store/profilePhotos/{DünyaDevleri|cesur|sampiyon}/{photoId} -> { url, price, name?, allowedStudents? }
  * Not: championsphoto kısmı ve diğer mağaza işlevleri olduğu gibi korunmuştur.
  */
 async function fetchStoreCategoriesFromDB() {
@@ -9593,9 +9779,13 @@ async function fetchStoreCategoriesFromDB() {
         allowedStudents: o[id].allowedStudents || null
       }));
     };
-    photoCategories.acemi = norm(data.acemi);
+    photoCategories['DünyaDevleri'] = norm(data['DünyaDevleri']);
     photoCategories.cesur = norm(data.cesur);
-    photoCategories.sampiyon = norm(data.sampiyon);
+    photoCategories.TemelKarakterler = norm(data.TemelKarakterler);
+    photoCategories.SüperLig = norm(data.SüperLig);
+    photoCategories.DünyaFutbolcuları = norm(data.DünyaFutbolcuları);
+    photoCategories.KizlarKösesi = norm(data.KizlarKösesi);
+    photoCategories['EFSANE'] = norm(data['EFSANE']);
     try{ renderStoreCategoryButtons(); }catch(e){}
 renderStoreCategoryButtons();
   } catch (e) {
@@ -9621,7 +9811,7 @@ async function useProfilePhoto(photoUrl) {
     }
 }
 
-async function loadProfilePhotos(category = 'acemi') {
+async function loadProfilePhotos(category = 'DünyaDevleri') {
   if (!window.selectedStudent) {
     // localStorage fallback
     try { window.selectedStudent = JSON.parse(localStorage.getItem('selectedStudent') || 'null'); } catch(_) {}
@@ -9633,7 +9823,14 @@ async function loadProfilePhotos(category = 'acemi') {
   }
 
   // Kategori verileri boşsa DB'den çek
-  if ((!photoCategories.acemi.length && !photoCategories.cesur.length && !photoCategories.sampiyon.length)) {
+  // Seçilen kategori boşsa verileri DB'den çek (yeni kategoriler için güvenli)
+  try {
+    if (!photoCategories[category] || !photoCategories[category].length) {
+      await fetchStoreCategoriesFromDB();
+    }
+  } catch (e) { console.warn('Kategori tazeleme uyarısı:', e); }
+
+  if ((!photoCategories['DünyaDevleri'].length && !photoCategories.cesur.length && !photoCategories['EFSANE'].length)) {
     await fetchStoreCategoriesFromDB(); try{ renderStoreCategoryButtons(); }catch(e){} }
 const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
    const studentSnapshot = await studentRef.once('value');
@@ -9686,14 +9883,14 @@ const studentRef = database.ref(`classes/${selectedStudent.classId}/students/${s
            saveToCache(CACHE_KEYS.PURCHASED, purchasedPhotos);
        }
 
-       if (category === 'sampiyon' && photoCategories.sampiyon.length === 0) {
+       if (category === 'EFSANE' && (photoCategories['EFSANE']?.length || 0) === 0) {
            container.innerHTML = '<div class="no-champion">Bu kategori sizin için henüz aktif değil</div>';
            return;
        }
 
        // Kişiye özel görünürlük filtresi
        const visKey = `${selectedStudent.classId}:${selectedStudent.studentId}`;
-       photoCategories[category]
+       (photoCategories[category] || [])
          .filter(p => !p.allowedStudents || p.allowedStudents[visKey])
          .forEach((photo, index) => {
            createPhotoCard(photo, purchasedPhotos, category, container, index);
@@ -9770,7 +9967,7 @@ async function buyProfilePhoto(photo){
 
     // Bulunduğumuz kategori butonu aktifse yeniden yükleyelim
     const activeBtn = document.querySelector('.category-button.active');
-    const cat = activeBtn ? activeBtn.dataset.category : 'acemi';
+    const cat = activeBtn ? activeBtn.dataset.category : 'DünyaDevleri';
     await loadProfilePhotos(cat);
   } catch(e){
     console.error('Satın alma hatası:', e);
@@ -9798,8 +9995,8 @@ async function novaOpenStore() {
   overlay.style.display = 'flex';
   try { await novaOpenStoreFlow(); } catch(e) { console.error('Store init error', e); }
   try { renderStoreCategoryButtons(); } catch(e) {}
-  try { loadProfilePhotos('acemi'); } catch(e) { console.warn('loadProfilePhotos yok:', e); } // flex: ortalama aktif
-  try { loadProfilePhotos('acemi'); } catch(e) { console.warn('loadProfilePhotos çağrısı bulunamadı:', e); }
+  try { loadProfilePhotos('DünyaDevleri'); } catch(e) { console.warn('loadProfilePhotos yok:', e); } // flex: ortalama aktif
+  try { loadProfilePhotos('DünyaDevleri'); } catch(e) { console.warn('loadProfilePhotos çağrısı bulunamadı:', e); }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9891,7 +10088,7 @@ function novaRenderCategoryButtons() {
 async function novaOpenStoreFlow() {
   await novaFetchStoreCategories();
   novaRenderCategoryButtons();
-  const first = NOVA_STORE_KEYS[0] || 'acemi';
+  const first = NOVA_STORE_KEYS[0] || 'DünyaDevleri';
   await loadProfilePhotos(first);
 }
 // === /NOVA FIX ===
@@ -11051,326 +11248,170 @@ function showExplanationAndNext(){
 })();
 </script>
 
-
-<script id="nova-diamond-bind">
-function setDiamondUI(val){
-  try{
-    var el1 = document.getElementById('diamond-value'); if(el1) el1.textContent = val;
-    var el2 = document.getElementById('currentDiamonds'); if(el2) el2.textContent = val;
-    var nodes = document.querySelectorAll('.diamond-stats .stats-value,[data-diamond-bind="value"]');
-    nodes.forEach(function(n){ if(n) n.textContent = val; });
-  }catch(e){ console.warn('Diamond UI update error', e); }
-}
-</script>
-
-
-<script id="nova-mainload">
-document.addEventListener('DOMContentLoaded', function(){
-  try{ if(typeof onMainScreenLoad==='function') onMainScreenLoad(); }catch(e){}
-});
-</script>
-
-
-<!-- === NOVA HOTFIX PATCH v2025.10.02 === -->
-<script>
-(function(){
-  // Ensure DOM ready
-  function onReady(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
-
-  onReady(function(){
-
-    /* ---------- A) MAIN SCREEN PHOTO & NAME CENTERING (Mobile Safe) ---------- */
-    try {
-      var main = document.getElementById('main-screen');
-      if (main) {
-        main.style.width = '95%';
-        main.style.margin = '0 auto';
-      }
-      document.querySelectorAll('.student-info').forEach(function(el){
-        el.style.display = 'flex';
-        el.style.flexDirection = 'column';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.textAlign = 'center';
-        el.style.width = '100%';
-      });
-      document.querySelectorAll('.student-photo').forEach(function(img){
-        img.style.display = 'block';
-        img.style.margin = '0 auto';
-        img.style.objectFit = 'cover';
-      });
-      document.querySelectorAll('.student-name').forEach(function(n){
-        n.style.textAlign = 'center';
-        n.style.marginTop = '8px';
-      });
-    } catch(e){ console.warn('Centering patch warning:', e); }
-
-    /* ---------- Helpers for diamonds ---------- */
-    function getDiamondEl(){
-      return document.getElementById('currentDiamonds') || document.querySelector('.diamond-count') || document.querySelector('.diamond-amount');
-    }
-    function getDiamonds(){
-      var el = getDiamondEl();
-      if(!el) return 0;
-      var val = parseInt((el.textContent || el.innerText || '0').replace(/\D+/g,''), 10);
-      return isNaN(val) ? 0 : val;
-    }
-    function setDiamonds(v){
-      var el = getDiamondEl();
-      if(el){ el.textContent = String(v); }
-      // also reflect HUD diamond if exists
-      document.querySelectorAll('.diamond-count, .diamond-amount').forEach(function(e){
-        if(e !== el){ e.textContent = String(v); }
-      });
-    }
-
-    /* ---------- B) DUEL CREDITS PURCHASE (fallback) ---------- */
-    window.purchaseCredits = async function(amount, price){
-      try {
-        var current = getDiamonds();
-        if(current < price){
-          await showAlertSafe('💎 Elmas yetersiz. Gerekli: ' + price + ', mevcut: ' + current);
-          return;
-        }
-        setDiamonds(current - price);
-
-        // Try to increment local duel credits if there is a counter
-        var creditEl = document.getElementById('userDuelCredits') || document.querySelector('#duelCreditsInfo .credit-amount');
-        if(creditEl){
-          var c = parseInt((creditEl.textContent || '0').replace(/\D+/g,''), 10) || 0;
-          creditEl.textContent = String(c + amount);
-        }
-        await showAlertSafe('🎫 ' + amount + ' düello bileti eklendi. Kalan elmas: ' + (current - price));
-      } catch (err){
-        console.error('purchaseCredits fallback error:', err);
-        await showAlertSafe('Bir sorun oluştu. Lütfen tekrar deneyin.');
-      }
-    };
-
-    /* ---------- C) PROFILE PHOTO BUY/USE FLOW (fallback) ---------- */
-    function findPriceFromCard(btn){
-      var card = btn.closest('.profile-card, .photo-card, .profile-item, .credit-package');
-      if(!card) return null;
-      var amt = card.querySelector('.diamond-amount, .price, [data-price]');
-      if(amt && amt.dataset && amt.dataset.price) return parseInt(amt.dataset.price, 10);
-      if(amt && (amt.textContent||'').trim()) {
-        var n = parseInt(amt.textContent.replace(/\D+/g,''), 10);
-        if(!isNaN(n)) return n;
-      }
-      var ds = btn.dataset && btn.dataset.price ? parseInt(btn.dataset.price, 10) : null;
-      return ds;
-    }
-    function findPhotoURL(btn){
-      var dsUrl = btn.dataset && (btn.dataset.photo || btn.dataset.url || btn.dataset.src);
-      if(dsUrl) return dsUrl;
-      var card = btn.closest('.profile-card, .photo-card, .profile-item');
-      var img = card ? card.querySelector('img') : null;
-      return img ? img.src : null;
-    }
-    function setActiveProfile(url){
-      if(!url) return;
-      try { localStorage.setItem('activeProfilePhoto', url); } catch(_){}
-      document.querySelectorAll('.student-photo, .duel-player-score img, .duel-player-photo').forEach(function(img){
-        img.src = url;
-      });
-    }
-    function markPurchased(btn){
-      btn.disabled = true;
-      btn.style.opacity = '0.6';
-      btn.style.cursor = 'not-allowed';
-      btn.textContent = 'Kullanılıyor';
-    }
-
-    async function showAlertSafe(msg){
-      try {
-        if (typeof showAlert === 'function') return await showAlert(msg);
-      } catch(_){}
-      alert(msg);
-    }
-
-    document.addEventListener('click', async function(ev){
-      var t = ev.target;
-      // Handle "Satın Al" under profile photos
-      if(t.matches('.profile-photo-button, .buy-button') && /Satın Al/i.test(t.textContent)){
-        var price = findPriceFromCard(t);
-        var url = findPhotoURL(t);
-        var current = getDiamonds();
-        if(price == null){ return; }
-        if(current < price){
-          await showAlertSafe('💎 Elmas yetersiz.');
-          return;
-        }
-        setDiamonds(current - price);
-        if(url) setActiveProfile(url);
-        markPurchased(t);
-        await showAlertSafe('✅ Satın alındı ve aktif edildi.');
-      }
-      // Handle "Kullan" buttons
-      if(t.matches('.use-button, .profile-photo-button') && /Kullan/i.test(t.textContent)){
-        var url2 = findPhotoURL(t);
-        if(url2){ setActiveProfile(url2); await showAlertSafe('🖼️ Profil resmi güncellendi.'); }
-      }
-    });
-
-    // On load: restore active profile if saved
-    try {
-      var saved = localStorage.getItem('activeProfilePhoto');
-      if(saved){ setActiveProfile(saved); }
-    } catch(_){}
-
-  }); // onReady
-})();
-</script>
-<!-- === /NOVA HOTFIX PATCH === -->
-
 </body>
 </html>
+<!-- === NOVA PATCH v8.1: EFSANE butonu sıralama + alev animasyonu + mağaza başlığı düzeni === -->
+<style>
+/* Alevli "EFSANE" butonu stili (mobil + desktop uyumlu) */
+.category-button.legend {
+  position: relative;
+  background: linear-gradient(135deg, #ff4d00, #ff8800, #ffcd3c);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: .6px;
+  box-shadow: 0 0 12px rgba(255,77,0,.55), 0 0 24px rgba(255,136,0,.35);
+  border: 2px solid rgba(255,255,255,.15);
+  text-transform: uppercase;
+  isolation: isolate;
+  animation: flicker 1.15s infinite ease-in-out;
+}
+.category-button.legend::before,
+.category-button.legend::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:12px;
+  background: conic-gradient(from 180deg at 50% 50%, rgba(255,160,0,.15), transparent 30%, rgba(255,60,0,.18), transparent 55%, rgba(255,230,0,.18), transparent 80%);
+  filter: blur(8px);
+  z-index:-1;
+  animation: heat 2.2s linear infinite;
+  pointer-events:none;
+}
+.category-button.legend::after{
+  inset:-10px;
+  filter: blur(18px);
+  opacity:.6;
+  animation-direction: reverse;
+}
+@keyframes flicker{
+  0%,100%{ filter: brightness(1); transform: translateY(0) }
+  35%{ filter: brightness(1.25); transform: translateY(-1px) }
+  60%{ filter: brightness(0.95); transform: translateY(0) }
+}
+@keyframes heat{
+  0%{ transform: rotate(0deg) }
+  100%{ transform: rotate(360deg) }
+}
 
-<!-- Nova Patch: Robust Store Category + Photo Rendering (overrides earlier functions) -->
-<script>
-(function(){
-  // Helper: safe get Firebase DB
-  function db(){ try{ return firebase.database(); }catch(e){ return null; } }
-
-  // Desired order with numeric prefixes
-  const DESIRED_ORDER = [
-    "01-TemelKarakterler",
-    "02-KizKosesi",
-    "03-Galatasaray",
-    "04-Fenerbahce",
-    "05-Besiktas",
-    "06-DigerOyuncular",
-    "07-DunyaDevleri",
-    "08-Acemi",
-    "09-Cesur",
-    "10-Sampiyon"
-  ];
-
-  // Backward-compat alias map
-  const ALIASES = {
-    a1: "01-TemelKarakterler",
-    a2: "02-KizKosesi",
-    a3: "03-Galatasaray",
-    a4: "04-Fenerbahce",
-    a5: "05-Besiktas",
-    a6: "07-DunyaDevleri"
-  };
-
-  // Prefer numeric prefix sort -> then _meta.order -> then name
-  function orderedKeys(obj){
-    if(!obj) return [];
-    const keys = Object.keys(obj);
-    // Promote numbered keys & map aliases if needed
-    const mapped = keys.map(k => {
-      const canonical = ALIASES[k] && obj[ALIASES[k]] ? ALIASES[k] : k;
-      return canonical;
-    });
-    const uniq = Array.from(new Set(mapped));
-    // If we already have the desired keys, return them in DESIRED_ORDER priority
-    const set = new Set(uniq);
-    const list = [];
-    DESIRED_ORDER.forEach(k=>{ if(set.has(k)) list.push(k); });
-    // Append any other keys at the end (but skip alias names a1..a6)
-    uniq.forEach(k=>{
-      if(/^a[1-6]$/.test(k)) return;
-      if(!list.includes(k)) list.push(k);
-    });
-    return list;
+/* Mağaza başlığını, elmas değeri ve takas bölümünü aynı satırda tutan esnek düzen */
+/* Bu sınıflar sayfada yoksa etkisiz kalır; varsa responsive hizalama sağlar */
+.store-header-grid{
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+}
+@media (max-width: 700px){
+  .store-header-grid{
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
+  .store-title{ text-align:center }
+  .diamond-wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
+}
+</style>
 
-  // PUBLIC: override
-  window.renderStoreCategoryButtons = async function renderStoreCategoryButtons(){
+<script>
+/* -------------------- NOVA: Güvenli kategori oluşturucu --------------------
+   Hedefler:
+   1) 'EFSANE' butonu DOM'da MUTLAKA en sonda yer alacak.
+   2) 'EFSANE' butonu alevli/özel animasyonlu olacak.
+   3) 'duel' kategorisi varsa açılışta ona geçiş desteklenecek.
+   4) Mevcut loadProfilePhotos ve DOM yapını bozmadan çalışır.
+---------------------------------------------------------------------------- */
+(function(){
+  // Yardımcı: benzersiz liste
+  function unique(arr){ const s = new Set(); return arr.filter(x => (x && !s.has(x) && s.add(x))); }
+
+  // Güvenli ana fonksiyon
+  window.renderStoreCategoryButtons = function renderStoreCategoryButtons(){
     const area = document.querySelector('.profile-categories');
     if(!area) return;
-    area.style.display='flex';
-    area.innerHTML='';
+    area.style.display = 'flex';
+    area.innerHTML = '';
 
-    let obj=null;
-    // First try firebase directly
-    const database = db();
-    if(database){
-      try{
-        const snap = await database.ref('store/profilePhotos').once('value');
-        obj = snap.val() || null;
-      }catch(_){}
-    }
-    // Fallback to global photoCategories if exists
-    if(!obj && typeof photoCategories!=='undefined') obj = photoCategories;
-
-    if(!obj){ // last resort: minimal default
-      obj = { "01-TemelKarakterler":{_meta:{name:"01-TemelKarakterler"}},
-              "02-KizKosesi":{_meta:{name:"02-KizKosesi"}},
-              "03-Galatasaray":{_meta:{name:"03-Galatasaray"}} };
+    // Veri kaynağı: photoCategories varsa anahtarlarını al, yoksa bilinen varsayılanlar
+    let keys = [];
+    try {
+      if (typeof photoCategories === 'object' && photoCategories){
+        keys = Object.keys(photoCategories);
+      }
+    } catch(e){}
+    if(!keys.length){
+      keys = ['duel','DünyaDevleri','cesur','TemelKarakterler','SüperLig','DünyaFutbolcuları','KizlarKösesi','EFSANE'];
     }
 
-    const keys = orderedKeys(obj);
+    // Temizlik + sıralama: 'EFSANE' sonda, 'duel' en başta kalsın (varsa)
+    keys = unique(keys);
+    const hasDuel = keys.includes('duel');
+    keys = keys.filter(k => k !== 'EFSANE' && k !== 'duel'); // ikisini geçici çıkar
+    if (hasDuel) keys.unshift('duel');
+    keys.push('EFSANE'); // EFSANE sona
 
-    keys.forEach((k,i)=>{
+    // DOM üretimi
+    keys.forEach((k, i) => {
       const btn = document.createElement('button');
       btn.className = 'category-button' + (i===0 ? ' active' : '');
       btn.dataset.category = k;
-      const display = (obj[k] && obj[k]._meta && obj[k]._meta.name) ? obj[k]._meta.name : k;
-      btn.textContent = display;
-      btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.category-button').forEach(b=>b.classList.remove('active'));
+      btn.textContent = k;
+
+      // EFSANE için özel sınıf
+      if (k === 'EFSANE'){
+        btn.classList.add('legend');
+        btn.title = '🔥 Efsane Seçkisi';
+      }
+
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+
         const duelStore = document.getElementById('duelCreditsStore');
         const photosContainer = document.getElementById('profilePhotosContainer');
-        if(duelStore && photosContainer){
-          if(k === 'duel'){ duelStore.style.display='block'; photosContainer.style.display='none'; }
-          else{ duelStore.style.display='none'; photosContainer.style.display='grid'; }
+        if (duelStore && photosContainer){
+          if (k === 'duel'){
+            duelStore.style.display = 'block';
+            photosContainer.style.display = 'none';
+          } else {
+            duelStore.style.display = 'none';
+            photosContainer.style.display = 'grid';
+          }
         }
-        loadProfilePhotos(k);
+        if (typeof loadProfilePhotos === 'function' && k !== 'duel'){
+          loadProfilePhotos(k);
+        }
       });
+
       area.appendChild(btn);
     });
-
-    // Autoload first
-    if(keys[0]) loadProfilePhotos(keys[0]);
   };
 
-  // PUBLIC: override
-  window.loadProfilePhotos = async function loadProfilePhotos(categoryKey){
-    const container = document.getElementById('profilePhotosContainer');
-    if(!container) return;
-    container.innerHTML = '';
+  // Mağaza üst başlık hizalama (varsa uygula)
+  document.addEventListener('DOMContentLoaded', function(){
+    // Olası başlık-seçenek yapılarının kapsayıcısını yakala
+    var title = document.querySelector('.store-title, .magaza-title, .shop-title');
+    var diamond = document.querySelector('.diamond-value, .diamond-display, #diamondDisplay');
+    var exchange = document.querySelector('.diamond-exchange, .diamond-takas, #diamondExchange');
 
-    // Resolve alias if user clicked an old key
-    if(ALIASES[categoryKey]) categoryKey = ALIASES[categoryKey];
-
-    const database = db();
-    let cat = null;
-    if(database){
-      try{
-        const snap = await database.ref('store/profilePhotos/'+categoryKey).once('value');
-        cat = snap.val() || null;
-      }catch(_){}
+    // Eğer üçlüden en az ikisi varsa grid uygula
+    if (title || diamond || exchange){
+      // En uygun kapsayıcıyı seç
+      var host = (title && title.parentElement) || (diamond && diamond.parentElement) || (exchange && exchange.parentElement);
+      if (host && !host.classList.contains('store-header-grid')){
+        host.classList.add('store-header-grid');
+        if (title) title.classList.add('store-title');
+        if (diamond){
+          var wrap = document.createElement('div');
+          wrap.className = 'diamond-wrap';
+          diamond.parentElement.insertBefore(wrap, diamond);
+          wrap.appendChild(diamond);
+          if (exchange) wrap.appendChild(exchange);
+        }
+      }
     }
-    if(!cat && typeof photoCategories!=='undefined'){
-      cat = photoCategories[categoryKey] || null;
-    }
-    if(!cat){ container.innerHTML='<div style="opacity:.7">Bu kategoride öğe yok.</div>'; return; }
 
-    Object.keys(cat).forEach(id=>{
-      if(id==='_meta') return;
-      const item = cat[id];
-      if(!item || typeof item!=='object') return;
-      const name = item.name || 'Adsız';
-      const url = item.url || (cat._meta && cat._meta.placeholderUrl) || 'https://via.placeholder.com/200x200.png';
-      const diamond = (typeof item.diamond!=='undefined' ? item.diamond : item.price)||0;
-
-      const card = document.createElement('div');
-      card.className = 'profile-photo-card';
-      card.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;padding:10px;background:#f7f7ff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)';
-      card.innerHTML = `
-        <div class=\"pf-frame\"><img src="${url}" alt="${name}"  class="profile-photo" style="object-fit: contain;border-radius:12px;border:3px solid #4f46e5;"></div>
-        <div style="font-weight:800;color:#111827;text-align:center">${name}</div>
-        <div style="display:flex;align-items:center;gap:6px"><span>💎</span><span style="font-weight:700">${Number(diamond)||0}</span></div>
-        <button class="buy-photo" data-id="${id}" style="background:#4f46e5;color:#fff;border:none;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer">Satın Al</button>
-      `;
-      container.appendChild(card);
-    });
-  };
-
-})(); 
+    // Sayfa açılışında kategorileri güvenle çiz
+    try { window.renderStoreCategoryButtons(); } catch(e){ console.warn('Kategori çizimi hatası:', e); }
+  });
+})();
 </script>
+<!-- === /NOVA PATCH === -->
