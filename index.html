@@ -5422,6 +5422,68 @@ html, body {
 #student-selection-screen.nova-kids-login .sr{
   position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0
 }
+</style>
+<!-- === Nova: Result Screen Cleanup & Premium Summary (CSS v3) === -->
+<style>
+/* Hide legacy/duplicate parts so only Nova UI stays visible */
+.wrong-block,
+#wrong-list,
+#act-review,
+#act-lesson,
+#act-print,
+#premium-modal,
+#lesson-video-button { display:none !important; }
+
+/* Nova UI styles (same base as before, minor tweaks) */
+:root{
+  --nz-border:rgba(148,163,184,.25);
+}
+#nova-summary{display:none;flex-direction:column;gap:18px;width:100%;max-width:980px;margin:0 auto;}
+#nova-summary.nz-show{display:flex;}
+.nz-row{display:flex;gap:14px;flex-wrap:wrap}
+.nz-card{flex:1 1 200px;min-width:220px;background:#ffffff;border:2px solid var(--nz-border);border-radius:16px;padding:14px 16px;box-shadow:0 10px 24px rgba(2,6,23,.06)}
+.nz-kpi{display:flex;align-items:center;justify-content:space-between}
+.nz-kpi .label{font-weight:700;color:#111827;font-size:.95rem}
+.nz-kpi .value{font-weight:900;font-size:1.4rem}
+.nz-kpi .value.ok{color:#065f46}
+.nz-kpi .value.warn{color:#92400e}
+.nz-kpi .value.bad{color:#991b1b}
+.nz-gauge{flex:2 1 280px;display:flex;align-items:center;justify-content:center;background:#ffffff;border:2px solid var(--nz-border);border-radius:16px;position:relative;min-height:170px}
+.nz-gauge canvas{width:240px;height:240px;max-width:90%}
+.nz-badge{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-weight:800;padding:6px 10px;border-radius:999px;border:2px solid #111827;background:#f8fafc;color:#111827}
+.nz-wrong-list{display:grid;grid-template-columns:1fr;gap:12px}
+.nz-item{background:#fff;border:2px solid var(--nz-border);border-left:8px solid #ef4444;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.nz-q{font-weight:800;color:#111827}
+.nz-pair{display:grid;grid-template-columns:120px 1fr;gap:10px;font-size:.95rem}
+.nz-pill{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid var(--nz-border);font-weight:700}
+.nz-you{background:#fee2e2;color:#991b1b}
+.nz-true{background:#dcfce7;color:#065f46}
+.nz-exp{background:#f1f5f9;border:1px dashed var(--nz-border);padding:8px;border-radius:8px;color:#1f2937}
+.nz-actions{display:flex;gap:10px;flex-wrap:wrap}
+.nz-btn{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(2,6,23,.12);transition:transform .12s ease}
+.nz-btn:hover{transform:translateY(-1px)}
+.nz-primary{background:#111827;color:#fff}
+.nz-secondary{background:#f8fafc;border:2px solid var(--nz-border);color:#111827}
+#nova-modal{position:fixed;inset:0;background:rgba(2,6,23,.6);display:none;align-items:center;justify-content:center;z-index:999999}
+#nova-modal .modal-card{width:min(1000px,96%);max-height:86vh;overflow:auto;background:#ffffff;border-radius:18px;border:2px solid var(--nz-border);padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.modal-title{font-weight:900;font-size:1.2rem;color:#111827}
+.modal-close{border:none;background:#111827;color:#fff;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}
+.modal-list{display:flex;flex-direction:column;gap:12px}
+@media (min-width:760px){
+  .nz-wrong-list{grid-template-columns:1fr 1fr}
+}
+</style>
+<style>
+/* === NOVA FINAL: Single-Source End Screen (Responsive) === */
+#score-container.nova-final-wrap{width:100%;max-width:1200px;margin:0 auto;padding:clamp(12px,2vw,24px);}
+#score-container .nz-row{display:flex;flex-wrap:wrap;gap:14px}
+#score-container .nz-card{flex:1 1 320px}
+#score-container .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:10px}
+#score-container .btn{border-radius:12px;padding:12px 16px;font-weight:800;border:1px solid #e5e7eb}
+#score-container #act-restart{background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;box-shadow:0 8px 22px rgba(99,102,241,.32)}
+/* Remove any remaining duplicated progress/gauges outside our mount */
+body > #nova-summary{display:none !important;}
 </style></head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -5435,7 +5497,6 @@ html, body {
 </div>
 </div>
 <!-- Öğrenci Seçimi Ekranı -->
-
 <div aria-labelledby="kidsLoginTitle" class="nova-kids-login" id="student-selection-screen" role="region">
 <div class="grid">
 <!-- Left: friendly hero -->
@@ -5500,7 +5561,6 @@ html, body {
 </section>
 </div>
 </div>
-
 <!-- Ana Ekran -->
 <div class="container" id="main-screen" style="display: none; position: relative;">
 <div class="profile-icon-container">
@@ -5513,7 +5573,7 @@ html, body {
 </div>
 <!-- === /NOVA Sürpriz Kutu === -->
 <div class="student-info">
-<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;">
+<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;"/>
 <div class="student-name" id="student-name"></div>
 <div class="star-frame" id="student-stars"></div>
 <div class="rank-label" id="student-rank"></div>
@@ -5537,7 +5597,7 @@ html, body {
 </div>
 </div>
 </div>
-</img></div>
+</div>
 <div class="buttons">
 <button class="single-player">Tek Kişilik Oyun</button>
 <button class="find-duel-button" id="findDuelButton">
@@ -5658,14 +5718,35 @@ html, body {
 </div>
 <div class="options-container" id="options-container"></div>
 <div class="explanation-container" id="explanation-container" style="display:none"></div>
-<div class="score-container" id="score-container">
-<span id="score"></span>
-<div class="score-message" id="score-message"></div>
-<img alt="Sonuç Resmi" class="final-image" id="score-image" style="display:none;"/>
-<!-- "Geri Dön" butonu -->
-<button class="end-game-button" id="final-back-button">Geri Dön</button>
-<button class="lesson-video-button" id="lesson-video-button">🎬 Ders videosunu izle</button>
+<div class="score-container nova-final-wrap" id="score-container"><div class="nova-end-root" id="nova-end-root"><div aria-live="polite" id="nova-summary">
+<div class="nz-row">
+<div class="nz-card">
+<div class="nz-kpi"><span class="label">Doğru</span><span class="value ok" id="nz-kpi-correct">0</span></div>
 </div>
+<div class="nz-card">
+<div class="nz-kpi"><span class="label">Toplam</span><span class="value" id="nz-kpi-total">0</span></div>
+</div>
+<div class="nz-card">
+<div class="nz-kpi"><span class="label">Yüzde</span><span class="value" id="nz-kpi-rate">0%</span></div>
+</div>
+</div>
+<div class="nz-gauge">
+<canvas aria-label="Başarı göstergesi" height="240" id="nzGauge" role="img" width="240"></canvas>
+<div class="nz-badge" id="nzBadge">BRONZ</div>
+</div>
+<div class="nz-row">
+<div class="nz-card" style="flex:1 1 100%">
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+<strong style="font-size:1.05rem">Yanlış Soru Özeti (ilk 8)</strong>
+<div class="nz-actions">
+<button class="nz-btn nz-primary" id="nzRepeatBtn">Yanlışları Tekrar Et</button>
+<button class="nz-btn nz-secondary" id="nzVideoBtn">Ders Videosu</button>
+</div>
+</div>
+<div class="nz-wrong-list" id="nzWrongList"></div>
+</div>
+</div>
+</div></div></div>
 </div>
 <!-- Düello Seçim Ekranı -->
 <div class="duel-selection-container" id="duel-selection-screen">
@@ -12139,7 +12220,588 @@ function showExplanationAndNext(){
     document.dispatchEvent(new Event('duello:forgotPassword'));
   });
 })();
-</script></body>
+</script>
+<!-- === Nova: Premium Bitiş Özeti (HTML v3) === -->
+
+<!-- Modal -->
+<div id="nova-modal">
+<div class="modal-card">
+<div class="modal-header">
+<div class="modal-title">Tüm Yanlışlar</div>
+<button class="modal-close" onclick="document.getElementById('nova-modal').style.display='none'">Kapat</button>
+</div>
+<div class="modal-list" id="nzModalList"></div>
+</div>
+</div>
+<!-- === Nova: Premium Bitiş Özeti (JS v3) === -->
+<script>
+(function(){
+  // Helper: escape HTML
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>"']/g, m=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[m]));
+  }
+  function cleanupExplanation(s){
+    return String(s||'').replace(/^\s*Açıklama[:：]\s*/i,'').trim();
+  }
+  // Robust question finder
+  function findQuestionText(){
+    const root = document.querySelector('.question-container, #question-container, .soru-container, .quiz-question, .game-question, .question-area, .questionWrap, .question-wrapper') || document;
+    const selectors = [
+      '.question-text', '.question-title', '.question', '#question', '#question-text',
+      '.soru-text', '.soruMetni', '.soru', '.prompt', '.quiz-question h2', '.quiz-question h3'
+    ];
+    for (const sel of selectors){
+      const el = root.querySelector(sel);
+      if (el && (el.innerText||el.textContent||'').trim().length>8){
+        return (el.innerText||el.textContent).trim();
+      }
+    }
+    // Fallback: take the longest textual node inside root but not within options
+    const options = new Set(Array.from(root.querySelectorAll('.options, .choices, .answers, .option, .option-button, button, .answer-option, .choice, .secenek'))
+      .map(e=>e));
+    function isInsideOptions(node){
+      let p=node; while(p){ if(options.has(p)) return true; p=p.parentNode; }
+      return false;
+    }
+    let longest='';
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    while (walker.nextNode()){
+      const txt = (walker.currentNode.nodeValue||'').trim();
+      if (txt.length>8 && txt.length<400 && !isInsideOptions(walker.currentNode.parentNode)){
+        if (txt.length>longest.length) longest=txt;
+      }
+    }
+    return longest || 'Soru metni bulunamadı';
+  }
+
+  // ====== Data tracker ======
+  const NovaTracker = (function(){
+    const state = { items: [], total:0, correctCount:0, finished:false };
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.option-button, .answer-option, .option, .choice');
+      if(!btn) return;
+      setTimeout(()=>{
+        try {
+          const qText = findQuestionText();
+          const opts = Array.from(document.querySelectorAll('.option-button, .answer-option, .option, .choice'));
+          const correctBtn = opts.find(b => b.classList.contains('correct') || b.dataset.correct==='true');
+          const chosenText = (btn.innerText||btn.textContent||'').trim();
+          const correctText = (correctBtn && (correctBtn.innerText||correctBtn.textContent||'').trim()) || '';
+          const expEl = document.querySelector('.explanation-text, .explanation-container, .explanation-card, #explanation, .explanation');
+          const explanation = cleanupExplanation((expEl && (expEl.innerText||expEl.textContent)||'').trim());
+          const isCorrect = btn.classList.contains('correct') || (btn===correctBtn);
+
+          state.total += 1;
+          if(isCorrect){ state.correctCount += 1; }
+          else { state.items.push({ q:qText, chosen:chosenText, correct:correctText, explanation, isCorrect:false }); }
+        } catch(err){ console.warn('NovaTracker capture error:', err); }
+      }, 250);
+    }, true);
+
+    function getBadge(rate){ if(rate>=90) return 'ELMAS'; if(rate>=75) return 'ALTIN'; if(rate>=60) return 'GÜMÜŞ'; return 'BRONZ'; }
+
+    function drawGauge(rate){
+      const canvas = document.getElementById('nzGauge'); if(!canvas) return;
+      const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height; const cx=w/2, cy=h/2, r=Math.min(w,h)/2-10;
+      ctx.clearRect(0,0,w,h);
+      ctx.lineWidth=16; ctx.strokeStyle='#e5e7eb'; ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,2*Math.PI); ctx.stroke();
+      const end=Math.PI+(rate/100)*Math.PI; ctx.strokeStyle= rate>=75 ? '#10b981' : (rate>=60 ? '#f59e0b' : '#ef4444');
+      ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,end); ctx.stroke();
+      ctx.fillStyle='#111827'; ctx.font='800 28px system-ui,Segoe UI,Roboto'; ctx.textAlign='center'; ctx.fillText(`${Math.round(rate)}%`,cx,cy+8);
+    }
+
+    function renderSummary(){
+      const wrap=document.getElementById('nova-summary'); if(!wrap) return;
+      const {total, correctCount, items}=state; const rate= total>0 ? (correctCount/total)*100 : 0;
+      const rateEl=document.getElementById('nz-kpi-rate');
+      document.getElementById('nz-kpi-correct').textContent=String(correctCount);
+      document.getElementById('nz-kpi-total').textContent=String(total);
+      rateEl.textContent=`${Math.round(rate)}%`;
+      rateEl.className = rate>=75 ? 'value ok' : (rate>=60 ? 'value warn' : 'value bad');
+      drawGauge(rate); document.getElementById('nzBadge').textContent=getBadge(rate);
+
+      const list=document.getElementById('nzWrongList'); list.innerHTML='';
+      items.slice(0,8).forEach((it,idx)=>{
+        const div=document.createElement('div'); div.className='nz-item';
+        div.innerHTML=`
+          <div class="nz-q">${idx+1}. ${escapeHtml(it.q)}</div>
+          <div class="nz-pair"><span class="nz-pill nz-you">Senin Cevabın</span><span>${escapeHtml(it.chosen||'-')}</span></div>
+          <div class="nz-pair"><span class="nz-pill nz-true">Doğru Cevap</span><span>${escapeHtml(it.correct||'-')}</span></div>
+          ${it.explanation?`<div class="nz-exp">${escapeHtml(it.explanation)}</div>`:''}
+        `;
+        list.appendChild(div);
+      });
+      wrap.classList.add('nz-show');
+    }
+
+    function openModal(){
+      const modal=document.getElementById('nova-modal'); const list=document.getElementById('nzModalList');
+      list.innerHTML='';
+      state.items.forEach((it,idx)=>{
+        const div=document.createElement('div'); div.className='nz-item';
+        div.innerHTML=`
+          <div class="nz-q">${idx+1}. ${escapeHtml(it.q)}</div>
+          <div class="nz-pair"><span class="nz-pill nz-you">Senin Cevabın</span><span>${escapeHtml(it.chosen||'-')}</span></div>
+          <div class="nz-pair"><span class="nz-pill nz-true">Doğru Cevap</span><span>${escapeHtml(it.correct||'-')}</span></div>
+          ${it.explanation?`<div class="nz-exp">${escapeHtml(it.explanation)}</div>`:''}
+        `;
+        list.appendChild(div);
+      });
+      modal.style.display='flex';
+    }
+
+    return { state, renderSummary, openModal };
+  })();
+
+  // Observe score container visibility
+  function observeScoreContainer(){
+    const sc=document.querySelector('.score-container, #score-container');
+    if(!sc) return;
+    const obs=new MutationObserver(()=>{
+      const visible=(getComputedStyle(sc).display!=='none' && sc.offsetParent!==null) || sc.classList.contains('show') || sc.classList.contains('active');
+      if(visible && !NovaTracker.state.finished){
+        NovaTracker.state.finished=true;
+        mountSummary(sc);
+        // Also remove legacy area if present
+        const wb=document.querySelector('.wrong-block'); if(wb) wb.style.display='none';
+        const actLesson=document.getElementById('act-lesson'); if(actLesson) actLesson.style.display='none';
+        const actReview=document.getElementById('act-review'); if(actReview) actReview.style.display='none';
+        const actPrint=document.getElementById('act-print'); if(actPrint) actPrint.style.display='none';
+        const lessonBtn=document.getElementById('lesson-video-button'); if(lessonBtn) lessonBtn.style.display='none';
+        NovaTracker.renderSummary();
+      }
+    });
+    obs.observe(sc,{attributes:true,attributeFilter:['style','class']});
+  }
+  function mountSummary(sc){
+    const nova=document.getElementById('nova-summary');
+    if(nova){ sc.insertAdjacentElement('afterend', nova); }
+  }
+
+  window.addEventListener('DOMContentLoaded', ()=>{
+    const sc=document.querySelector('.score-container, #score-container');
+    const nova=document.getElementById('nova-summary'); if(sc && nova){ sc.insertAdjacentElement('afterend', nova); }
+    observeScoreContainer();
+
+    const rpt=document.getElementById('nzRepeatBtn');
+    const vid=document.getElementById('nzVideoBtn');
+    if(rpt) rpt.addEventListener('click', NovaTracker.openModal);
+    if(vid) vid.addEventListener('click', ()=>{
+      // Prefer native lesson video action if present
+      try{ document.getElementById('lesson-video-button')?.click(); }catch(_){}
+      // Fire integration event with analysis payload
+      try{ window.dispatchEvent(new CustomEvent('nova:open-lesson-video', { detail: { tracker: 'nova', data: (window.NovaTracker && window.NovaTracker.state) || null } })); }catch(_){}
+    });
+  });
+})();
+</script>
+<!-- === Nova: Responsive & Symmetric Layout Patch (v4 CSS) === -->
+<style>
+/* Global box model for symmetry */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Nova container sizing */
+#nova-summary{display:none;flex-direction:column;gap:18px;width:100%;max-width:1100px;margin:0 auto;padding:0 12px}
+#nova-summary.nz-show{display:flex;}
+
+/* KPI row uses grid for perfect symmetry */
+.nz-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:768px){
+  .nz-row{grid-template-columns:1fr}
+}
+
+/* Wrong list: responsive auto-fit */
+.nz-wrong-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+@media (max-width:768px){
+  .nz-wrong-list{grid-template-columns:1fr}
+}
+
+/* Cards tightened to avoid overflow */
+.nz-card{min-width:0}
+
+/* Gauge centers nicely */
+.nz-gauge{margin:0 auto;width:100%;max-width:560px}
+.nz-gauge canvas{width:100%;height:auto;aspect-ratio:1/1;}
+
+/* Buttons wrap well */
+.nz-actions{flex-wrap:wrap;justify-content:flex-end}
+</style>
+<!-- === Nova: Score Container Replace & Strict Single-UI (v4 JS) === -->
+<script>
+(function(){
+  // When score container becomes visible, move nova-summary INSIDE it and clear others
+  function mountStrictlyInside(sc){
+    const nova=document.getElementById('nova-summary');
+    if(!nova) return;
+    // wipe everything else so legacy UI disappears
+    try { sc.innerHTML=''; } catch(_){}
+    sc.appendChild(nova);
+  }
+
+  function observeAndMount(){
+    const sc=document.querySelector('.score-container, #score-container');
+    if(!sc) return;
+    const once=()=>{
+      mountStrictlyInside(sc);
+      if(!window.__novaStrictMounted){
+        window.__novaStrictMounted=true;
+      }
+    };
+    // If already visible now, mount immediately
+    const visible=(getComputedStyle(sc).display!=='none' && sc.offsetParent!==null) || sc.classList.contains('show') || sc.classList.contains('active');
+    if(visible) once();
+    const obs=new MutationObserver(()=>{
+      const vis=(getComputedStyle(sc).display!=='none' && sc.offsetParent!==null) || sc.classList.contains('show') || sc.classList.contains('active');
+      if(vis) once();
+    });
+    obs.observe(sc,{attributes:true,attributeFilter:['style','class']});
+  }
+  window.addEventListener('DOMContentLoaded', observeAndMount);
+})();
+</script>
+<!-- === Nova: Overlap Fix & Typography Tune (v5 CSS) === -->
+<style>
+/* Safe container spacing to avoid overlaps */
+#nova-summary{gap:20px;padding:12px 16px}
+
+/* KPI cards: ensure consistent height */
+.nz-card{display:flex;flex-direction:column;justify-content:center;min-height:64px}
+
+/* Gauge block: fixed max width & height with internal centering */
+.nz-gauge{width:100%;max-width:520px;min-height:260px;padding:14px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.nz-gauge canvas{max-width:480px;max-height:240px;width:100%;height:auto}
+.nz-badge{position:absolute;bottom:14px}
+
+/* Wrong list typography: readable but compact to avoid giant texts */
+.nz-q{font-size:1rem;line-height:1.45}
+.nz-pair{font-size:.95rem;line-height:1.4}
+.nz-exp{font-size:.95rem;line-height:1.45}
+
+/* Card shadows and borders consistent */
+.nz-item{border-left-width:6px}
+
+/* Ensure summary blocks have spacing from page edges inside #score-container */
+#score-container, .score-container{padding:8px 0 !important}
+</style>
+<!-- === Nova: Question Stem Support & Safer Canvas Size (v5 JS) === -->
+<script>
+(function(){
+  // Extend findQuestionText to include stem/öncül
+  function _getText(el){ return (el && (el.innerText||el.textContent)||'').trim(); }
+  window.__novaFindQuestionText = function(){
+    const root = document.querySelector('.question-container, #question-container, .soru-container, .quiz-question, .game-question, .question-area, .questionWrap, .question-wrapper') || document;
+    const qSelectors = [
+      '.question-text', '.question-title', '.question', '#question', '#question-text',
+      '.soru-text', '.soruMetni', '.soru', '.prompt', '.quiz-question h2', '.quiz-question h3'
+    ];
+    const stemSelectors = [
+      '.question-stem', '.question-preamble', '.question-desc', '.stem', '.preamble',
+      '.oncul', '.öncül', '.soru-oncul', '.soru-öncül', '.kok', '.kök', '.soru-koku', '.soru-kök'
+    ];
+    let stem='';
+    for(const sel of stemSelectors){
+      const el = root.querySelector(sel);
+      if(el && _getText(el).length>3){ stem = _getText(el); break; }
+    }
+    let q='';
+    for(const sel of qSelectors){
+      const el = root.querySelector(sel);
+      if(el && _getText(el).length>5){ q=_getText(el); break; }
+    }
+    if(!q){
+      // Fallback longest text (excluding options)
+      const options = new Set(Array.from(root.querySelectorAll('.options, .choices, .answers, .option, .option-button, button, .answer-option, .choice, .secenek')));
+      function isInsideOptions(node){ let p=node; while(p){ if(options.has(p)) return true; p=p.parentNode; } return false; }
+      let longest=''; const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      while(walker.nextNode()){
+        const txt=(walker.currentNode.nodeValue||'').trim();
+        if(txt.length>8 && txt.length<400 && !isInsideOptions(walker.currentNode.parentNode)){ if(txt.length>longest.length) longest=txt; }
+      }
+      q = longest;
+    }
+    return (stem ? (stem + ' — ' + q) : q) || 'Soru metni bulunamadı';
+  };
+
+  // Use safer canvas size based on container width
+  function _sizeGauge(){
+    const cvs=document.getElementById('nzGauge');
+    if(!cvs) return;
+    const box=cvs.parentElement;
+    const w=Math.min(480, Math.max(260, Math.floor(box.clientWidth*0.9)));
+    cvs.width=w; cvs.height=w;
+  }
+  window.addEventListener('resize', _sizeGauge);
+
+  // Patch tracker to call new finder and resizer
+  const oldInit = window.addEventListener;
+  window.addEventListener = function(type, listener, opts){
+    if(type==='DOMContentLoaded'){
+      const wrapped = function(e){
+        try{ _sizeGauge(); }catch(_){}
+        return listener && listener(e);
+      };
+      return oldInit.call(window, type, wrapped, opts);
+    }
+    return oldInit.call(window, type, listener, opts);
+  };
+
+  // Monkey-patch global NovaTracker if exists to use new finder
+  const patchInterval = setInterval(()=>{
+    try{
+      if(typeof window.NovaTracker!=='undefined' && window.NovaTracker._useNewFinder!==true){
+        const NT = window.NovaTracker;
+        const orig = NT;
+        // Replace only the text finder via closure trick
+        document.addEventListener('click', function(e){
+          const btn = e.target.closest('.option-button, .answer-option, .option, .choice');
+          if(!btn) return;
+          setTimeout(()=>{
+            try{
+              const qText = window.__novaFindQuestionText();
+              // We won't duplicate; original listener already pushes item.
+              // This is just to ensure when original fails; we could store last question globally
+              window.__novaLastQuestion = qText;
+            }catch(_){}
+          }, 150);
+        }, true);
+        NT._useNewFinder = true;
+        clearInterval(patchInterval);
+      }
+    }catch(_){}
+  }, 200);
+})();
+</script>
+<!-- === Nova: Gauge Redraw & Video CTA Styling (v6 CSS) === -->
+<style>
+/* Extra spacing so lists never collide with gauge */
+#nova-summary .nz-gauge{margin-top:6px;margin-bottom:6px}
+
+/* Eye-catching "Ders Videosu" */
+#nzVideoBtn{
+  background: linear-gradient(135deg,#111827 0%, #1f2937 50%, #0f172a 100%);
+  color:#fff; border:0; position:relative; overflow:hidden;
+}
+#nzVideoBtn::after{
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,.18), transparent 50%);
+  pointer-events:none; mix-blend:overlay;
+}
+#nzVideoBtn .nz-cta-icon{margin-right:8px;display:inline-block;transform:translateY(2px)}
+@keyframes pulseCTA{0%{box-shadow:0 0 0 0 rgba(16,185,129,.45)}70%{box-shadow:0 0 0 14px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+#nzVideoBtn{animation:pulseCTA 2.4s ease-out infinite;border-radius:12px}
+</style>
+<!-- === Nova: Mount Redraw & Robust Percentage (v6 JS) === -->
+<script>
+(function(){
+  function ensureGaugeRedraw(){
+    try{
+      const cvs=document.getElementById('nzGauge');
+      if(!cvs) return;
+      // Recompute canvas intrinsic size based on container
+      const box=cvs.parentElement;
+      const w=Math.min(520, Math.max(260, Math.floor(box.clientWidth*0.9)));
+      cvs.width=w; cvs.height=w;
+      // If NovaTracker available, force render
+      if(window.NovaTracker && typeof window.NovaTracker.renderSummary==='function'){
+        window.NovaTracker.renderSummary();
+      }
+    }catch(_){}
+  }
+
+  // Hook into strict mount function if present
+  const tryHook = setInterval(()=>{
+    try{
+      const sc=document.querySelector('.score-container, #score-container');
+      const nova=document.getElementById('nova-summary');
+      if(sc && nova && nova.parentElement===sc){
+        clearInterval(tryHook);
+        setTimeout(ensureGaugeRedraw, 50);
+        window.addEventListener('resize', ensureGaugeRedraw);
+      }
+    }catch(_){}
+  }, 120);
+
+  // Make the KPI "Yüzde" always show a value even when total=0
+  const safeRate = setInterval(()=>{
+    try{
+      const rateEl=document.getElementById('nz-kpi-rate');
+      if(rateEl && !rateEl.textContent.trim()){
+        rateEl.textContent='0%';
+        rateEl.className='value bad';
+      }
+    }catch(_){}
+  }, 300);
+
+  // Decorate Video button with icon text
+  window.addEventListener('DOMContentLoaded', ()=>{
+    const v=document.getElementById('nzVideoBtn');
+    if(v && !v.dataset.decorated){
+      v.dataset.decorated='1';
+      v.innerHTML = '<span class="nz-cta-icon">▶</span>Ders Videosu';
+    }
+  });
+})();
+</script>
+<!-- === Nova v7 CSS: Compact Gauge, Hide Bottom Gauge, CTA, Layout === -->
+<style>
+/* Hide large gauge block entirely */
+.nz-gauge{display:none !important}
+
+/* Compact gauge card */
+.nz-compact-card{display:flex;align-items:center;justify-content:center;min-height:120px}
+.nz-mini-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+#nzGaugeMini{width:160px;height:160px;max-width:100%;}
+.nz-badge-mini{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-weight:800;padding:4px 8px;border-radius:999px;border:2px solid #111827;background:#f8fafc;color:#111827}
+
+/* Actions row: add Play Again primary button on the left */
+.nz-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.nz-left-actions{display:flex;gap:10px;flex-wrap:wrap}
+#nzPlayBtn{background:#111827;color:#fff;border:0}
+/* Make KPI row 4 cards on desktop */
+#nova-summary .nz-row{grid-template-columns:repeat(4,1fr)}
+@media (max-width:900px){ #nova-summary .nz-row{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:640px){ #nova-summary .nz-row{grid-template-columns:1fr} }
+
+/* CTA button styling (keep from v6) */
+#nzVideoBtn{
+  background: linear-gradient(135deg,#111827 0%, #1f2937 50%, #0f172a 100%);
+  color:#fff; border:0; position:relative; overflow:hidden;border-radius:12px
+}
+#nzVideoBtn::after{
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,.18), transparent 50%);
+  pointer-events:none; mix-blend:overlay;
+}
+#nzVideoBtn .nz-cta-icon{margin-right:8px;display:inline-block;transform:translateY(2px)}
+@keyframes pulseCTA{0%{box-shadow:0 0 0 0 rgba(16,185,129,.45)}70%{box-shadow:0 0 0 14px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+#nzVideoBtn{animation:pulseCTA 2.4s ease-out infinite}
+</style>
+<!-- === Nova v7 JS: Compact Gauge, Play Again, Stronger Video Open, Percent Fix === -->
+<script>
+(function(){
+  // Helpers
+  function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function q(sel,root=document){return root.querySelector(sel);}
+  function qa(sel,root=document){return Array.from(root.querySelectorAll(sel));}
+
+  // Build compact gauge card dynamically (after summary exists)
+  function ensureCompactGauge(){
+    const topRow=q('#nova-summary .nz-row'); if(!topRow) return;
+    if(!q('#nzGaugeMini')){
+      const card=document.createElement('div'); card.className='nz-card nz-compact-card';
+      card.innerHTML=`<div class="nz-mini-wrap"><canvas id="nzGaugeMini" width="160" height="160" role="img" aria-label="Başarı göstergesi"></canvas><div id="nzBadgeMini" class="nz-badge-mini">BRONZ</div></div>`;
+      topRow.appendChild(card);
+    }
+  }
+
+  // Draw gauge on either mini or legacy id
+  function drawGauge(rate){
+    const canvas = q('#nzGaugeMini') || q('#nzGauge');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 10;
+    ctx.clearRect(0,0,w,h);
+    ctx.lineWidth = 16;
+    // Back arc
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 2*Math.PI); ctx.stroke();
+    // Value arc
+    const end = Math.PI + (Math.max(0, Math.min(100, rate))/100)*Math.PI;
+    ctx.strokeStyle = rate>=75 ? '#10b981' : (rate>=60 ? '#f59e0b' : '#ef4444');
+    ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, end); ctx.stroke();
+    // Text
+    ctx.fillStyle = '#111827'; ctx.font = '800 28px system-ui,Segoe UI,Roboto'; ctx.textAlign='center';
+    ctx.fillText(`${Math.round(rate)}%`, cx, cy+8);
+  }
+
+  function getBadge(rate){ if(rate>=90) return 'ELMAS'; if(rate>=75) return 'ALTIN'; if(rate>=60) return 'GÜMÜŞ'; return 'BRONZ'; }
+
+  // Strong opener for lesson video
+  function openLessonVideo(payload){
+    // 1) Try explicit id
+    const byId = q('#lesson-video-button');
+    if(byId){ if(byId.tagName==='A' && byId.href){ window.open(byId.href,'_blank'); return; } byId.click(); return; }
+    // 2) Try anchor candidates with href
+    const link = qa('a[href*="youtube"],a[href*="video"],a[data-lesson],a[data-video],.lesson-video a,.ders-video a').find(a=>a.href);
+    if(link){ window.open(link.href,'_blank'); return; }
+    // 3) Try button candidates
+    const btn = q('.lesson-video, .ders-video, button[data-lesson], button[data-video], button[id*="video"], button[onclick*="video"]');
+    if(btn){ btn.click(); return; }
+    // 4) Try text-based match on buttons/links
+    const elems = qa('a,button'); 
+    const t = (el)=> (el.textContent||'').toLowerCase().replace(/\s+/g,' ');
+    const hit = elems.find(el=> t(el).includes('ders videosu') || t(el).includes('video'));
+    if(hit){ if(hit.tagName==='A' && hit.href){ window.open(hit.href,'_blank'); return; } hit.click(); return; }
+    // 5) Fallback: emit event for host app
+    try{ window.dispatchEvent(new CustomEvent('nova:open-lesson-video', { detail: payload })); }catch(_){}
+    // 6) Last resort: ask host to bind or show message
+    alert('Ders videosu bağlantısı bulunamadı. Lütfen sayfada #lesson-video-button ya da bir video bağlantısı tanımlayın.');
+  }
+
+  // Play again handler
+  function clickPlayAgain(){
+    // Prefer known ids/classes
+    let el = q('#play-again, .play-again, #btn-retry, .btn-retry, .retry, #retry, .again, #again, #btnTekrar');
+    if(!el){
+      const candidates = qa('button,a');
+      el = candidates.find(x=> (x.textContent||'').trim().toLowerCase().includes('tekrar oyna') || (x.textContent||'').toLowerCase().includes('yeniden'));
+    }
+    if(el){ if(el.tagName==='A' && el.href){ window.location.href = el.href; } else { el.click(); } }
+    else { location.reload(); }
+  }
+
+  // Patch existing NovaTracker render to update mini gauge & badges + inject Play Again button above wrong summary
+  const patcher = setInterval(()=>{
+    try{
+      // Ensure compact gauge card exists
+      ensureCompactGauge();
+      // Wire action buttons row: left side "Tekrar Oyna"
+      const actionsRow = q('#nzWrongList')?.parentElement?.querySelector('.nz-actions');
+      if(actionsRow && !q('#nzPlayBtn')){
+        const leftWrap = document.createElement('div'); leftWrap.className='nz-left-actions';
+        leftWrap.innerHTML = `<button id="nzPlayBtn" class="nz-btn nz-primary">Tekrar Oyna</button>`;
+        actionsRow.prepend(leftWrap);
+        q('#nzPlayBtn').addEventListener('click', clickPlayAgain);
+      }
+      // Wire "Ders Videosu" button robustly
+      const v = q('#nzVideoBtn'); if(v && !v.dataset.bound){ v.dataset.bound='1'; v.addEventListener('click', ()=>openLessonVideo({source:'nova'})); }
+
+      // Monkey-patch renderSummary to also update mini
+      if(window.NovaTracker && !window.NovaTracker.__v7patched){
+        const orig = window.NovaTracker.renderSummary;
+        window.NovaTracker.renderSummary = function(){
+          const res = orig.apply(window.NovaTracker, arguments);
+          // update rate text class & draw mini gauge
+          try{
+            const total = window.NovaTracker.state.total || 0;
+            const correct = window.NovaTracker.state.correctCount || 0;
+            const rate = total>0 ? (correct/total)*100 : 0;
+            drawGauge(rate);
+            const badge = getBadge(rate);
+            const mini = q('#nzBadgeMini'); if(mini) mini.textContent = badge;
+          }catch(_){}
+          return res;
+        };
+        window.NovaTracker.__v7patched = true;
+      }
+      // First-time draw if possible
+      if(window.NovaTracker && window.NovaTracker.state){
+        const t = window.NovaTracker.state.total||0;
+        const c = window.NovaTracker.state.correctCount||0;
+        const rate = t>0 ? (c/t)*100 : 0;
+        drawGauge(rate);
+        const mini = q('#nzBadgeMini'); if(mini) mini.textContent = getBadge(rate);
+        const rateEl = q('#nz-kpi-rate'); if(rateEl && !rateEl.textContent.trim()) rateEl.textContent='0%';
+      }
+      clearInterval(patcher);
+    }catch(_){}
+  }, 150);
+})();
+</script>
+</body>
 </html>
 <!-- === NOVA PATCH v8.1: EFSANE butonu sıralama + alev animasyonu + mağaza başlığı düzeni === -->
 <style>
