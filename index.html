@@ -5207,6 +5207,146 @@ html, body {
 }
 /* === End Patch v1.1 === */
 </style>
+
+<style>
+
+/* === NOVA RESPONSIVE UPGRADE v2 (single + duel question screens) === */
+:root{
+  --q-max: 1100px;
+  --q-minh: clamp(280px, 52vh, 560px);
+  --q-pad: clamp(12px, 2.2vw, 28px);
+  --opt-pad: clamp(10px, 1.6vw, 18px);
+  --opt-minh: clamp(44px, 6.2vh, 80px);
+  --opt-maxw: 520px;
+  --soft-card: 0 8px 24px rgba(0,0,0,.12);
+  --soft-card-strong: 0 12px 36px rgba(0,0,0,.18);
+}
+
+/* Container paddings */
+.single-player-game-container,
+.duel-game-container{
+  width:100%;
+  max-width: 1280px;
+  padding: clamp(12px, 3vw, 32px);
+  margin-inline:auto;
+}
+
+/* Question frame */
+.question-container{
+  position: relative;
+  max-width: min(100%, var(--q-max));
+  min-height: var(--q-minh);
+  padding: var(--q-pad);
+  border-radius: 16px;
+  border-width: 2px;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(255,255,255,.85), rgba(255,255,255,.92)),
+              linear-gradient(180deg, #fffbea, #fff);
+  box-shadow: var(--soft-card);
+  overflow: hidden;
+  margin-inline:auto;
+}
+
+/* subtle animated rim, very light so it doesn't distract children */
+.question-container::before{
+  content:"";
+  position:absolute; inset:-2px;
+  border-radius: 18px;
+  background: conic-gradient(from 0deg, #ffd86b, #a5b4fc, #6ee7b7, #ffd86b);
+  filter: blur(8px);
+  opacity:.10;
+  z-index:0;
+  animation: novaSpin 9s linear infinite;
+}
+@keyframes novaSpin{to{transform: rotate(360deg)}}
+
+/* Image scaling stays within frame */
+.question-image{
+  max-width:100%;
+  max-height: clamp(160px, 34vh, 360px);
+  object-fit: contain;
+  border-radius: 12px;
+  margin: 0 auto;
+  display:block;
+}
+
+/* Balanced multi-line question text */
+.question-text{
+  font-size: clamp(18px, calc(0.9rem + 1.1vw), 28px);
+  line-height: 1.26;
+  text-wrap: balance;
+  hyphens: auto;
+  margin-bottom: clamp(8px, 1.4vh, 16px);
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Options -> responsive grid, perfect fit on phones and desktop */
+.options-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: clamp(8px, 1.8vw, 16px);
+  width:100%;
+  max-width: 1100px;
+  margin-inline:auto;
+}
+
+/* Buttons: touch friendly */
+.option-button{
+  min-height: var(--opt-minh);
+  padding: var(--opt-pad);
+  font-size: clamp(16px, calc(0.8rem + 0.7vw), 22px);
+  max-width: var(--opt-maxw);
+  margin-inline:auto;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* gentle ripple on tap/click without JS */
+.option-button:active{ transform: translateY(1px) scale(.99); }
+
+/* Progress + timer sizing for readability */
+.progress-bar{ height: clamp(16px, 1.8vh, 24px); }
+.timer{ font-size: clamp(16px, calc(0.8rem + .8vw), 22px); }
+
+/* Duel UI: scale names + counters for any device */
+.duel-player-name{
+  font-size: clamp(12px, calc(0.6rem + .6vw), 18px) !important;
+  line-height: 1.25;
+  word-break: break-word;
+}
+.duel-player-score{ padding: clamp(10px, 1.2vw, 16px); }
+.duel-player-correct-count{ font-size: clamp(18px, calc(1rem + 1vw), 28px); }
+.winner-message{ font-size: clamp(16px, calc(0.9rem + .9vw), 26px); }
+
+/* Cute micro-animations when explanation opens */
+.explanation-card{ box-shadow: var(--soft-card-strong); }
+
+/* Confetti particles */
+.nova-particle{
+  position: fixed;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99999;
+  animation: nova-pop 1s ease forwards;
+}
+@keyframes nova-pop{
+  0%{ transform: translate(0,0) scale(.4); opacity: 1; }
+  100%{ transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0; }
+}
+
+/* Accessibility: reduce motion if user prefers */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}
+/* Phone tweaks */
+@media (max-width: 480px){
+  .question-container{ border-width: 1px; border-radius: 12px; }
+}
+/* === END NOVA RESPONSIVE UPGRADE v2 === */
+
+</style>
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -11686,6 +11826,91 @@ function showExplanationAndNext(){
   }catch(e){ console.warn('Nova Audio Guard init error', e); }
 })();
 // === End Nova Audio Guard v1 ===
+</script>
+
+
+<script>
+/* === NOVA RUNTIME ENHANCEMENTS v2 === */
+(function(){
+  function confettiBurst(x, y){
+    try {
+      const count = 26;
+      for(let i=0;i<count;i++){
+        const p = document.createElement('div');
+        p.className = 'nova-particle';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        const dx = (Math.random()*2 - 1) * 220;
+        const dy = (Math.random()*-1) * 240 - 60;
+        p.style.setProperty('--dx', dx + 'px');
+        p.style.setProperty('--dy', dy + 'px');
+        p.style.background = 'hsl(' + (Math.random()*360) + ',85%,60%)';
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(), 1200);
+      }
+    } catch(e){ /* no-op */ }
+  }
+
+  // Fit long questions into the frame by gently reducing font-size as needed
+  function fitText(el, minPx=14){
+    if(!el) return;
+    const parent = el.closest('.question-container') || el.parentElement;
+    if(!parent) return;
+    // reset to computed
+    el.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(el).fontSize) || 22;
+    let guard = 0;
+    // leave some headroom (32px) for padding etc.
+    while (el.scrollHeight > (parent.clientHeight - 32) && fs > minPx && guard < 40){
+      fs -= 1;
+      el.style.fontSize = fs + 'px';
+      guard++;
+    }
+  }
+  function autoFitAll(){
+    document.querySelectorAll('.question-container .question-text').forEach(el => fitText(el, 14));
+  }
+
+  // Observe new questions/options and correct/wrong changes without touching game logic
+  const attrObserver = new MutationObserver((muts)=>{
+    for(const m of muts){
+      if(m.type === 'attributes' && m.attributeName === 'class'){
+        const el = m.target;
+        if(el.classList && el.classList.contains('option-button')){
+          if(el.classList.contains('correct')){
+            const r = el.getBoundingClientRect();
+            confettiBurst(r.left + r.width/2, r.top + r.height/2);
+            const ex = document.querySelector('.explanation-container');
+            if(ex){ ex.style.display = 'block'; }
+          }
+          // no change for wrong; visual already handled by CSS
+        }
+      } else if (m.type === 'childList'){
+        // Question text changed -> refit
+        autoFitAll();
+      }
+    }
+  });
+
+  function attach(){
+    document.querySelectorAll('.option-button').forEach(el => {
+      try{ attrObserver.observe(el, { attributes: true }); }catch(_){}
+    });
+  }
+
+  const treeObserver = new MutationObserver(()=>{
+    attach();
+    autoFitAll();
+  });
+  treeObserver.observe(document.body, { childList: true, subtree: true });
+
+  window.addEventListener('resize', autoFitAll);
+  document.addEventListener('DOMContentLoaded', function(){
+    attach();
+    autoFitAll();
+  });
+})();
+/* === END NOVA RUNTIME ENHANCEMENTS v2 === */
 </script>
 
 </body>
