@@ -11749,6 +11749,123 @@ function showExplanationAndNext(){
   .store-title{ text-align:center }
   .diamond-wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
 }
+
+
+/* === Nova Responsive Question UI (2025-10-03) === */
+:root{
+  --q-maxw: min(1000px, 95vw);
+  --q-minh: clamp(320px, 50vh, 560px);
+  --q-pad: clamp(16px, 3vw, 28px);
+  --q-border: 4px;
+  --q-radius: 16px;
+  --q-shadow: 0 8px 24px rgba(0,0,0,.15);
+  --q-font: clamp(1.1rem, 2.4vw, 1.6rem);
+  --opt-font: clamp(0.95rem, 2vw, 1.3rem);
+  --opt-pad-y: clamp(10px, 1.8vh, 16px);
+  --opt-pad-x: clamp(12px, 3vw, 22px);
+  --opt-minw: clamp(140px, 40%, 420px);
+}
+
+/* Container for single and duel question cards */
+.single-player-game-container,
+.duel-game-container{
+  align-items:center;
+  justify-content:center;
+  padding: clamp(14px, 3vw, 32px);
+}
+
+/* Question frame */
+.question-container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width: 100%;
+  max-width: var(--q-maxw);
+  min-height: var(--q-minh);
+  padding: var(--q-pad);
+  text-align:center;
+  border: var(--q-border) solid #ff8a00;
+  border-radius: var(--q-radius);
+  background: #fffbea;
+  box-shadow: var(--q-shadow);
+  overflow:hidden;
+  margin-inline:auto;
+}
+
+/* Question text */
+.question-text{
+  font-size: var(--q-font);
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 8px 0 12px 0;
+  text-wrap: pretty;
+  word-break: break-word;
+  max-width: 90ch;
+}
+
+/* Optional image inside the question */
+.question-image{
+  max-width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  margin: 8px auto 10px auto;
+  display:block;
+}
+
+/* Options grid */
+.options-container{
+  display:flex;
+  flex-wrap: wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap: clamp(8px, 2vw, 16px);
+  width: 100%;
+  max-width: var(--q-maxw);
+  margin-top: 6px;
+}
+
+/* Option buttons */
+.option-button{
+  flex: 1 1 var(--opt-minw);
+  min-width: var(--opt-minw);
+  max-width: 480px;
+  padding: var(--opt-pad-y) var(--opt-pad-x);
+  font-size: var(--opt-font);
+  line-height: 1.25;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Progress/timer tighten spacing on mobile */
+.progress-container{max-width: var(--q-maxw);}
+.timer{font-size: clamp(1rem, 2.4vw, 1.2rem);}
+
+/* Portrait phones: ensure full-bleed fit */
+@media (max-width: 480px) {
+  .question-container{
+    min-height: clamp(320px, 58vh, 620px);
+  }
+  .options-container{
+    gap: 8px;
+  }
+}
+
+/* Tall screens (tablet portrait) */
+@media (min-height: 900px) and (max-width: 1024px){
+  .question-container{ min-height: clamp(480px, 60vh, 700px); }
+}
+
+/* Landscape small devices: keep text within frame without overflow */
+@media (max-height: 420px) and (orientation: landscape){
+  .question-image{ max-height: 40vh; }
+  .question-text{ font-size: clamp(1rem, 2.2vw, 1.3rem); }
+  .option-button{ font-size: clamp(0.9rem, 2vw, 1.1rem); }
+}
+/* === End Nova Responsive Question UI === */
+
 </style>
 
 <script>
