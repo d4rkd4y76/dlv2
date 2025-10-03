@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" name="viewport"/>
 <title>Şampiyonlar Düellosu</title>
 <!-- Comfortaa Font -->
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&amp;display=swap" rel="stylesheet"/>
@@ -4522,7 +4522,6 @@ html, body {
 }
 
 </style>
-
 <style>
 /* --- Nova: Düello cezası kilit stili --- */
 .find-duel-button.locked,
@@ -4546,8 +4545,6 @@ html, body {
   font-weight: 700;
 }
 </style>
-
-
 <style>
 /* === RESİMLİ SORU (robust) === */
 .resimli-soru-banner {
@@ -4741,8 +4738,6 @@ html, body {
 .player-name-column .rank-label{ display:block; margin:2px auto 0; font-size:.8em; }
 .star-frame + .rank-label{ display:block; }
 </style>
-
-
 <style id="nova-rank-centering-fix">
 /* --- Nova mobile/desktop centering & stacking for name → stars → rank --- */
 #main-screen{ width:100% !important; max-width:1400px; margin:0 auto !important; }
@@ -4770,8 +4765,6 @@ html, body {
   .star-frame{ min-width:56px; }
 }
 </style>
-
-
 <style id="nova-store-title-top">
 .profile-change-header{
   display:flex; flex-direction:column; align-items:center;
@@ -4806,8 +4799,6 @@ html, body {
   border-radius:10px; padding:6px 10px; color:#b91c1c; font-weight:900; cursor:pointer;
 }
 </style>
-
-
 <style id="nova-placement-fix">
 /* Nova placement: keep surprise box away from profile image */
 .student-photo { position: relative; z-index: 10 !important; }
@@ -4843,7 +4834,6 @@ html, body {
 
 }
 </style>
-
 <style id="nova-perf">
 /* Performance guardrails */
 @media (prefers-reduced-motion: reduce) {
@@ -4852,8 +4842,6 @@ html, body {
 .find-duel-button, .single-player, .friends-button, .surprise-box { will-change: transform; }
 /* Lighter shadows (global pass) */
 </style>
-
-
 <style>
 .explanation-container{margin-top:12px;display:none;}
 .explanation-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
@@ -4862,8 +4850,6 @@ html, body {
 .next-question-button:hover{opacity:.92;transform:translateY(-1px);}
 .explanation-correct{margin-bottom:8px;}
 </style>
-
-
 <style>
 /* === Nova: Ders Videosu Akışı (Single Player Result) === */
 .lesson-video-button{
@@ -4903,8 +4889,6 @@ html, body {
 }
 /* === End Nova === */
 </style>
-
-
 <style id="nova-profile-frame-override">
 /* === Nova Override: 440x550 oranlı dikdörtgen (köşeleri yuvarlatılmış) çerçeve === */
 /* Tüm görseller aynı oran ve stil: */
@@ -4937,8 +4921,6 @@ html, body {
   overflow: hidden;
 }
 </style>
-
-
 <style id="nova-extra-frames">
 /* === Nova Ek Düzenleme: Tüm ekranlarda aynı oran (440x550) === */
 
@@ -4966,8 +4948,6 @@ html, body {
 
 .ranking-player-photo { width: 60px !important; height: 75px !important; }
 </style>
-
-
 <style id="nova-store-fix">
 /* Mağaza kartlarındaki görsel oranını 440x550 (w:h=1:1.25) yap */
 .profile-photo {
@@ -4982,7 +4962,6 @@ html, body {
   object-fit: cover !important;
 }
 </style>
-
 <style>
 /* --- NOVA: EFSANE özel buton stili --- */
 .category-button.legendary{
@@ -5108,7 +5087,6 @@ html, body {
 /* keep category bar spacing consistent after new header */
 .profile-categories{ margin-top: 8px; }
 </style>
-
 <style id="nova-storebar-fix-20251002">
 /* === Nova Single-Row Store Header Fix (2025-10-02) === */
 .profile-change-header{
@@ -5169,7 +5147,6 @@ html, body {
   .current-diamonds{ padding:4px 10px !important; }
 }
 </style>
-
 <style>
 /* === Nova Responsive Patch v1.1 (compact mobile typography) === */
 :root{
@@ -5209,7 +5186,7 @@ html, body {
 </style>
 <style>
 
-/* ==== NOVA PREMIUM BİTİŞ ÖZETİ (yalnızca ek CSS) ==== */
+/* ==== NOVA PREMIUM v3 ==== */
 #premium-summary{display:none;flex-direction:column;gap:16px;width:100%;max-width:960px;margin:0 auto}
 #premium-summary .metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 #premium-summary .metric{background:#ffffff;border:2px solid #e5e7eb;border-radius:14px;padding:12px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.06)}
@@ -5234,46 +5211,218 @@ html, body {
 
 #premium-summary .wrong-block{background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:12px}
 #premium-summary .wrong-block h4{margin:0 0 8px 0;font-size:1rem;color:#111827}
-#premium-summary .wrong-list{display:grid;grid-template-columns:1fr;gap:16px}
+#premium-summary .wrong-list{display:grid;grid-template-columns:1fr;gap:18px}
 #premium-summary .wrong-card{border:2px solid #e5e7eb;border-radius:14px;padding:14px 16px;background:#ffffff;box-shadow:0 6px 14px rgba(0,0,0,.06)}
 #premium-summary .wrong-card .q{display:flex;align-items:center;gap:8px;font-weight:900;color:#0f172a;margin-bottom:10px;font-size:1.05rem}
 #premium-summary .wrong-card .qid{flex:0 0 auto;width:28px;height:28px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;background:#111827;box-shadow:0 3px 8px rgba(0,0,0,.15)}
 #premium-summary .wrong-card .divider{height:1px;background:#e5e7eb;margin:8px 0 10px 0;border-radius:1px}
-#premium-summary .wrong-card .row{font-size:.92rem;line-height:1.25;margin-top:6px}
-#premium-summary .wrong-card .k{font-weight:800;color:#6b7280;margin-right:4px;min-width:110px;display:inline-block}
+#premium-summary .wrong-card .row{font-size:.95rem;line-height:1.35;margin-top:6px;display:block}
+#premium-summary .wrong-card .k{font-weight:800;color:#6b7280;margin-right:6px;min-width:120px;display:inline-block}
 
+/* Modal */
 #premium-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999999}
-#premium-modal .box{background:#fff;width:clamp(280px,90vw,900px);max-height:85vh;overflow:auto;border-radius:16px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
-#premium-modal .box h3{margin:0 0 8px 0}
+#premium-modal .box{background:#fff;width:clamp(320px,92vw,960px);max-height:85vh;overflow:auto;border-radius:16px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+#premium-modal .box h3{margin:0 0 12px 0}
 #premium-modal .box .close{float:right;border:none;background:#111827;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer}
+#premium-modal .wrong-card{border:2px solid #e5e7eb;border-radius:14px;padding:14px 16px;background:#ffffff;box-shadow:0 6px 14px rgba(0,0,0,.06); margin-bottom:14px}
+#premium-modal .wrong-card .q{display:flex;align-items:center;gap:8px;font-weight:900;color:#0f172a;margin-bottom:10px;font-size:1.05rem}
+#premium-modal .wrong-card .qid{flex:0 0 auto;width:28px;height:28px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;background:#111827;box-shadow:0 3px 8px rgba(0,0,0,.15)}
+#premium-modal .wrong-card .divider{height:1px;background:#e5e7eb;margin:8px 0 10px 0;border-radius:1px}
+#premium-modal .wrong-card .row{font-size:.95rem;line-height:1.35;margin-top:6px;display:block}
+#premium-modal .wrong-card .k{font-weight:800;color:#6b7280;margin-right:6px;min-width:120px;display:inline-block}
 
 @media (max-width:640px){
   #premium-summary .metric-grid{grid-template-columns:1fr}
   #premium-summary .gauge{width:120px;height:120px}
   #premium-summary .gauge svg{width:120px;height:120px}
 }
-@media print{
-  #premium-summary .actions{display:none!important}
-}
+@media print{ #premium-summary .actions{display:none!important} }
 
-/* v2 Ders Videosu butonu şık görünüm */
+/* Premium "Ders Videosu" görünümü */
 #premium-summary .actions #act-lesson{
   background:linear-gradient(135deg,#2563eb,#7c3aed);
   color:#fff;border:none;box-shadow:0 10px 22px rgba(37,99,235,.35);
   position:relative;padding-left:40px;font-weight:900;letter-spacing:.3px
 }
 #premium-summary .actions #act-lesson::before{
-  content:'▶';
-  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  content:'▶'; position:absolute;left:14px;top:50%;transform:translateY(-50%);
   font-weight:900;font-size:1rem;line-height:1
 }
-#premium-summary .actions #act-lesson:hover{
-  transform:translateY(-1px) scale(1.01);
-  box-shadow:0 16px 30px rgba(124,58,237,.35)
-}
+#premium-summary .actions #act-lesson:hover{ transform:translateY(-1px) scale(1.01); box-shadow:0 16px 30px rgba(124,58,237,.35) }
 
 </style>
-</head>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/><style id="nova-kids-login-styles">
+/* === NOVA KIDS LOGIN (scoped to #student-selection-screen.nova-kids-login) === */
+#student-selection-screen.nova-kids-login{
+  --bg1:#f0f7ff;
+  --bg2:#fff7f0;
+  --panel:#ffffff;
+  --primary:#5b8cff;
+  --secondary:#ff7ac6;
+  --accent:#ffcf5a;
+  --ok:#22c55e;
+  --err:#ef4444;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --radius:20px;
+  --shadow: 0 14px 38px rgba(18, 24, 40, .12);
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  color: var(--ink);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 24px);
+  position: relative;
+  isolation: isolate;
+}
+
+/* playful background */
+#student-selection-screen.nova-kids-login::before{
+  content:"";
+  position:absolute; inset:0; z-index:-1;
+  background:
+    radial-gradient(700px 300px at 10% -10%, rgba(91,140,255,.15), transparent 60%),
+    radial-gradient(600px 300px at 110% 110%, rgba(255,122,198,.12), transparent 60%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+
+/* layout */
+#student-selection-screen.nova-kids-login .grid{
+  display:grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(14px, 2.5vw, 28px);
+  align-items: stretch;
+}
+@media (max-width: 900px){
+  #student-selection-screen.nova-kids-login .grid{ grid-template-columns: 1fr }
+}
+
+/* left: hero */
+#student-selection-screen.nova-kids-login .hero{
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: clamp(16px, 3vw, 28px);
+  box-shadow: var(--shadow);
+  position:relative; overflow:hidden;
+}
+#student-selection-screen.nova-kids-login .badge{
+  display:inline-flex; align-items:center; gap:10px;
+  background: #eef2ff; color:#334155; border:1px solid #e2e8f0;
+  padding:8px 12px; border-radius:999px; font-weight:800; letter-spacing:.2px;
+}
+#student-selection-screen.nova-kids-login h1{
+  font-family:"Baloo 2", cursive;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height:1.1; margin:16px 0 8px; color:#0b1220;
+}
+#student-selection-screen.nova-kids-login .lead{ color:var(--muted); margin:0 0 10px }
+#student-selection-screen.nova-kids-login .stickers{
+  display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;
+}
+#student-selection-screen.nova-kids-login .sticker{
+  display:flex; align-items:center; gap:8px; background:#fff7ed; border:1px solid #ffe0b2; color:#7c4a03;
+  padding:10px 12px; border-radius:14px; font-weight:700;
+}
+
+/* simple mascot (SVG) */
+#student-selection-screen.nova-kids-login .mascot{
+  position:absolute; right:-20px; bottom:-10px; width:180px; height:180px; opacity:.25;
+}
+@media (max-width: 520px){
+  #student-selection-screen.nova-kids-login .mascot{ display:none }
+}
+
+/* right: form card */
+#student-selection-screen.nova-kids-login .card{
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: clamp(16px, 3vw, 24px);
+  box-shadow: var(--shadow);
+  display:flex; flex-direction:column; gap:12px;
+}
+#student-selection-screen.nova-kids-login .toprow{
+  display:flex; align-items:center; justify-content:space-between;
+}
+#student-selection-screen.nova-kids-login .brand{
+  display:flex; align-items:center; gap:10px; font-weight:900;
+  letter-spacing:.2px; color:#0b1220;
+}
+#student-selection-screen.nova-kids-login .brand .dot{
+  width:12px; height:12px; border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, var(--accent), var(--secondary));
+}
+#student-selection-screen.nova-kids-login .register-link{
+  background:none; border:0; font-weight:800; color:var(--primary); cursor:pointer;
+}
+#student-selection-screen.nova-kids-login .register-link:hover{ text-decoration:underline }
+
+#student-selection-screen.nova-kids-login .subtitle{
+  color:var(--muted); margin:0 0 6px; font-size:14px;
+}
+
+#student-selection-screen.nova-kids-login form{ display:grid; gap:12px }
+
+#student-selection-screen.nova-kids-login .field{
+  display:flex; align-items:center; gap:10px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:14px;
+  padding:12px 14px; transition: border-color .15s, box-shadow .15s, transform .12s;
+}
+#student-selection-screen.nova-kids-login .field:focus-within{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(91,140,255,.18);
+  transform: translateY(-1px);
+}
+#student-selection-screen.nova-kids-login .ico{ font-size:20px }
+#student-selection-screen.nova-kids-login .field input,
+#student-selection-screen.nova-kids-login .field select{
+  appearance:none; border:0; outline:0; background:transparent; width:100%; color:#0b1220;
+  font: inherit; font-size:16px;
+}
+#student-selection-screen.nova-kids-login .eye{ cursor:pointer; padding:6px 8px; border-radius:10px }
+#student-selection-screen.nova-kids-login .eye:hover{ background:#eef2ff }
+
+#student-selection-screen.nova-kids-login .row{ display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+@media (max-width: 560px){
+  #student-selection-screen.nova-kids-login .row{ grid-template-columns: 1fr }
+}
+
+#student-selection-screen.nova-kids-login .actions{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  flex-wrap:wrap;
+}
+#student-selection-screen.nova-kids-login .muted{ color:var(--muted); font-size:13px }
+#student-selection-screen.nova-kids-login .link{ background:none; border:0; color:var(--primary); font-weight:800; cursor:pointer }
+#student-selection-screen.nova-kids-login .link:hover{ text-decoration:underline }
+
+#student-selection-screen.nova-kids-login .cta{
+  width:100%; border:0; border-radius:14px; padding:16px; font-weight:900;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  color:#fff; letter-spacing:.3px; box-shadow: 0 10px 28px rgba(91,140,255,.25);
+  cursor:not-allowed; opacity:.7; transition: transform .15s, box-shadow .15s, opacity .15s;
+}
+#student-selection-screen.nova-kids-login .cta.active{ cursor:pointer; opacity:1 }
+#student-selection-screen.nova-kids-login .cta.active:hover{ transform: translateY(-1px) }
+
+#student-selection-screen.nova-kids-login .error{ color:var(--err); font-weight:800; min-height:22px }
+
+#student-selection-screen.nova-kids-login .helper{
+  display:flex; gap:10px; align-items:center; margin-top:2px; color:#0f5132;
+  background:#d1fae5; border:1px solid #86efac; padding:10px 12px; border-radius:12px; font-weight:700;
+}
+
+/* accessibility & motion */
+@media (prefers-reduced-motion: reduce){
+  #student-selection-screen.nova-kids-login .field,
+  #student-selection-screen.nova-kids-login .cta{ transition: none }
+}
+
+/* safe-area & small screens */
+#student-selection-screen.nova-kids-login .card,
+#student-selection-screen.nova-kids-login .hero{ margin: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) }
+
+/* visually hidden labels */
+#student-selection-screen.nova-kids-login .sr{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0
+}
+</style></head>
 <body>
 <!-- Oyundakiler Modal -->
 <div class="players-overlay" id="playersOverlay">
@@ -5286,40 +5435,85 @@ html, body {
 </div>
 </div>
 <!-- Öğrenci Seçimi Ekranı -->
-<div class="container student-selection-container" id="student-selection-screen">
-<h2>🏆 Düellomatik 🏆</h2>
-<div class="table-section">
-<h3>Öğrenci Seçme</h3>
-<label for="selection-class-select">Sınıfı Seç:</label>
-<select id="selection-class-select">
-<option value="">Seçiniz</option>
-</select>
-<!-- Eski select yerine eklenecek input -->
-<label for="selection-name-input">Kullanıcı Adı:</label>
-<input disabled="" id="selection-name-input" placeholder="Kullanıcı adınızı giriniz" type="text"/>
-<label for="student-password-input">Şifre Giriniz:</label>
-<input disabled="" id="student-password-input" placeholder="Şifre" type="password"/>
-</div>
-<button class="login-button" disabled="" id="login-button">Giriş</button>
-<button class="register-button" id="register-button">Kayıt Ol</button>
 
-<div class="error" id="student-selection-error"></div>
+<div aria-labelledby="kidsLoginTitle" class="nova-kids-login" id="student-selection-screen" role="region">
+<div class="grid">
+<!-- Left: friendly hero -->
+<section class="hero">
+<span class="badge">🎒 Öğrenci Dostu • Hızlı Giriş</span>
+<h1 id="kidsLoginTitle">Şampiyonlar Düellosu’na Hoş Geldin!</h1>
+<p class="lead">Sınıfını seç, adını yaz, şifreni gir. Hemen oyuna başla! Hem telefonda hem bilgisayarda pırıl pırıl.</p>
+<div aria-hidden="true" class="stickers">
+<div class="sticker">🏆 Başarı Rozeti</div>
+<div class="sticker" style="background:#ecfeff;border-color:#bae6fd;color:#0c4a6e">🧠 Zihin Egzersizi</div>
+<div class="sticker" style="background:#f0fdf4;border-color:#bbf7d0;color:#065f46">⏱️ Hızlı Başlangıç</div>
 </div>
+<!-- simple SVG mascot -->
+<svg aria-hidden="true" class="mascot" fill="none" viewbox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<circle cx="60" cy="60" fill="#FFCF5A" opacity=".6" r="50"></circle>
+<circle cx="45" cy="50" fill="#0b1220" r="6"></circle>
+<circle cx="75" cy="50" fill="#0b1220" r="6"></circle>
+<path d="M40 78 C 56 90, 64 90, 80 78" stroke="#0b1220" stroke-linecap="round" stroke-width="6"></path>
+</svg>
+</section>
+<!-- Right: login card -->
+<section aria-label="Giriş paneli" class="card">
+<div class="toprow">
+<div class="brand"><span class="dot"></span> <span>Şampiyonlar Düellosu</span></div>
+<button aria-label="Kayıt Ol" class="register-link" id="register-button" type="button">Kayıt Ol</button>
+</div>
+<p class="subtitle">Sınıfını seç, kullanıcı adını ve şifreni gir.</p>
+<form novalidate="">
+<div class="field">
+<span aria-hidden="true" class="ico">🏫</span>
+<label class="sr" for="selection-class-select">Sınıf</label>
+<select id="selection-class-select">
+<option value="">Sınıfını Seç</option>
+</select>
+</div>
+<div class="row">
+<div class="field">
+<span aria-hidden="true" class="ico">👤</span>
+<label class="sr" for="selection-name-input">Kullanıcı Adı</label>
+<input autocomplete="username" id="selection-name-input" inputmode="text" placeholder="Kullanıcı adın" type="text"/>
+</div>
+<div class="field">
+<span aria-hidden="true" class="ico">🔒</span>
+<label class="sr" for="student-password-input">Şifre</label>
+<input autocomplete="current-password" id="student-password-input" placeholder="Şifre" type="password"/>
+<span aria-label="Şifreyi göster/gizle" class="eye" id="togglePwd" role="button">👁️</span>
+</div>
+</div>
+<div class="actions">
+<label class="muted" style="display:flex;align-items:center;gap:8px">
+<input id="rememberMe" style="accent-color:#5b8cff" type="checkbox"/> Beni hatırla
+          </label>
+<button class="link" id="forgot" type="button">Şifremi Unuttum?</button>
+</div>
+<button class="cta" disabled="" id="login-button" type="button">Hemen Başla</button>
+<div aria-live="polite" class="error" id="student-selection-error" role="alert"></div>
+<div aria-live="polite" class="helper">
+<span>📌</span>
+<span>İpucu: Alanları doldurunca buton aktif olur. Enter’a basarak da başlayabilirsin.</span>
+</div>
+</form>
+</section>
+</div>
+</div>
+
 <!-- Ana Ekran -->
 <div class="container" id="main-screen" style="display: none; position: relative;">
 <div class="profile-icon-container">
-<img decoding="async" loading="lazy" alt="Profile" class="profile-icon" id="profile-icon" src="https://i.pinimg.com/originals/66/22/ab/6622ab37c6db6ac166dfec760a2f2939.gif"/>
+<img alt="Profile" class="profile-icon" decoding="async" id="profile-icon" loading="lazy" src="https://i.pinimg.com/originals/66/22/ab/6622ab37c6db6ac166dfec760a2f2939.gif"/>
 </div>
-
-  <!-- === NOVA: Sürpriz Kutu (her 5 düello) === -->
-  <div id="surprise-box" class="surprise-box locked" title="Sürpriz kutu">
-    <img decoding="async" loading="lazy" id="surprise-box-img" src="https://i.giphy.com/ojujiWCHxud7s3cY4F.webp" alt="Sürpriz Kutu">
-    <div id="surprise-box-counter" class="surprise-box-counter">Kalan maç: 5</div>
-  </div>
-  <!-- === /NOVA Sürpriz Kutu === -->
-
+<!-- === NOVA: Sürpriz Kutu (her 5 düello) === -->
+<div class="surprise-box locked" id="surprise-box" title="Sürpriz kutu">
+<img alt="Sürpriz Kutu" decoding="async" id="surprise-box-img" loading="lazy" src="https://i.giphy.com/ojujiWCHxud7s3cY4F.webp"/>
+<div class="surprise-box-counter" id="surprise-box-counter">Kalan maç: 5</div>
+</div>
+<!-- === /NOVA Sürpriz Kutu === -->
 <div class="student-info">
-<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;"/>
+<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;">
 <div class="student-name" id="student-name"></div>
 <div class="star-frame" id="student-stars"></div>
 <div class="rank-label" id="student-rank"></div>
@@ -5343,7 +5537,7 @@ html, body {
 </div>
 </div>
 </div>
-</div>
+</img></div>
 <div class="buttons">
 <button class="single-player">Tek Kişilik Oyun</button>
 <button class="find-duel-button" id="findDuelButton">
@@ -5471,7 +5665,6 @@ html, body {
 <!-- "Geri Dön" butonu -->
 <button class="end-game-button" id="final-back-button">Geri Dön</button>
 <button class="lesson-video-button" id="lesson-video-button">🎬 Ders videosunu izle</button>
-
 </div>
 </div>
 <!-- Düello Seçim Ekranı -->
@@ -5626,43 +5819,37 @@ html, body {
 <div class="profile-change-overlay" id="profileChangeOverlay">
 <!-- Elmas Takas Modal (Minimal, layoutı bozmaz) -->
 <div id="diamondExchangeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;">
-  <div style="max-width:420px;margin:8vh auto;background:#0b1220;border:2px solid #1f2a44;border-radius:16px;box-shadow: 0 6px 18px rgba(0,0,0,.5);padding:18px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <div style="font-size:20px;font-weight:800;color:#e5e7eb;">💱 Elmas Takas</div>
-      <button onclick="closeDiamondExchangeModal()" aria-label="Kapat"
-              style="background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;">✖</button>
-    </div>
-    <div style="font-size:13px;color:#94a3b8;margin-bottom:12px;">
+<div style="max-width:420px;margin:8vh auto;background:#0b1220;border:2px solid #1f2a44;border-radius:16px;box-shadow: 0 6px 18px rgba(0,0,0,.5);padding:18px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+<div style="font-size:20px;font-weight:800;color:#e5e7eb;">💱 Elmas Takas</div>
+<button aria-label="Kapat" onclick="closeDiamondExchangeModal()" style="background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;">✖</button>
+</div>
+<div style="font-size:13px;color:#94a3b8;margin-bottom:12px;">
       1 Düello Kredisi → <b style="color:#f0f9ff">5 💎</b>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;margin:10px 0 14px;">
-      <label for="exchange-count-input" style="color:#cbd5e1;font-size:14px;">Adet</label>
-      <input id="exchange-count-input" type="number" min="1" value="1"
-             style="flex:0 0 120px;padding:10px;border-radius:10px;border:2px solid #ff8a00;font-size:1.05em;text-align:center;background:#0b1220;color:#e2e8f0;">
-      <span id="exchange-current-credits" style="margin-left:auto;font-size:13px;color:#94a3b8;">Mevcut Kredin: ...</span>
-    </div>
-    <button onclick="handleDiamondExchangeModal()"
-            style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer;">
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:10px 0 14px;">
+<label for="exchange-count-input" style="color:#cbd5e1;font-size:14px;">Adet</label>
+<input id="exchange-count-input" min="1" style="flex:0 0 120px;padding:10px;border-radius:10px;border:2px solid #ff8a00;font-size:1.05em;text-align:center;background:#0b1220;color:#e2e8f0;" type="number" value="1"/>
+<span id="exchange-current-credits" style="margin-left:auto;font-size:13px;color:#94a3b8;">Mevcut Kredin: ...</span>
+</div>
+<button onclick="handleDiamondExchangeModal()" style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer;">
       Elmas Al
     </button>
-    <div style="margin-top:10px;font-size:12px;color:#64748b;">İşlem onayından sonra elmas ve krediler anında güncellenir.</div>
-  </div>
+<div style="margin-top:10px;font-size:12px;color:#64748b;">İşlem onayından sonra elmas ve krediler anında güncellenir.</div>
 </div>
-
+</div>
 <div class="profile-change-content">
-
 <div class="profile-change-header">
-  <h2 class="store-title">Mağaza <span class="cart-icon">🛒</span></h2>
-  <div class="store-controls">
-    <div class="current-diamonds">
-      <span class="diamond-icon">💎</span>
-      <span class="diamond-amount" id="currentDiamonds">0</span>
-    </div>
-    <button id="openExchangeButton" onclick="openDiamondExchangeModal()">💱 Elmas Takas</button>
-    <button id="profileCloseButton">✖</button>
-  </div>
+<h2 class="store-title">Mağaza <span class="cart-icon">🛒</span></h2>
+<div class="store-controls">
+<div class="current-diamonds">
+<span class="diamond-icon">💎</span>
+<span class="diamond-amount" id="currentDiamonds">0</span>
 </div>
-
+<button id="openExchangeButton" onclick="openDiamondExchangeModal()">💱 Elmas Takas</button>
+<button id="profileCloseButton">✖</button>
+</div>
+</div>
 <div class="profile-categories">
 <!-- Buttons will be rendered from DB by renderStoreCategoryButtons() -->
 </div>
@@ -5672,7 +5859,6 @@ html, body {
 <!-- 100 Hak Paketi -->
 <div class="credit-package">
 <div class="package-header">
-
 </div>
 <div class="package-price">
 <span class="diamond-amount">100</span>
@@ -10671,7 +10857,6 @@ async function purchaseUnlimited(cost) {
 
 
     </script>
-
 <script>
 // Ceza sistemi KALDIRILDI: Nova
 
@@ -10724,8 +10909,6 @@ function getRankHTML(count){
     return `<div class="rank-label rank-${lvl}">${txt}</div>`;
 }
 </script>
-
-
 <script>
 (function(){
   function ensureBanner(container){
@@ -10787,8 +10970,6 @@ function getRankHTML(count){
   setInterval(updateAllBanners, 1000);
 })();
 </script>
-
-
 <script>
 function safeShowAlert(msg){
   try{
@@ -10939,7 +11120,6 @@ Emin misiniz?`);
   }
 }
 </script>
-
 <script>
 
 // === NOVA: Sürpriz Kutu Mantığı (her 5 düello) ===
@@ -11082,7 +11262,6 @@ async function novaSafeIncrementMatchCountOnce(){
 }
 
 </script>
-
 <script id="nova-defer-init">
 (function(){
   var idle = window.requestIdleCallback || function(cb){ return setTimeout(cb,0); };
@@ -11106,7 +11285,6 @@ async function novaSafeIncrementMatchCountOnce(){
   document.addEventListener('touchstart', primeAudio, {once:true});
 })();
 </script>
-
 <script>
 
 // === Nova: Single-player Explanation Feature (v2) ===
@@ -11149,23 +11327,19 @@ function showExplanationAndNext(){
 }
 
 </script>
-
 <!-- Nova: Ders Videosu Ekranı (Single Player) -->
 <div class="lesson-video-screen" id="lesson-video-screen">
-  <div class="lesson-video-header">
-    <div class="lesson-pill" id="lesson-video-breadcrumb">Ders & Konu</div>
-    <div class="video-title" id="lesson-video-title">Ders Videosu</div>
-  </div>
-  <div class="video-frame">
-    <iframe id="lesson-video-iframe" src="" title="Ders Videosu" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-  </div>
-  <div class="lesson-video-actions">
-    <button class="lesson-video-back" id="lesson-video-back">Geri</button>
-  </div>
+<div class="lesson-video-header">
+<div class="lesson-pill" id="lesson-video-breadcrumb">Ders &amp; Konu</div>
+<div class="video-title" id="lesson-video-title">Ders Videosu</div>
 </div>
-
-
-
+<div class="video-frame">
+<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" id="lesson-video-iframe" src="" title="Ders Videosu"></iframe>
+</div>
+<div class="lesson-video-actions">
+<button class="lesson-video-back" id="lesson-video-back">Geri</button>
+</div>
+</div>
 <!-- Nova: RTDB Adapter for Lesson Video URL (supports Firebase v8 & v9) -->
 <script>
 (function(){
@@ -11406,8 +11580,6 @@ function showExplanationAndNext(){
 })();
 // === End Nova ===
 </script>
-
-
 <!-- Nova: precise duel analytics hook (wraps updateDuelScore) -->
 <script>
 (function(){
@@ -11465,8 +11637,6 @@ function showExplanationAndNext(){
   }, 400);
 })();
 </script>
-
-
 <!-- Nova: Topic performance logger (<=4 correct -> record, keep last 25) -->
 <script>
 (function(){
@@ -11520,8 +11690,6 @@ function showExplanationAndNext(){
   }, 300);
 })();
 </script>
-
-
 <script>
 // === Nova Patch: Store Category Ordering & Colors ===
 (function() {
@@ -11695,8 +11863,6 @@ function showExplanationAndNext(){
   color: #fff;
 }
 </style>
-
-
 <script>
 // === Nova Audio Guard v1 ===
 (function(){
@@ -11753,42 +11919,33 @@ function showExplanationAndNext(){
 })();
 // === End Nova Audio Guard v1 ===
 </script>
-
 <script>
 
-/* ==== NOVA PREMIUM BİTİŞ ÖZETİ (yalnızca ek JS) ==== */
+/* ==== NOVA PREMIUM v3 (yalnızca ek JS) ==== */
 (function(){
   'use strict';
-  function save(key,val){ try{ sessionStorage.setItem(key, JSON.stringify(val)); }catch(_){ } }
-  function load(key,fb){ try{ var s=sessionStorage.getItem(key); return s?JSON.parse(s):fb; }catch(_){ return fb; } }
+  function save(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(_){ } }
+  function load(k,f){ try{ var s=sessionStorage.getItem(k); return s?JSON.parse(s):f; }catch(_){ return f; } }
   var WRONG_KEY='wrongAnswers', MAX_LIST=8;
 
   document.addEventListener('click', function(ev){
     try{
       var t=ev.target;
-      if (t && !(t.classList&&t.classList.contains('option-button'))){
-        t = t.closest ? t.closest('.option-button') : null;
-      }
+      if (t && !(t.classList&&t.classList.contains('option-button'))){ t=t.closest?t.closest('.option-button'):null; }
       if (!t) return;
       setTimeout(function(){
         try{
           var container=document.querySelector('.single-player-game-container, .duel-game-container')||document;
           var qEl=container.querySelector('.question-text');
           var expEl=document.querySelector('#explanation-container, .explanation-container');
-          var chosenBtn=t;
-          var chosenText=(chosenBtn.textContent||'').trim();
-          var correctBtn=null;
-          var btns=container.querySelectorAll('.option-button');
-          for (var i=0;i<btns.length;i++){
-            var b=btns[i];
-            if (b.classList.contains('correct') || b.getAttribute('data-correct')==='true'){ correctBtn=b; break; }
-          }
+          var chosenText=(t.textContent||'').trim();
+          var correctBtn=null, btns=container.querySelectorAll('.option-button');
+          for (var i=0;i<btns.length;i++){ var b=btns[i]; if (b.classList.contains('correct') || b.getAttribute('data-correct')==='true'){ correctBtn=b; break; } }
           var isWrong=t.classList.contains('wrong') || t.getAttribute('data-correct')==='false';
           if (isWrong && correctBtn){
             var item={ q:qEl?(qEl.textContent||'').trim():'', chosen:chosenText, correct:(correctBtn.textContent||'').trim(), exp: expEl?(expEl.textContent||'').trim():'' };
             var list=load(WRONG_KEY,[]);
-            var dup=false;
-            for (var j=0;j<list.length;j++){ if (list[j].q===item.q && list[j].chosen===item.chosen){ dup=true; break; } }
+            var dup=false; for (var j=0;j<list.length;j++){ if(list[j].q===item.q && list[j].chosen===item.chosen){ dup=true; break; } }
             if (!dup){ list.push(item); save(WRONG_KEY,list); }
           }
         }catch(_){}
@@ -11799,16 +11956,13 @@ function showExplanationAndNext(){
   function bindReset(){
     try{
       var startBtn=document.querySelector('#start-game-button');
-      if (startBtn && !startBtn.__novaBound){
-        startBtn.__novaBound=true;
-        startBtn.addEventListener('click', function(){ try{ sessionStorage.removeItem(WRONG_KEY); }catch(_){} });
-      }
+      if (startBtn && !startBtn.__novaBound){ startBtn.__novaBound=true; startBtn.addEventListener('click', function(){ try{ sessionStorage.removeItem(WRONG_KEY);}catch(_){}}); }
     }catch(_){}
   }
   bindReset(); new MutationObserver(bindReset).observe(document.documentElement,{childList:true,subtree:true});
 
   function isVisible(el){ if(!el) return false; var s=window.getComputedStyle(el); return s && s.display!=='none' && s.visibility!=='hidden' && (el.offsetParent!==null || s.position==='fixed'); }
-  function numberOr(s,fb){ var m=(s||'').match(/(\d+[.,]?\d*)/g); if(!m) return fb; var n=parseFloat(m[m.length-1].replace(',','.')); return isFinite(n)?n:fb; }
+  function numberOr(s,f){ var m=(s||'').match(/(\d+[.,]?\d*)/g); if(!m) return f; var n=parseFloat(m[m.length-1].replace(',','.')); return isFinite(n)?n:f; }
 
   function extractMetrics(){
     var total=0, correct=0, pct=0;
@@ -11823,7 +11977,7 @@ function showExplanationAndNext(){
     return {total:total||0, correct:correct||0, pct:Math.max(0,Math.min(100,Math.round(pct)))};
   }
 
-  function computeBadge(pct){ if(pct>=90) return {name:'ELMAS',emoji:'💎'}; if(pct>=75) return {name:'ALTIN',emoji:'🥇'}; if(pct>=50) return {name:'GÜMÜŞ',emoji:'🥈'}; return {name:'BRONZ',emoji:'🥉'}; }
+  function computeBadge(p){ if(p>=90) return {name:'ELMAS',emoji:'💎'}; if(p>=75) return {name:'ALTIN',emoji:'🥇'}; if(p>=50) return {name:'GÜMÜŞ',emoji:'🥈'}; return {name:'BRONZ',emoji:'🥉'}; }
 
   function ensurePremiumUI(scoreBox){
     if (!document.getElementById('premium-summary')){
@@ -11903,7 +12057,89 @@ function showExplanationAndNext(){
 })();
 
 </script>
-</body>
+<script id="nova-kids-login-js">
+(function(){
+  const root = document.getElementById('student-selection-screen');
+  if(!root) return;
+  const cls = document.getElementById('selection-class-select');
+  const user = document.getElementById('selection-name-input');
+  const pass = document.getElementById('student-password-input');
+  const login = document.getElementById('login-button');
+  const err = document.getElementById('student-selection-error');
+  const eye = document.getElementById('togglePwd');
+
+  // Şifre göster/gizle
+  eye?.addEventListener('click', () => {
+    const type = pass.type === 'password' ? 'text' : 'password';
+    pass.type = type;
+    eye.textContent = type === 'password' ? '👁️' : '🙈';
+  });
+
+  function validate(){
+    const ok = (cls?.value || '').trim() !== '' &&
+               (user?.value || '').trim().length >= 2 &&
+               (pass?.value || '').trim().length >= 4;
+    login.disabled = !ok;
+    login.classList.toggle('active', ok);
+    if(ok) err.textContent = '';
+  }
+  ['change','input'].forEach(ev => {
+    cls?.addEventListener(ev, validate);
+    user?.addEventListener(ev, validate);
+    pass?.addEventListener(ev, validate);
+  });
+  validate();
+
+  // Enter ile giriş
+  [cls,user,pass].forEach(el => el?.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !login.disabled){ e.preventDefault(); login.click(); }
+  }));
+
+  // Beni hatırla
+  const remember = document.getElementById('rememberMe');
+  try{
+    const saved = JSON.parse(localStorage.getItem('duello_login_pref')||'{}');
+    if(saved.user) user.value = saved.user;
+    if(saved.cls) { for(const o of cls.options){ if(o.value === saved.cls){ cls.value = saved.cls; break; } } }
+    if('rem' in saved) remember.checked = !!saved.rem;
+  }catch(_){}
+  function persist(){
+    try{
+      localStorage.setItem('duello_login_pref', JSON.stringify({
+        user: remember.checked ? user.value : '',
+        cls: remember.checked ? cls.value : '',
+        rem: remember.checked
+      }));
+    }catch(_){}
+  }
+  remember?.addEventListener('change', persist);
+  [cls,user,pass].forEach(el => el?.addEventListener('input', persist));
+
+  // Giriş click -> uygulamanın mevcut akışına CustomEvent
+  login?.addEventListener('click', () => {
+    const payload = {
+      classId: (cls?.value || '').trim(),
+      username: (user?.value || '').trim(),
+      password: (pass?.value || '').trim()
+    };
+    if(!payload.classId || !payload.username || !payload.password){
+      err.textContent = 'Lütfen tüm alanları doldurun.';
+      return;
+    }
+    document.dispatchEvent(new CustomEvent('duello:loginAttempt', { detail: payload }));
+  });
+
+  // Dıştan hata yazdırmak için
+  document.addEventListener('duello:loginError', e => {
+    err.textContent = e.detail?.message || 'Giriş başarısız.';
+  });
+
+  // Şifremi unuttum delege
+  document.getElementById('forgot')?.addEventListener('click', () => {
+    document.dispatchEvent(new Event('duello:forgotPassword'));
+  });
+})();
+</script></body>
 </html>
 <!-- === NOVA PATCH v8.1: EFSANE butonu sıralama + alev animasyonu + mağaza başlığı düzeni === -->
 <style>
@@ -12082,7 +12318,6 @@ function showExplanationAndNext(){
 /* === End Nova Responsive Question UI === */
 
 </style>
-
 <script>
 /* -------------------- NOVA: Güvenli kategori oluşturucu --------------------
    Hedefler:
