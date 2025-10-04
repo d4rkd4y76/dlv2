@@ -5484,7 +5484,21 @@ html, body {
 #score-container #act-restart{background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;box-shadow:0 8px 22px rgba(99,102,241,.32)}
 /* Remove any remaining duplicated progress/gauges outside our mount */
 body > #nova-summary{display:none !important;}
-</style></head>
+</style><style>
+/* NOVA SAFE PATCH: Only hide visuals; keep DOM for scripts */
+#nova-end-root #nova-summary .nz-row:first-of-type { display:none !important; } /* KPI cards */
+#nova-end-root .nz-gauge, 
+#nova-end-root #nzBadge { 
+  visibility:hidden !important; 
+  height:0 !important; 
+  margin:0 !important; 
+  padding:0 !important; 
+  border:0 !important; 
+  overflow:hidden !important; 
+}
+#premium-summary, .metric-grid { display:none !important; } /* bottom premium block */
+</style>
+</head>
 <body>
 <!-- Oyundakiler Modal -->
 <div class="players-overlay" id="playersOverlay">
@@ -5719,6 +5733,22 @@ body > #nova-summary{display:none !important;}
 <div class="options-container" id="options-container"></div>
 <div class="explanation-container" id="explanation-container" style="display:none"></div>
 <div class="score-container nova-final-wrap" id="score-container"><div class="nova-end-root" id="nova-end-root"><div aria-live="polite" id="nova-summary">
+<div id="novaGaugePro" style="display:flex;justify-content:center;align-items:center;padding:16px 0 8px;">
+  <svg id="novaGaugeSVG" width="220" height="220" viewBox="0 0 120 120" role="img" aria-label="Başarı Yüzdesi">
+    <circle cx="60" cy="60" r="52" stroke-width="12" fill="none" stroke="rgba(0,0,0,0.08)"></circle>
+    <circle id="novaGaugeArc" cx="60" cy="60" r="52" stroke-width="12" fill="none" stroke-linecap="round"
+            stroke="url(#grad)" stroke-dasharray="0 999" transform="rotate(-90 60 60)"></circle>
+    <defs>
+      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#22c55e"/>
+        <stop offset="100%" stop-color="#10b981"/>
+      </linearGradient>
+    </defs>
+    <text id="novaGaugeText" x="60" y="65" text-anchor="middle" font-size="26" font-weight="700">0%</text>
+    <text x="60" y="82" text-anchor="middle" font-size="9" fill="#666">Başarı</text>
+  </svg>
+</div>
+
 <div class="nz-row">
 <div class="nz-card">
 <div class="nz-kpi"><span class="label">Doğru</span><span class="value ok" id="nz-kpi-correct">0</span></div>
@@ -12801,6 +12831,75 @@ function showExplanationAndNext(){
   }, 150);
 })();
 </script>
+
+<script>
+(function(){
+  function readPct(){
+    var rateEl = document.getElementById('nz-kpi-rate');
+    if(rateEl && /(\d+)%/.test(rateEl.textContent)){ return parseInt(rateEl.textContent,10); }
+    var c = parseInt((document.getElementById('nz-kpi-correct')||{}).textContent||'0',10);
+    var t = parseInt((document.getElementById('nz-kpi-total')||{}).textContent||'0',10);
+    return t>0 ? Math.round(100*c/t) : 0;
+  }
+  var arc, txt, C, r=52;
+  function ensureEls(){
+    arc = document.getElementById('novaGaugeArc');
+    txt = document.getElementById('novaGaugeText');
+    C = 2*Math.PI*r;
+    return !!(arc && txt);
+  }
+  function animateTo(target){
+    if(!ensureEls()) return;
+    var startDash = arc.getAttribute('stroke-dasharray')||('0 '+C);
+    var m = String(startDash).match(/^([\d.]+)/);
+    var cur = m ? (parseFloat(m[1])*100/C) : 0;
+    var t0=null;
+    function step(ts){
+      if(!t0) t0=ts;
+      var t=Math.min(1,(ts-t0)/700);
+      var val=cur+(target-cur)*t;
+      arc.setAttribute('stroke-dasharray', (C*val/100)+' '+C);
+      txt.textContent = Math.round(val)+'%';
+      if(t<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function bindObservers(){
+    ['nz-kpi-rate','nz-kpi-correct','nz-kpi-total'].forEach(function(id){
+      var node = document.getElementById(id);
+      if(!node) return;
+      var mo = new MutationObserver(function(){ animateTo(readPct()); });
+      mo.observe(node, {childList:true, subtree:true, characterData:true});
+    });
+  }
+  function bindButtons(){
+    var v = document.getElementById('nzVideoBtn');
+    if(v && !v.dataset.novaBound){
+      v.addEventListener('click', function(e){ 
+        try{ e.preventDefault(); (window.openLessonVideo||function(){alert('Ders videosu bağlantısı bulunamadı.');})({source:'nova-safe'}); }catch(_){}
+      });
+      v.dataset.novaBound = '1';
+    }
+    var p = document.getElementById('nzPlayBtn');
+    if(p && !p.dataset.novaBound){
+      p.addEventListener('click', function(e){
+        e.preventDefault();
+        try{
+          if(typeof window.clickPlayAgain==='function'){ window.clickPlayAgain(); }
+          else { location.reload(); }
+        }catch(_){ location.reload(); }
+      });
+      p.dataset.novaBound='1';
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    try{ animateTo(readPct()); }catch(_){}
+    bindObservers();
+    bindButtons();
+  });
+})();
+</script>
+
 </body>
 </html>
 <!-- === NOVA PATCH v8.1: EFSANE butonu sıralama + alev animasyonu + mağaza başlığı düzeni === -->
