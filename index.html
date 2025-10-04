@@ -4521,6 +4521,42 @@ html, body {
   display:flex !important;
 }
 
+
+/* === NOVA v8.3: Medal visual quality + feedback mapping (0–30/30–60/60–90/90–100) === */
+.nz-badge-mini{font-weight:900;letter-spacing:.6px}
+.nz-badge-mini[data-type="BRONZ"]{background:#fff7ed !important;border-color:#b45309 !important;color:#92400e !important}
+.nz-badge-mini[data-type="GÜMÜŞ"]{background:#f3f4f6 !important;border-color:#6b7280 !important;color:#374151 !important}
+.nz-badge-mini[data-type="ALTIN"]{background:#fffbeb !important;border-color:#d97706 !important;color:#b45309 !important}
+.nz-badge-mini[data-type="ELMAS"]{background:#ecfeff !important;border-color:#06b6d4 !important;color:#0e7490 !important}
+
+/* Feedback pill right under compact gauge */
+#nzFeedback{
+  display:block;
+  margin:8px auto 2px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:.95rem;
+  border:2px solid #e5e7eb;
+  max-width:900px;
+  text-align:center;
+}
+#nzFeedback.bad   {background:#fee2e2;border-color:#fecaca;color:#991b1b}
+#nzFeedback.warn  {background:#fff7ed;border-color:#fed7aa;color:#92400e}
+#nzFeedback.good  {background:#ecfeff;border-color:#bae6fd;color:#0e7490}
+#nzFeedback.best  {background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+
+
+/* === NOVA PATCH: Hide medal/badge area on single-player result === */
+#nzBadge, #nzBadgeMini, .nz-badge, .nz-badge-mini, .nz-gauge, .nz-mini-wrap {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
 </style>
 <style>
 /* --- Nova: Düello cezası kilit stili --- */
@@ -5498,6 +5534,62 @@ body > #nova-summary{display:none !important;}
 }
 #premium-summary, .metric-grid { display:none !important; } /* bottom premium block */
 </style>
+
+<style>
+/* Nova: Kullanıcı talebiyle yanlış soru listesi sonuç ekranında gösterilmesin */
+#nzWrongList { display: none !important; }
+/* İlgili kart başlığı silindi; butonlar (Yanlışları Tekrar Et / Ders Videosu) korunuyor. */
+</style>
+
+
+<style>
+/* === Nova UI Patch: Topic chip & responsive actions === */
+.nz-topic-card{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.55rem .8rem;
+  border-radius:14px;
+  border:1.5px solid rgba(0,0,0,.08);
+  background: linear-gradient(180deg, #fff, #fafafa);
+  box-shadow: 0 2px 6px rgba(0,0,0,.05) inset;
+  font-size:.95rem;
+  margin-bottom:.25rem;
+  max-width: 100%;
+}
+.nz-topic-card .nz-topic-label{
+  font-weight:600; opacity:.75;
+}
+.nz-topic-card .nz-topic-name{
+  font-weight:700;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width: min(70vw, 420px);
+}
+
+/* Actions row: center & symmetric buttons on all screens */
+.nz-actions{
+  display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; width:100%;
+}
+.nz-actions .nz-btn{
+  flex:1 1 180px;
+  min-height:42px;
+}
+@media (min-width: 720px){
+  .nz-actions .nz-btn{ flex:0 0 220px; }
+}
+
+/* Optional small visual accent depending on subject type (if set via data-attr) */
+.nz-topic-card[data-subject="matematik"]{ border-color:#2a9d8f22; }
+.nz-topic-card[data-subject="turkce"]{ border-color:#e76f5122; }
+.nz-topic-card[data-subject="fen"]{ border-color:#3a86ff22; }
+</style>
+
+
+<style>
+/* Nova: boş kartların tamamen kaybolması için */
+.nz-card:empty { display:none !important; padding:0 !important; margin:0 !important; height:0 !important; }
+</style>
+
 </head>
 <body>
 <!-- Oyundakiler Modal -->
@@ -5766,14 +5858,17 @@ body > #nova-summary{display:none !important;}
 </div>
 <div class="nz-row">
 <div class="nz-card" style="flex:1 1 100%">
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px">
-<strong style="font-size:1.05rem">Yanlış Soru Özeti (ilk 8)</strong>
+
+<!-- Nova: Konu kartı -->
+<div id="nzTopicCard" class="nz-topic-card" aria-live="polite"></div>
+
+<!-- Yanlış Soru Özeti başlığı kaldırıldı -->
 <div class="nz-actions">
 <button class="nz-btn nz-primary" id="nzRepeatBtn">Yanlışları Tekrar Et</button>
 <button class="nz-btn nz-secondary" id="nzVideoBtn">Ders Videosu</button>
 </div>
 </div>
-<div class="nz-wrong-list" id="nzWrongList"></div>
+<div class="nz-wrong-list" id="nzWrongList" style="display:none !important"></div>
 </div>
 </div>
 </div></div></div>
@@ -12330,7 +12425,7 @@ function showExplanationAndNext(){
       }, 250);
     }, true);
 
-    function getBadge(rate){ if(rate>=90) return 'ELMAS'; if(rate>=75) return 'ALTIN'; if(rate>=60) return 'GÜMÜŞ'; return 'BRONZ'; }
+    function getBadge(rate){ if(rate>=90) return 'ELMAS'; if(rate>=60) return 'ALTIN'; if(rate>=30) return 'GÜMÜŞ'; return 'BRONZ'; }
 
     function drawGauge(rate){
       const canvas = document.getElementById('nzGauge'); if(!canvas) return;
@@ -12747,7 +12842,7 @@ function showExplanationAndNext(){
     ctx.fillText(`${Math.round(rate)}%`, cx, cy+8);
   }
 
-  function getBadge(rate){ if(rate>=90) return 'ELMAS'; if(rate>=75) return 'ALTIN'; if(rate>=60) return 'GÜMÜŞ'; return 'BRONZ'; }
+  function getBadge(rate){ if(rate>=90) return 'ELMAS'; if(rate>=60) return 'ALTIN'; if(rate>=30) return 'GÜMÜŞ'; return 'BRONZ'; }
 
   // Strong opener for lesson video
   function openLessonVideo(payload){
@@ -12897,6 +12992,181 @@ function showExplanationAndNext(){
     bindObservers();
     bindButtons();
   });
+})();
+</script>
+
+
+<script>
+// === NOVA v8.3: Success comment mapping + medal visuals + robust replay ===
+(function(){
+  function q(s, r=document){ return r.querySelector(s); }
+  function qa(s, r=document){ return Array.from(r.querySelectorAll(s)); }
+
+  function readPct(){
+    var el = document.getElementById('nz-kpi-rate');
+    if(el && /([0-9]{1,3})%/.test(el.textContent)){ return Math.min(100, parseInt(RegExp.$1,10)); }
+    var c = parseInt((document.getElementById('nz-kpi-correct')||{}).textContent||'0',10);
+    var t = parseInt((document.getElementById('nz-kpi-total')||{}).textContent||'0',10);
+    return t>0 ? Math.round(100*c/t) : 0;
+  }
+
+  function ensureFeedbackHost(){
+    // Mount right under compact gauge (if exists), else under #nova-summary
+    var summary = q('#nova-summary');
+    if(!summary) return null;
+    var mount = q('#novaGaugeSVG')?.parentElement || summary;
+    var fb = document.getElementById('nzFeedback');
+    if(!fb){
+      fb = document.createElement('div');
+      fb.id = 'nzFeedback';
+      mount.insertAdjacentElement('afterend', fb);
+    }
+    return fb;
+  }
+
+  function mapFeedback(pct){
+    if(pct < 30) return {cls:'bad',  text:'Bu sonuç hedefinin çok altında. Şimdi odaklanıp düzenli çalışmaya başlıyoruz; toparlayacağına güveniyorum.'};
+    if(pct < 60) return {cls:'warn', text:'Orta seviyenin altındasın. Eksikleri kapatmak için düzenli çalışman şart.'};
+    if(pct < 90) return {cls:'good', text:'İyi bir seviye; dikkatini koruyup çalışmayı sürdürürsen daha yukarı çıkarsın.'};
+    return {cls:'best', text:'Şampiyon performans; çalışmanı bırakma, seviyeni sabitle.'};
+  }
+
+  function updateFeedback(){
+    var fb = ensureFeedbackHost(); if(!fb) return;
+    var pct = readPct();
+    var m = mapFeedback(pct);
+    fb.className = ''; // reset
+    fb.classList.add(m.cls);
+    fb.textContent = m.text;
+    // Also decoration for medal chip
+    var mini = document.getElementById('nzBadgeMini');
+    if(mini){
+      var badge = (typeof getBadge==='function') ? getBadge(pct) : (pct>=90?'ELMAS':pct>=60?'ALTIN':pct>=30?'GÜMÜŞ':'BRONZ');
+      mini.textContent = badge;
+      mini.setAttribute('data-type', badge);
+    }
+  }
+
+  // Keep feedback synced with KPI changes
+  document.addEventListener('DOMContentLoaded', function(){
+    try{ updateFeedback(); }catch(e){}
+    ['nz-kpi-rate','nz-kpi-correct','nz-kpi-total'].forEach(function(id){
+      var node = document.getElementById(id);
+      if(!node) return;
+      var mo = new MutationObserver(function(){ updateFeedback(); });
+      mo.observe(node, {childList:true, subtree:true, characterData:true});
+    });
+  });
+})();
+</script>
+
+
+<!-- === NOVA PATCH START (Replay Wiring) === -->
+<script>
+(function(){
+  function logNova(msg){ try{ console.debug('[NOVA]', msg); }catch(_){} }
+
+  function restartSameSingleGame(){
+    try{
+      // If custom clickPlayAgain exists, prefer it.
+      if (typeof window.clickPlayAgain === 'function') {
+        logNova('Using clickPlayAgain()');
+        window.clickPlayAgain();
+        return;
+      }
+      // Try to click any known "start single-player" triggers still bound with last selections
+      var startCandidates = document.querySelectorAll('#start-game-button, .start-game-button.active, #startSingle, .startSingle, [data-action=\"startSingle\"]');
+      for (var i=0;i<startCandidates.length;i++){
+        var b = startCandidates[i];
+        if (!b.disabled) { logNova('Clicking existing start button'); b.click(); return; }
+      }
+      // Fallback: if there is a reset function then call it
+      if (typeof window.resetGameScreens === 'function') { window.resetGameScreens(); }
+      // Try to show single player game container directly
+      var sp = document.querySelector('.single-player-game-container');
+      if (sp) { sp.style.display = 'flex'; }
+      // If there's a generic startTimer or startGame function, try them carefully
+      if (typeof window.startGame === 'function') { logNova('Calling startGame()'); window.startGame(); return; }
+    }catch(e){ console.error('NOVA restart error', e); }
+  }
+
+  // Wire #act-restart (results screen button)
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if (!t) return;
+    if (t.id === 'act-restart' || t.closest('#act-restart')){
+      ev.preventDefault();
+      restartSameSingleGame();
+    }
+  }, true);
+
+  // If #act-restart exists but no listener, attach one (idempotent)
+  function attachIfPresent(){
+    var r = document.getElementById('act-restart');
+    if (r && !r.dataset.novaBound){
+      r.addEventListener('click', function(e){ e.preventDefault(); restartSameSingleGame(); });
+      r.dataset.novaBound = '1';
+      logNova('Bound #act-restart');
+    }
+    // Ensure nzPlayBtn delegates to the same function
+    var p = document.getElementById('nzPlayBtn');
+    if (p && !p.dataset.novaBound){
+      p.addEventListener('click', function(e){ e.preventDefault(); restartSameSingleGame(); });
+      p.dataset.novaBound = '1';
+      logNova('Bound #nzPlayBtn');
+    }
+  }
+  attachIfPresent();
+  // Also observe DOM mutations in case the result panel is injected dynamically
+  try{
+    var mo = new MutationObserver(attachIfPresent);
+    mo.observe(document.documentElement, {subtree:true, childList:true});
+  }catch(_){}
+
+  logNova('Replay patch ready');
+})();
+</script>
+<!-- === NOVA PATCH END === -->
+
+
+<script>
+// === Nova JS Patch: Fill topic card on results screen ===
+(function(){
+  function byId(x){ return document.getElementById(x); }
+  function topicTextFromSelects(){
+    var cls = byId('class-select'), sub = byId('subject-select'), top = byId('topic-select');
+    var subText = sub && sub.options && sub.selectedIndex >= 0 ? (sub.options[sub.selectedIndex] && sub.options[sub.selectedIndex].text || '') : '';
+    var topText = top && top.options && top.selectedIndex >= 0 ? (top.options[top.selectedIndex] && top.options[top.selectedIndex].text || '') : '';
+    return {subject: (subText||'').trim(), topic: (topText||'').trim()};
+  }
+  function topicTextFromCache(){
+    try{
+      var s = window.__novaSelection__ || {};
+      var t = topicTextFromSelects();
+      // prefer visible option labels; fall back to ids if needed
+      return {subject: t.subject || (s.subjectName||''), topic: t.topic || (s.topicName||'')};
+    }catch(e){ return {subject:'', topic:''}; }
+  }
+  function renderTopicCard(){
+    var card = document.getElementById('nzTopicCard');
+    if(!card) return;
+    var data = topicTextFromCache();
+    var subjectSlug = (data.subject || '').toLowerCase().replace(/[^\p{L}0-9]+/gu,'').slice(0,16);
+    var label = data.subject ? data.subject + " • Konu" : "Konu";
+    var topicName = data.topic || "Seçilen konu";
+    card.setAttribute('data-subject', subjectSlug);
+    card.innerHTML = '<span class="nz-topic-label">'+label+':</span><span class="nz-topic-name">'+topicName+'</span>';
+  }
+
+  if (document.readyState !== 'loading') { renderTopicCard(); }
+  else { document.addEventListener('DOMContentLoaded', renderTopicCard); }
+
+  var list = document.getElementById('nzWrongList');
+  if (list){
+    try {
+      new MutationObserver(function(){ renderTopicCard(); }).observe(list, {childList:true});
+    } catch(_){}
+  }
 })();
 </script>
 
