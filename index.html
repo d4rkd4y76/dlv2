@@ -4533,6 +4533,86 @@ html, body {
 .nova-circular-wrap{animation:novaPop .35s ease-out}
 /* === NOVA END === */
 
+
+/* === Nova: Duel Result FX v2 === */
+.duel-player-score.winner{
+  background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(5,150,105,.08));
+  box-shadow: 0 10px 28px rgba(16,185,129,.25), inset 0 0 0 2px rgba(5,150,105,.45);
+  transform-origin: center;
+  animation: novaWinPulse .9s ease-out 1, novaWinGlow 2.2s ease-in-out infinite alternate;
+}
+.duel-player-score.loser{
+  background: linear-gradient(135deg, rgba(239,68,68,.06), rgba(220,38,38,.06));
+  box-shadow: 0 10px 24px rgba(220,38,38,.18), inset 0 0 0 2px rgba(220,38,38,.35);
+  filter: grayscale(.25) saturate(.9);
+  position: relative;
+  overflow: hidden;
+  animation: novaLoseShake 1.2s ease-in-out 1;
+}
+.duel-player-score.loser::after{
+  content:'';
+  position:absolute; inset:-10px;
+  background: radial-gradient(ellipse at center, rgba(239,68,68,.20), transparent 60%);
+  backdrop-filter: blur(2px);
+  pointer-events:none;
+}
+.duel-player-score.tie{
+  background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(37,99,235,.08));
+  box-shadow: 0 10px 24px rgba(59,130,246,.22), inset 0 0 0 2px rgba(37,99,235,.45);
+}
+
+#winner-message {
+  letter-spacing:.4px;
+}
+.duel-final-theme-win #winner-message{
+  background: linear-gradient(90deg,#22c55e,#16a34a,#22c55e);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow: 0 0 18px rgba(16,185,129,.35);
+}
+.duel-final-theme-lose #winner-message{
+  background: linear-gradient(90deg,#ef4444,#dc2626,#ef4444);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow: 0 0 14px rgba(239,68,68,.35);
+}
+.duel-final-theme-tie #winner-message{
+  background: linear-gradient(90deg,#60a5fa,#3b82f6,#60a5fa);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow: 0 0 14px rgba(59,130,246,.35);
+}
+
+/* Subtle vignette on the whole duel screen based on result */
+#duel-game-screen.duel-final-theme-win::before,
+#duel-game-screen.duel-final-theme-lose::before,
+#duel-game-screen.duel-final-theme-tie::before{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+}
+#duel-game-screen.duel-final-theme-win::before{ background: radial-gradient(1200px 800px at 50% 30%, rgba(16,185,129,.10), transparent 60%); }
+#duel-game-screen.duel-final-theme-lose::before{ background: radial-gradient(1200px 800px at 50% 30%, rgba(239,68,68,.12), transparent 60%); }
+#duel-game-screen.duel-final-theme-tie::before{ background: radial-gradient(1200px 800px at 50% 30%, rgba(59,130,246,.10), transparent 60%); }
+
+/* Confetti canvas positioning */
+#duel-confetti {
+  position: fixed; inset:0; z-index: 9998; pointer-events: none;
+}
+
+/* keyframes */
+@keyframes novaWinPulse{
+  0%{ transform: scale(.9) }
+  60%{ transform: scale(1.05) }
+  100%{ transform: scale(1) }
+}
+@keyframes novaWinGlow{
+  from{ box-shadow: 0 10px 28px rgba(16,185,129,.25), inset 0 0 0 2px rgba(5,150,105,.45) }
+  to{ box-shadow: 0 14px 34px rgba(16,185,129,.35), inset 0 0 0 2px rgba(5,150,105,.65) }
+}
+@keyframes novaLoseShake{
+  0%,100%{ transform: translateX(0) }
+  20%{ transform: translateX(-4px) }
+  40%{ transform: translateX(4px) }
+  60%{ transform: translateX(-3px) }
+  80%{ transform: translateX(3px) }
+}
+
 </style>
 <style>
 /* --- Nova: Düello cezası kilit stili --- */
@@ -5603,8 +5683,90 @@ body > #nova-summary{display:none !important;}
 #result-back-btn:hover { transform: translateY(-1px); }
 #result-back-btn:active { transform: translateY(0); }
 </style>
+<style>
+
+/* === Nova Patch: Center actions row on result screen === */
+.nz-actions, .result-actions, .buttons-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: 100%;
+  margin: 8px 0 4px 0;
+}
+/* Make the two buttons visually balanced */
+.nz-actions .nz-btn, .result-actions .nz-btn {
+  min-width: 180px;
+  justify-content: center;
+}
+@media (max-width: 640px){
+  .nz-actions, .result-actions, .buttons-row { flex-direction: column !important; }
+  .nz-actions .nz-btn, .result-actions .nz-btn { width: 100%; }
+}
+/* Semi-transparent, but clear Back button for results screen */
+#result-back-btn{
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 9999;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.65); /* slate-900 @ 65% */
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+  font-weight: 700;
+  backdrop-filter: blur(2px);
+  display: none; /* only visible on result screen */
+}
+#result-back-btn .ico {
+  display:inline-block;
+  width: 18px; height: 18px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+  text-align:center; line-height:18px;
+}
+#result-back-btn:hover{ transform: translateY(-1px); }
+#result-back-btn:active{ transform: translateY(0); }
+
+</style>
+<style>
+/* === Nova v5b: Teacher Advice Card (robust) === */
+.advice-card{
+  margin-top:16px;
+  background:#fff7ed;
+  border:2px solid #fb923c;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(251,146,60,.22);
+  padding:12px 14px;
+  text-align:center;
+  gap:8px;
+}
+.advice-title{
+  display:inline-block;
+  font-weight:900;
+  font-size:1.05rem;
+  color:#9a3412;
+  background:#ffedd5;
+  border:2px dashed #fb923c;
+  border-radius:999px;
+  padding:4px 10px;
+  letter-spacing:.2px;
+  margin-bottom:8px;
+}
+.advice-text{
+  margin-top:6px;
+  font-size:1rem;
+  line-height:1.45;
+  color:#7c2d12;
+  min-height:60px;
+}
+</style>
 </head>
-<body>
+<body data-nova-back='1'>
+<button id="result-back-btn" aria-label="Geri Dön"><span class="ico">←</span>Geri Dön</button>
+
 <!-- Oyundakiler Modal -->
 <div class="players-overlay" id="playersOverlay">
 <div class="players-content">
@@ -9867,7 +10029,17 @@ function endDuelGame() {
         const finalMessage = winnerId ? `👑${winnerName}👑` : "🤝 Berabere! 🤝";
         winnerMessage.textContent = finalMessage;
 
-        // Trophy container
+        
+            // Nova: Apply themed winner/loser visuals
+            try{
+              if (winnerId && duelInviterScore !== duelInvitedScore){
+                const outcome = (duelInviterScore>duelInvitedScore)?'inviterWin':'invitedWin';
+                window.novaDecorateDuelResult && window.novaDecorateDuelResult(outcome);
+              } else {
+                window.novaDecorateDuelResult && window.novaDecorateDuelResult('tie');
+              }
+            }catch(e){ console.warn(e); }
+// Trophy container
         const trophyContainer = document.createElement('div');
         trophyContainer.className = 'trophy-container';
         
@@ -11756,6 +11928,7 @@ function showExplanationAndNext(){
     close: closeVideoScreen,
     setUrl: (url)=>{ if (videoIframe) videoIframe.src = url; }
   };
+  try{ window.addEventListener('nova:open-lesson-video', function(){ try{ openVideo(); }catch(_){} }); }catch(_){}
 })();
 // === End Nova ===
 </script>
@@ -12490,6 +12663,11 @@ function showExplanationAndNext(){
       if(visible && !NovaTracker.state.finished){
         NovaTracker.state.finished=true;
         mountSummary(sc);
+        
+        try {
+          var backBtn = document.getElementById('result-back-btn');
+          if (backBtn) { backBtn.style.display = 'inline-flex'; }
+        } catch(_) {}
         // Also remove legacy area if present
         const wb=document.querySelector('.wrong-block'); if(wb) wb.style.display='none';
         const actLesson=document.getElementById('act-lesson'); if(actLesson) actLesson.style.display='none';
@@ -12517,6 +12695,8 @@ function showExplanationAndNext(){
     if(vid) vid.addEventListener('click', ()=>{
       // Prefer native lesson video action if present
       try{ document.getElementById('lesson-video-button')?.click(); }catch(_){}
+      // Direct Nova fallback (NEW clears legacy btn)
+      try{ if (window.NovaLessonVideo && typeof window.NovaLessonVideo.open==='function'){ window.NovaLessonVideo.open(); } }catch(_){}
       // Fire integration event with analysis payload
       try{ window.dispatchEvent(new CustomEvent('nova:open-lesson-video', { detail: { tracker: 'nova', data: (window.NovaTracker && window.NovaTracker.state) || null } })); }catch(_){}
     });
@@ -13236,6 +13416,244 @@ class="nz-badge-mini">BRONZ</div></div>`;
 })();
 </script>
 <!-- === NOVA PATCH END === -->
+
+<script>
+(function(){
+  function ensureBackWiring(){
+    var btn = document.getElementById('result-back-btn');
+    if(!btn || btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', function(){
+      // Try to simulate "Tek Kişilik Oyun" button click
+      try {
+        var single = document.querySelector('.single-player');
+        if (single) { single.click(); return; }
+      } catch(e){}
+      // Fallback: navigate to main screen if app exposes api
+      try { window.dispatchEvent(new CustomEvent('nova:go-single')); } catch(_) {}
+    });
+  }
+
+  function toggleBackByScore(){
+    var sc = document.querySelector('.score-container, #score-container');
+    var backBtn = document.getElementById('result-back-btn');
+    if(!backBtn) return;
+    var visible = sc && ((getComputedStyle(sc).display!=='none' && sc.offsetParent!==null) || sc.classList.contains('show') || sc.classList.contains('active'));
+    backBtn.style.display = visible ? 'inline-flex' : 'none';
+  }
+
+  // Observe score container if MutationObserver wasn't already wired elsewhere
+  var sc = document.querySelector('.score-container, #score-container');
+  if (sc && typeof MutationObserver !== 'undefined'){
+    var obs = new MutationObserver(toggleBackByScore);
+    obs.observe(document.body, {attributes:true,childList:true,subtree:true});
+  }
+
+  // Initial
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureBackWiring();
+    toggleBackByScore();
+  });
+  window.addEventListener('load', function(){
+    ensureBackWiring();
+    toggleBackByScore();
+  });
+})();
+</script>
+
+
+<!-- Nova v5b: Teacher Advice Card -->
+<script>
+(function(){
+  function clamp(x){ return Math.max(0, Math.min(100, Math.round(x))); }
+
+  function inferPercent(){
+    var s = (typeof window.singleScore === 'number') ? window.singleScore : (typeof window.score === 'number' ? window.score : null);
+    var t = (typeof window.totalQuestions === 'number') ? window.totalQuestions : (typeof window.toplamSoru === 'number' ? window.toplamSoru : null);
+    if (typeof s === 'number' && typeof t === 'number' && t > 0) return clamp(100 * s / t);
+
+    var el = document.getElementById('score');
+    if (el){
+      var ds = el.getAttribute('data-score');
+      var dt = el.getAttribute('data-total') || el.getAttribute('data-toplam');
+      if (ds && !isNaN(ds)){
+        var v = Number(ds);
+        if (dt && !isNaN(dt) && Number(dt) > 0) return clamp(100 * v / Number(dt));
+        if (v <= 100) return clamp(v);
+      }
+      var txt = (el.textContent || '').trim();
+      var m01 = txt.match(/(\d{1,3})\s*\/\s*(\d{1,3})/);
+      if (m01){ return clamp(100 * Number(m01[1]) / Number(m01[2]||1)); }
+      var m02 = txt.match(/(\d{1,3})\s*%/);
+      if (m02){ return clamp(Number(m02[1])); }
+    }
+
+    var pNode = document.querySelector('#score-container .percent, #score-container .nova-percent-text');
+    if (pNode){
+      var m = (pNode.textContent||'').match(/(\d{1,3})\s*%/);
+      if (m) return clamp(Number(m[1]));
+    }
+
+    var sc = document.getElementById('score-container');
+    if (sc){
+      var walker = document.createTreeWalker(sc, NodeFilter.SHOW_TEXT, null, false);
+      var texts = [];
+      while (walker.nextNode()) { texts.push(walker.currentNode.nodeValue); }
+      var joined = texts.join(' ');
+      var m2 = joined.match(/(\d{1,3})\s*%/);
+      if (m2) return clamp(Number(m2[1]));
+    }
+    return null;
+  }
+
+  function getAdvice(p){
+    if (p >= 0 && p < 30) {
+      return "Bu sonuç hedefinin çok altında. Şimdi odaklanıp düzenli çalışmaya başlıyoruz; toparlayacağına güveniyorum. İlk işin yukarıdaki ders videosu butonuna basarak  dersimizin videosunu seyretmek, daha sonra da yanlış yaptığın soruları dikkatlice inceleyi unutma.";
+    } else if (p >= 30 && p < 60) {
+      return "Orta seviyenin altındasın. Eksikleri kapatmak için düzenli çalışman şart. Yukarıdan dersin videosunu seyredip yanlışlara bakman faydalı olacaktır.";
+    } else if (p >= 60 && p < 90) {
+      return "İyi bir seviye; dikkatini koruyup çalışmayı sürdürürsen daha yukarı çıkarsın. Yanlış yaptığın sorulara bakmayı ihmal etme.";
+    } else if (p >= 90 && p <= 100) {
+      return "Şampiyon sen harikasın ; çalışmanı bırakma, seviyeni sabitle , bu konuda gerçekten şahanesin.";
+    }
+    return "";
+  }
+
+  function ensureCard(){
+    var sc = document.getElementById('score-container');
+    if (!sc || getComputedStyle(sc).display === 'none') return null;
+    var card = document.getElementById('teacher-advice-card');
+    if (!card){
+      card = document.createElement('div');
+      card.id = 'teacher-advice-card';
+      card.className = 'advice-card';
+      card.innerHTML = '<div class="advice-title">ÖĞRETMENİNDEN TAVSİYE 😊</div><div class="advice-text" id="teacher-advice-text"></div>';
+      var ring = sc.querySelector('.percent, .nova-percent-text, .nova-circular-wrap');
+      var anchor = document.getElementById('score-message');
+      if (ring && ring.parentNode) {
+        var parent = ring.closest ? (ring.closest('#score-container') || ring.parentNode) : ring.parentNode;
+        parent.parentNode.insertBefore(card, parent.nextSibling);
+      } else if (anchor && anchor.parentNode) {
+        anchor.parentNode.insertBefore(card, anchor.nextSibling);
+      } else {
+        sc.appendChild(card);
+      }
+    }
+    return card;
+  }
+
+  function render(){
+    var card = ensureCard();
+    if (!card) return;
+    var p = inferPercent();
+    if (p == null) return;
+    var text = document.getElementById('teacher-advice-text');
+    if (text) text.textContent = getAdvice(p);
+  }
+
+  function boot(){
+    render();
+    setTimeout(render, 200);
+    setTimeout(render, 600);
+    setTimeout(render, 1200);
+    var start = Date.now();
+    var iv = setInterval(function(){
+      render();
+      if (Date.now() - start > 10000) clearInterval(iv);
+    }, 500);
+  }
+
+  try{
+    if (typeof window.endGame === 'function' && !window.endGame.__adviceV5b){
+      var orig = window.endGame;
+      window.endGame = function(){
+        var r = orig.apply(this, arguments);
+        setTimeout(boot, 50);
+        return r;
+      };
+      window.endGame.__adviceV5b = true;
+    }
+  }catch(e){}
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+
+// === Nova Duel Result Decorator v2 ===
+(function(){
+  function launchConfetti(durationMs){
+    try{
+      const old = document.getElementById('duel-confetti');
+      if (old) old.remove();
+      const c = document.createElement('canvas');
+      c.id = 'duel-confetti';
+      document.body.appendChild(c);
+      const ctx = c.getContext('2d');
+      let W= c.width = window.innerWidth, H = c.height = window.innerHeight;
+      const pieces = Array.from({length: Math.min(220, Math.floor(W/6))}, (_,i)=> ({
+        x: Math.random()*W, y: -20 - Math.random()*H*0.6,
+        r: 4+Math.random()*6, // radius
+        vx: -1+Math.random()*2, vy: 1+Math.random()*2.5 + 2,
+        rot: Math.random()*Math.PI, vr: -0.1+Math.random()*0.2,
+        s: Math.random()>.5?1:-1 // spin dir
+      }));
+      const colors = [[34,197,94],[16,185,129],[132,204,22],[250,204,21]];
+      let rafId, start=performance.now();
+      function loop(t){
+        ctx.clearRect(0,0,W,H);
+        for(const p of pieces){
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          if (p.y - p.r > H){ p.y = -20; p.x = Math.random()*W; }
+          const cidx = (p.r%colors.length)|0; const col = colors[cidx];
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.9})`;
+          ctx.fillRect(-p.r, -p.r*0.6, p.r*2, p.r*1.2);
+          ctx.restore();
+        }
+        if (t - start < durationMs) rafId = requestAnimationFrame(loop);
+        else { cancelAnimationFrame(rafId); c.remove(); }
+      }
+      rafId = requestAnimationFrame(loop);
+      window.addEventListener('resize', ()=>{ W= c.width = innerWidth; H = c.height = innerHeight; });
+    }catch(e){ console.warn('Confetti failed', e); }
+  }
+
+  window.novaDecorateDuelResult = function(outcome){
+    try{
+      const inviterBox = document.getElementById('duel-player-inviter-score');
+      const invitedBox = document.getElementById('duel-player-invited-score');
+      inviterBox && inviterBox.classList.remove('winner','loser','tie');
+      invitedBox && invitedBox.classList.remove('winner','loser','tie');
+
+      const root = document.getElementById('duel-game-screen');
+      root && root.classList.remove('duel-final-theme-win','duel-final-theme-lose','duel-final-theme-tie');
+
+      if (outcome === 'inviterWin'){
+        inviterBox && inviterBox.classList.add('winner');
+        invitedBox && invitedBox.classList.add('loser');
+        root && root.classList.add('duel-final-theme-win');
+        launchConfetti(3500);
+      } else if (outcome === 'invitedWin'){
+        invitedBox && invitedBox.classList.add('winner');
+        inviterBox && inviterBox.classList.add('loser');
+        root && root.classList.add('duel-final-theme-win');
+        launchConfetti(3500);
+      } else {
+        inviterBox && inviterBox.classList.add('tie');
+        invitedBox && invitedBox.classList.add('tie');
+        root && root.classList.add('duel-final-theme-tie');
+      }
+    }catch(e){ console.warn(e); }
+  };
+})();
+// === End Nova ===
+
+</script>
 </body>
 </html>
 <!-- === NOVA PATCH v8.1: EFSANE butonu sıralama + alev animasyonu + mağaza başlığı düzeni === -->
@@ -13519,3 +13937,91 @@ class="nz-badge-mini">BRONZ</div></div>`;
 })();
 </script>
 <!-- === /NOVA PATCH === -->
+
+
+<script>
+(function(){
+  // Nova fix v2: back button should only appear on result screen and
+  // should behave like the in-result "Geri Dön" (id=final-back-button).
+  function isVisible(el){
+    if(!el) return false;
+    const cs = getComputedStyle(el);
+    if(cs.visibility==='hidden' or cs.display==='none') return False;
+    if(el.offsetParent===null && cs.position!=='fixed') return false;
+    return true;
+  }
+
+  function toggleBackStrict(){
+    var sc = document.getElementById('score-container');
+    var endBtn = document.getElementById('final-back-button');
+    var backBtn = document.getElementById('result-back-btn');
+    if(!backBtn) return;
+    var show = isVisible(sc) && isVisible(endBtn);
+    backBtn.style.display = show ? 'inline-flex' : 'none';
+  }
+
+  function wireBackStrict(){
+    var backBtn = document.getElementById('result-back-btn');
+    if(!backBtn || backBtn.dataset.wired2) return;
+    backBtn.dataset.wired2='1';
+    backBtn.addEventListener('click', function(){
+      var endBtn = document.getElementById('final-back-button');
+      if(endBtn && isVisible(endBtn)){
+        endBtn.click(); // this replaces the result panel in-place
+        return;
+      }
+      // Fallbacks
+      var singleNav = document.querySelector('.single-player');
+      if(singleNav){ singleNav.click(); }
+    });
+  }
+
+  // Observe DOM for changes to results screen
+  var mo = new MutationObserver(function(){ toggleBackStrict(); });
+  mo.observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
+
+  document.addEventListener('DOMContentLoaded', function(){
+    wireBackStrict(); toggleBackStrict();
+  });
+  window.addEventListener('load', function(){
+    wireBackStrict(); toggleBackStrict();
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  function hardBack(){
+    try{
+      // stop all music if function exists
+      if (typeof stopAllMusic === 'function') stopAllMusic();
+    }catch(_){}
+    try{
+      var singlePlayerGameScreen = document.getElementById('single-player-game-screen');
+      var mainScreen = document.getElementById('main-screen');
+      var scoreContainer = document.getElementById('score-container');
+      if (scoreContainer) scoreContainer.style.display='none';
+      if (singlePlayerGameScreen) singlePlayerGameScreen.style.display='none';
+      if (mainScreen) mainScreen.style.display='flex';
+      if (typeof resetGameScreens === 'function') resetGameScreens();
+    }catch(_){}
+  }
+
+  var backBtn = document.getElementById('result-back-btn');
+  if (backBtn && !backBtn.dataset.hardbound){
+    backBtn.dataset.hardbound='1';
+    backBtn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      // Try the native final-back-button first (if visible)
+      var endBtn = document.getElementById('final-back-button');
+      if (endBtn && getComputedStyle(endBtn).display!=='none') {
+        endBtn.click();
+        setTimeout(hardBack, 20); // ensure consistency
+      } else {
+        hardBack();
+      }
+    }, true);
+  }
+})();
+</script>
