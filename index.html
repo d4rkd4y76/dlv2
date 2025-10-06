@@ -6202,7 +6202,167 @@ body > #nova-summary{display:none !important;}
 #duel-game-screen .duel-topbar{ display:none !important; }
 #duel-game-screen .players-info-row{ display:none !important; }
 /* === /NOVA VS HUD === */
-</style></head>
+</style>
+<style id="nova-matchmaking-pack">
+/* === NOVA MATCHMAKING PRO (lightweight, GPU-friendly) === */
+.matchmaking-screen.nova-mm{
+  background: radial-gradient(1400px 700px at 50% 120%, #081225 0%, #050d1d 45%, #030916 70%, #01040c 100%) !important;
+  }
+.matchmaking-screen.nova-mm::before{
+  content:""; position:fixed; inset:-10%;
+  background:
+    radial-gradient(2px 2px at 20% 30%, rgba(180,220,255,.9), transparent 52%) repeat,
+    radial-gradient(1px 1px at 70% 75%, rgba(140,180,255,.8), transparent 52%) repeat,
+    radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,.95), transparent 52%) repeat;
+  background-size: 280px 280px, 240px 240px, 200px 200px;
+  opacity:.75; filter: drop-shadow(0 0 2px rgba(150,190,255,.4));
+  animation: novaMMStars 42s linear infinite;
+  z-index:0; pointer-events:none;
+}
+.matchmaking-screen.nova-mm::after{
+  content:""; position:fixed; inset:-20%;
+  background: conic-gradient(from 0deg at 50% -10%, rgba(0,255,235,.07), transparent 20%, rgba(255,0,255,.06) 40%, transparent 60%, rgba(0,255,235,.06) 80%, transparent);
+  filter: blur(12px);
+  animation: novaMMSweep 13s linear infinite;
+  z-index:1; pointer-events:none;
+}
+@keyframes novaMMStars{to{transform:translateY(-220px)}}
+@keyframes novaMMSweep{to{transform:rotate(1turn)}}
+
+/* content card */
+.matchmaking-screen.nova-mm .matchmaking-content{
+  position:relative; z-index:2;
+  background: rgba(8,18,40,.9) !important;
+  border:1px solid rgba(0,200,255,.35);
+  border-radius: 18px;
+  box-shadow: 0 18px 46px rgba(0,0,0,.55), inset 0 0 26px rgba(0,200,255,.12);
+  backdrop-filter: blur(8px);
+  color:#dff7ff !important;
+  width:min(520px, 92%) !important;
+  animation: novaMMIn .45s ease both;
+}
+@keyframes novaMMIn{ from{ transform: translateY(10px); opacity:0 } to{ transform:none; opacity:1 } }
+
+.matchmaking-screen.nova-mm .matchmaking-content h2{
+  margin-top:4px;
+  font-weight:900; letter-spacing:.6px;
+  font-size: clamp(20px, 2.2vw, 28px);
+  text-align:center;
+  background: linear-gradient(90deg, #00f0ff, #00ffcc, #66a6ff, #00f0ff);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  text-shadow: 0 0 18px rgba(0,255,245,.25);
+}
+
+/* scanning beam inside card */
+.matchmaking-screen.nova-mm .matchmaking-content::before{
+  content:""; position:absolute; left:-10%; right:-10%; height:80px; top:-100px;
+  background: linear-gradient(180deg, transparent, rgba(0,255,210,.12), rgba(0,255,210,.22), rgba(0,255,210,.12), transparent);
+  filter: blur(4px);
+  animation: novaMMBeam 3.8s ease-in-out infinite;
+  z-index:0; pointer-events:none;
+}
+@keyframes novaMMBeam{
+  0%{ transform: translateY(-100px) }
+  50%{ transform: translateY(calc(100% + 100px)) }
+  100%{ transform: translateY(-100px) }
+}
+
+/* searching animation -> radar */
+.matchmaking-screen.nova-mm .searching-animation{
+  width:84px; height:84px; margin: 8px auto 14px; position:relative;
+}
+.matchmaking-screen.nova-mm .searching-animation::before{
+  content:""; position:absolute; inset:0; border-radius:16px; transform: rotate(45deg);
+  border:2px solid rgba(0,255,220,.25);
+  box-shadow: inset 0 0 14px rgba(0,200,255,.25), 0 0 14px rgba(0,255,230,.12);
+}
+.matchmaking-screen.nova-mm .searching-animation::after{
+  content:""; position:absolute; left:50%; top:50%; width:46%; height:3px;
+  background: linear-gradient(90deg, rgba(0,255,220,0), rgba(0,255,220,.8));
+  transform-origin:left center; transform: rotate(35deg) translate(-50%,-50%);
+  animation: novaRadar 1.9s linear infinite;
+  border-radius:2px;
+}
+@keyframes novaRadar{ to{ transform: rotate(395deg) translate(-50%,-50%);} }
+
+/* available players */
+.matchmaking-screen.nova-mm .available-players h3{
+  color:#b8f7ff !important; text-shadow: 0 0 12px rgba(0,255,220,.35) !important;
+}
+.matchmaking-screen.nova-mm .players-list{
+  display:flex; flex-direction:column; gap:10px;
+  max-height: 320px; overflow:auto; padding-right:4px;
+  scrollbar-width: thin;
+}
+.matchmaking-screen.nova-mm .players-list::-webkit-scrollbar{ width:8px }
+.matchmaking-screen.nova-mm .players-list::-webkit-scrollbar-thumb{
+  background: linear-gradient(#00f0ff,#00ffcc);
+  border-radius:10px;
+}
+
+/* player item makeover (no logic change) */
+.matchmaking-screen.nova-mm .player-item{
+  background: linear-gradient(180deg, rgba(20,36,68,.85), rgba(10,18,34,.85)) !important;
+  border:1px solid rgba(0,200,255,.28) !important;
+  border-radius:12px !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,.25), inset 0 0 22px rgba(0,200,255,.12) !important;
+  padding:12px !important; gap:14px !important;
+}
+.matchmaking-screen.nova-mm .player-photo{
+  border:2px solid #ffa500 !important; border-radius:12px !important;
+  box-shadow: 0 0 10px rgba(255,165,0,.35);
+}
+.matchmaking-screen.nova-mm .player-name{
+  color:#e9f7ff !important; text-shadow: 0 0 6px rgba(0,0,0,.35);
+  font-weight:800 !important; letter-spacing:.2px;
+}
+
+/* action buttons */
+.matchmaking-screen.nova-mm .davet-et-button{
+  background: linear-gradient(90deg, #00ffa8, #00d0ff) !important;
+  color:#00121a !important; font-weight:900 !important; border-radius:12px !important;
+  box-shadow: 0 8px 22px rgba(0,255,200,.35);
+}
+.matchmaking-screen.nova-mm .oyunda-button{
+  background: linear-gradient(90deg, #ff8a00, #ff3d3d) !important;
+  color:#1b0000 !important; font-weight:900 !important; border-radius:12px !important;
+  box-shadow: 0 8px 22px rgba(255,120,0,.35);
+}
+
+/* cancel button */
+.matchmaking-screen.nova-mm .cancel-search-button{
+  background: linear-gradient(90deg, #ff4d6d, #ff2d55) !important;
+  color:#fff !important; font-weight:900 !important; letter-spacing:.4px;
+  border-radius:12px !important; border: none !important;
+  box-shadow: 0 10px 24px rgba(255,77,109,.35);
+  padding:12px 18px !important;
+}
+.matchmaking-screen.nova-mm .cancel-search-button:hover{
+  filter: brightness(1.05);
+}
+
+/* stagger for inner elements */
+.matchmaking-screen.nova-mm .mm-stagger{ opacity:0; transform: translateY(6px); animation: novaStagger .5s ease forwards; }
+@keyframes novaStagger{ to{ opacity:1; transform: translateY(0);} }
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .matchmaking-screen.nova-mm::after,
+  .matchmaking-screen.nova-mm::before,
+  .matchmaking-screen.nova-mm .matchmaking-content::before,
+  .matchmaking-screen.nova-mm .searching-animation::after{ animation:none !important; }
+}
+</style>
+
+
+<style id="nova-mm-cancel-fix">
+/* Ensure decorative beam does NOT intercept clicks */
+.matchmaking-screen.nova-mm .matchmaking-content::before{
+  pointer-events: none !important;
+}
+</style>
+
+</head>
 <body data-nova-back='1'>
 <button id="result-back-btn" aria-label="Geri Dön"><span class="ico">←</span>Geri Dön</button>
 
@@ -10162,7 +10322,7 @@ chosen = chosen.map(q => {
 
 await currentDuelRef.child('questions').set(chosen);
                 await currentDuelRef.child('gameStarted').set(true);
-                showAlert("Düello Başlatıldı!");
+                
             } else {
                 showAlert("Bu konuya ait soru bulunamadı.");
             }
@@ -10493,10 +10653,10 @@ function endDuelGame() {
         
         // Add trophies with animation
         if (winnerId) {
-            for(let i = 0; i < 6; i++) {
+            for(let i = 0; i < 1; i++) {
                 const trophy = document.createElement('div');
                 trophy.className = 'trophy';
-                trophy.textContent = '🏆';
+                trophy.textContent = '';
                 trophy.style.animation = `trophyEntry 0.5s ${i * 0.2}s forwards`;
                 trophyContainer.appendChild(trophy);
             }
@@ -14808,6 +14968,49 @@ body.nova-dark-duel {
 })();
 // === /NOVA VS HUD logic ===
 </script>
+
+<script id="nova-matchmaking-init">
+(function(){
+  function armMM(){
+    var scr = document.getElementById('matchmakingScreen');
+    if(!scr) return;
+    // Add nova flag class when visible
+    function apply(){
+      var style = window.getComputedStyle(scr);
+      if(style.display === 'none'){
+        scr.classList.remove('nova-mm');
+        return;
+      }
+      if(style.display !== 'none'){
+        if(!scr.classList.contains('nova-mm')){
+          scr.classList.add('nova-mm');
+          // Stagger inner children for smooth entrance
+          var content = scr.querySelector('.matchmaking-content');
+          if(content){
+            Array.prototype.forEach.call(content.children, function(el, i){
+              if(!el.classList.contains('mm-stagger')){
+                el.classList.add('mm-stagger');
+                el.style.setProperty('--i', i);
+                el.style.animationDelay = (0.05 * i) + 's';
+              }
+            });
+          }
+        }
+      }
+    }
+    // Initial
+    apply();
+    // Observe style/class changes caused by open/close JS
+    var obs = new MutationObserver(apply);
+    obs.observe(scr, {attributes:true, attributeFilter:['style','class']});
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', armMM);
+  }else{ armMM(); }
+})();
+</script>
+
 </body>
 </html>
 
