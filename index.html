@@ -118,64 +118,6 @@
   opacity:.9; animation: novaOrbShock 800ms ease-out forwards; box-shadow: 0 0 16px rgba(0,255,200,.65);
 }
 @keyframes novaOrbShock{ to{ transform: translate(-50%,-50%) scale(5); opacity:0; } }
-
-/* === NOVA VS HUD (MK-style) === */
-.nova-vs-hud{
-  width:100%; max-width:900px; margin:4px auto 8px auto;
-  display:flex; align-items:center; justify-content:space-between; gap:14px;
-  position:relative; z-index:50;
-}
-.nova-hud-side{ flex:1; display:flex; flex-direction:column; gap:6px; }
-.nova-hud-side.right{ align-items:flex-end; }
-.nova-name{
-  font-weight:900; letter-spacing:.4px; font-size:clamp(12px,2.1vmin,14px);
-  color:#eaf6ff; text-transform:uppercase; text-shadow:0 2px 10px rgba(0,0,0,.55);
-  opacity:.95;
-}
-.nova-hp{
-  width:100%; height:18px; border-radius:999px; position:relative; overflow:hidden;
-  background: linear-gradient(180deg, rgba(5,10,24,.85), rgba(12,20,40,.85));
-  box-shadow: inset 0 0 0 1px rgba(96,200,255,.18), inset 0 0 18px rgba(0,200,255,.18),
-              0 8px 20px rgba(0,0,0,.35);
-}
-.nova-hp.mirror{ transform: scaleX(-1); } /* sağ barı aynala (MK görünümü) */
-.nova-hp-fill{
-  position:absolute; left:0; top:0; height:100%; width:50%;
-  background: linear-gradient(90deg, #24ffb5, #00d8ff, #6aa7ff);
-  box-shadow: 0 0 18px rgba(0,230,255,.35), 0 0 30px rgba(0,255,230,.25);
-  transition: width .7s cubic-bezier(.2,.8,.2,1);
-}
-.nova-hp-gloss{ pointer-events:none; position:absolute; inset:0;
-  background: radial-gradient(80% 220% at 50% -120%, rgba(255,255,255,.45), transparent 60%);
-  mix-blend-mode:screen; opacity:.35;
-}
-.nova-center-badge{
-  min-width:52px; height:28px; padding:0 10px;
-  display:flex; align-items:center; justify-content:center;
-  font-weight:900; color:#0c162e; letter-spacing:1px;
-  background: linear-gradient(180deg, #eaf6ff, #bfe6ff);
-  border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6);
-  text-shadow:none; user-select:none;
-}
-/* Hit / Epic pulse */
-.nova-hit{ animation: novaHit .75s ease; }
-@keyframes novaHit{
-  0%{ filter: drop-shadow(0 0 0 rgba(255,0,80,0)); }
-  30%{ filter: drop-shadow(0 0 18px rgba(255,60,120,.85)); }
-  100%{ filter: drop-shadow(0 0 0 rgba(255,0,80,0)); }
-}
-.nova-boost{ animation: novaBoost .75s ease; }
-@keyframes novaBoost{
-  0%{ box-shadow: 0 0 18px rgba(0,230,255,.25), 0 0 40px rgba(0,255,230,.15) }
-  50%{ box-shadow: 0 0 30px rgba(0,255,255,.65), 0 0 75px rgba(0,255,200,.45) }
-  100%{ box-shadow: 0 0 18px rgba(0,230,255,.25), 0 0 40px rgba(0,255,230,.15) }
-}
-/* Her ihtimale karşı eski VS rozeti/overlayini gizle */
-.duel-vs-wrap{ display:none !important; }
-
-/* NOVA: Hide only the topbar inside the duel QUESTION screen */
-#duel-game-screen .duel-topbar{ display:none !important; }
-/* === /NOVA VS HUD === */
 </style>
 
 <meta charset="utf-8"/>
@@ -6198,13 +6140,68 @@ body > #nova-summary{display:none !important;}
 </style>
 
 <style>
-/* === NOVA Duel Autoscale === */
-#duel-game-screen{ height:100svh; overflow:hidden; }
-#nova-duel-inner{ transform-origin: top center; will-change: transform; margin: 0 auto; }
-@supports (height: 100dvh){
-  #duel-game-screen{ height:100dvh; } /* modern mobile browsers */
+/* === NOVA VS HUD (MK-style) === */
+.nova-vs-hud{
+  width:100%; max-width:900px; margin:4px auto 8px auto;
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  position:relative; z-index:50;
 }
-/* === /NOVA Duel Autoscale === */
+.nova-hud-side{ flex:1; display:flex; flex-direction:column; gap:6px; position:relative; }
+.nova-hud-side.right{ align-items:flex-end; }
+.nova-name{
+  font-weight:900; letter-spacing:.4px; font-size:clamp(12px,2.1vmin,14px);
+  color:#eaf6ff; text-transform:uppercase; text-shadow:0 2px 10px rgba(0,0,0,.55);
+  opacity:.95;
+}
+.nova-hp{
+  width:100%; height:18px; border-radius:999px; position:relative; overflow:hidden;
+  background: linear-gradient(180deg, rgba(5,10,24,.85), rgba(12,20,40,.85));
+  box-shadow: inset 0 0 0 1px rgba(96,200,255,.18), inset 0 0 18px rgba(0,200,255,.18),
+              0 8px 20px rgba(0,0,0,.35);
+}
+.nova-hp.mirror{ transform: scaleX(-1); }
+.nova-hp-fill{
+  position:absolute; left:0; top:0; height:100%; width:50%;
+  background: linear-gradient(90deg, #24ffb5, #00d8ff, #6aa7ff);
+  box-shadow: 0 0 18px rgba(0,230,255,.35), 0 0 30px rgba(0,255,230,.25);
+  transition: width .7s cubic-bezier(.2,.8,.2,1);
+}
+.nova-hp-gloss{ pointer-events:none; position:absolute; inset:0;
+  background: radial-gradient(80% 220% at 50% -120%, rgba(255,255,255,.45), transparent 60%);
+  mix-blend-mode:screen; opacity:.35;
+}
+.nova-hp-count{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  font-weight:900; font-size:clamp(10px,1.8vmin,13px);
+  color:#0c162e; background:rgba(234,246,255,.9); padding:1px 8px; border-radius:999px;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+}
+.nova-hp.mirror .nova-hp-count{ transform:translate(-50%,-50%) scaleX(-1); }
+.nova-center-badge{
+  min-width:52px; height:28px; padding:0 10px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; color:#0c162e; letter-spacing:1px;
+  background: linear-gradient(180deg, #eaf6ff, #bfe6ff);
+  border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6);
+  text-shadow:none; user-select:none;
+}
+/* FX */
+.nova-hit{ animation: novaHit .75s ease; }
+@keyframes novaHit{
+  0%{ filter: drop-shadow(0 0 0 rgba(255,0,80,0)); }
+  30%{ filter: drop-shadow(0 0 18px rgba(255,60,120,.85)); }
+  100%{ filter: drop-shadow(0 0 0 rgba(255,0,80,0)); }
+}
+.nova-boost{ animation: novaBoost .75s ease; }
+@keyframes novaBoost{
+  0%{ box-shadow: 0 0 18px rgba(0,230,255,.25), 0 0 40px rgba(0,255,230,.15) }
+  50%{ box-shadow: 0 0 30px rgba(0,255,255,.65), 0 0 75px rgba(0,255,200,.45) }
+  100%{ box-shadow: 0 0 18px rgba(0,230,255,.25), 0 0 40px rgba(0,255,230,.15) }
+}
+/* Sadece soru ekranında: üstteki topbarı ve alttaki oyuncu kartlarını gizle */
+#duel-game-screen .duel-topbar{ display:none !important; }
+#duel-game-screen .players-info-row{ display:none !important; }
+/* === /NOVA VS HUD === */
 </style></head>
 <body data-nova-back='1'>
 <button id="result-back-btn" aria-label="Geri Dön"><span class="ico">←</span>Geri Dön</button>
@@ -6536,13 +6533,14 @@ body > #nova-summary{display:none !important;}
 </div>
 <!-- Düello Oyun Ekranı -->
 <div class="duel-game-container" id="duel-game-screen">
-<!-- NOVA VS HUD (Mortal-Kombat Style Health Bars) -->
+<!-- NOVA VS HUD (MK-style health bars with counters) -->
 <div id="nova-vs-hud" class="nova-vs-hud" aria-hidden="false">
   <div class="nova-hud-side left">
     <div class="nova-name" id="novaLeftName">Oyuncu 1</div>
     <div class="nova-hp">
       <div class="nova-hp-fill" id="novaLeftHP"></div>
       <div class="nova-hp-gloss"></div>
+      <div class="nova-hp-count" id="novaLeftCount">0</div>
     </div>
   </div>
   <div class="nova-center-badge" title="Düello">VS</div>
@@ -6551,6 +6549,7 @@ body > #nova-summary{display:none !important;}
     <div class="nova-hp mirror">
       <div class="nova-hp-fill" id="novaRightHP"></div>
       <div class="nova-hp-gloss"></div>
+      <div class="nova-hp-count" id="novaRightCount">0</div>
     </div>
   </div>
 </div>
@@ -10176,15 +10175,13 @@ await currentDuelRef.child('questions').set(chosen);
 
             duelSelectionScreen.style.display = 'none';
             duelGameScreen.style.display = 'flex';
-            try{ novaPrepareDuelScaler(); novaAutoScaleDuel(); }catch(e){}
+            try{ novaInitDuelHud(data); }catch(e){}
 
 
             document.getElementById('duel-player-inviter-photo').src = data.inviter.photo ? data.inviter.photo : "https://via.placeholder.com/80";
             document.getElementById('duel-player-inviter-name').textContent = data.inviter.name;
             document.getElementById('duel-player-invited-photo').src = data.invited.photo ? data.invited.photo : "https://via.placeholder.com/80";
             document.getElementById('duel-player-invited-name').textContent = data.invited.name;
-            try{ novaInitDuelHud(data); }catch(e){}
-
 
             duelInviterScore = 0;
             // Nova: populate framed stars under names (in‑game)
@@ -10300,8 +10297,6 @@ await currentDuelRef.child('questions').set(chosen);
         button.dataset.optionIndex = idx;
         button.addEventListener('click', duelSelectOption);
         duelOptionsContainer.appendChild(button);
-        try{ novaAutoScaleDuel(); }catch(e){}
-
     });
 
     resetDuelTimer();
@@ -10350,6 +10345,19 @@ function duelSelectOption(e) {
         chosen: chosenOptionText,
         correct: isCorrect
     });
+    // NOVA: Immediate COUNTER TEXT update only (no bar animation, no score mutation)
+    try{
+        if (isCorrect) {
+            var lc = document.getElementById('novaLeftCount');
+            var rc = document.getElementById('novaRightCount');
+            if (isInviter && lc) { var v = parseInt(lc.textContent||'0',10); lc.textContent = String(v+1); }
+            if (!isInviter && rc) { var v2 = parseInt(rc.textContent||'0',10); rc.textContent = String(v2+1); }
+        }
+    }catch(e){ /* silent */ }
+
+    
+
+
 }
 
 function listenToResponses() {
@@ -10373,37 +10381,7 @@ function listenToResponses() {
 
         // Yeni +1 Efekti Fonksiyonu
         function showScoreIncrementEffect(scoreElement) {
-            const plusOne = document.createElement('div');
-            plusOne.classList.add('animated-plus-one');
-            plusOne.textContent = '+1';
-            document.body.appendChild(plusOne);
-
-            // Get center position
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-
-            // Get the scoreElement's position
-            const rect = scoreElement.getBoundingClientRect();
-            const targetX = rect.left + rect.width / 2;
-            const targetY = rect.top + rect.height / 2;
-
-            // Calculate translation
-            const deltaX = targetX - centerX;
-            const deltaY = targetY - centerY;
-
-            // Animate
-            plusOne.animate([
-                { transform: `translate(-50%, -50%) translate(0px, 0px) scale(1)`, opacity: 1 },
-                { transform: `translate(-50%, -50%) translate(${deltaX}px, ${deltaY}px) scale(0.5)`, opacity: 0 }
-            ], {
-                duration: 1000,
-                easing: 'ease-out'
-            });
-
-            // Remove the element after animation
-            setTimeout(() => {
-                plusOne.remove();
-            }, 1000);
+            return; // NOVA: +1 effect disabled
         }
 
         function revealDuelAnswerAfterTimeout() {
@@ -14794,25 +14772,24 @@ body.nova-dark-duel {
       if(!hud) return;
       document.getElementById('novaLeftName').textContent  = (data && data.inviter && data.inviter.name) ? data.inviter.name : 'Oyuncu 1';
       document.getElementById('novaRightName').textContent = (data && data.invited && data.invited.name) ? data.invited.name : 'Oyuncu 2';
-      // Reset to 50-50
       document.getElementById('novaLeftHP').style.width = '50%';
       document.getElementById('novaRightHP').style.width = '50%';
+      try{ document.getElementById('novaLeftCount').textContent='0'; document.getElementById('novaRightCount').textContent='0'; }catch(e){}
     }catch(e){ console.warn('HUD init error', e); }
   };
   window.novaUpdateDuelHud = function(leftScore, rightScore, leftOld, rightOld){
-    // left = inviter, right = invited
     try{
       const left = document.getElementById('novaLeftHP');
       const right = document.getElementById('novaRightHP');
       if(!left || !right) return;
-      // Map score diff to 0..100 (start 50/50, each point diff shifts 5%)
       const diff = (Number(leftScore)||0) - (Number(rightScore)||0);
-      const leftPct = clamp(50 + diff*5, 0, 100);
+      const leftPct = Math.max(0, Math.min(100, 50 + diff*5));
       const rightPct = 100 - leftPct;
-      // Animate
       left.style.width  = leftPct + '%';
       right.style.width = rightPct + '%';
-      // Hit/boost effects
+      const lc = document.getElementById('novaLeftCount'); const rc = document.getElementById('novaRightCount');
+      if(lc) lc.textContent = String(leftScore||0);
+      if(rc) rc.textContent = String(rightScore||0);
       const leftGain  = (Number(leftScore)||0)  > (Number(leftOld)||0);
       const rightGain = (Number(rightScore)||0) > (Number(rightOld)||0);
       const leftEl  = document.querySelector('.nova-hud-side.left .nova-hp');
@@ -14822,14 +14799,12 @@ body.nova-dark-duel {
           setTimeout(()=>{ leftEl.classList.remove('nova-boost'); rightEl.classList.remove('nova-hit'); }, 800);
         }else if(rightGain && !leftGain){ rightEl.classList.add('nova-boost'); leftEl.classList.add('nova-hit');
           setTimeout(()=>{ rightEl.classList.remove('nova-boost'); leftEl.classList.remove('nova-hit'); }, 800);
-        }else{ // both gain or neither
+        }else{
           [leftEl,rightEl].forEach(el=>{ el.classList.add('nova-boost'); setTimeout(()=>el.classList.remove('nova-boost'), 600); });
         }
       }
     }catch(e){ console.warn('HUD update error', e); }
   };
-  // Make globally accessible for other scripts
-  window.__novaHudReady = true;
 })();
 // === /NOVA VS HUD logic ===
 </script>
