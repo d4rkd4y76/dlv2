@@ -6621,6 +6621,205 @@ body > #nova-summary{display:none !important;}
     </style>
     <!-- NOVA_RESULT_STYLES_END -->
     
+
+<!-- Nova: Season Ranking Fullscreen & Smooth Table Overrides -->
+<style id="nova-season-ranking-fullscreen">
+  /* Lock scroll helper */
+  body.no-scroll { overflow: hidden !important; }
+
+  /* Fullscreen season ranking panel */
+  #rankingPanel {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background:
+      radial-gradient(120% 100% at 50% 0%, #ffffff 0%, #f8fafc 45%, #eef2ff 100%) !important;
+    z-index: 9999 !important;
+    display: none;                 /* will be toggled to flex by JS */
+    flex-direction: column !important;
+    padding: clamp(12px, 2.5vw, 24px) !important;
+    border-radius: 0 !important;
+    right: auto !important;
+    left: 0 !important;
+    overflow: hidden !important;
+    contain: layout paint;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #rankingPanel h2 {
+    margin: 0 0 12px 0 !important;
+    text-align: center;
+    font-size: clamp(20px, 2.4vw, 28px) !important;
+    letter-spacing: .3px;
+  }
+
+  /* Layout inside panel */
+  #rankingPanel .ranking-table-container{
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+    background: rgba(255,255,255,.85) !important;
+    border-radius: 16px !important;
+    padding: clamp(6px, 1.2vw, 12px) !important;
+    box-shadow: 0 8px 24px rgba(2,6,23,.06) !important;
+    will-change: scroll-position;
+    contain: content;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modern, calm table */
+  #rankingPanel .ranking-table{
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    table-layout: fixed;
+    font-size: clamp(12px, 1.1vw, 15px);
+  }
+
+  #rankingPanel .ranking-table thead th{
+    position: sticky; top: 0;
+    background: #f1f5f9 !important; /* slate-100 */
+    color: #0f172a !important;      /* slate-900 */
+    text-transform: none !important;
+    font-weight: 700 !important;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    z-index: 2;
+  }
+
+  #rankingPanel .ranking-table tbody td{
+    padding: 10px 12px !important;
+    color: #111827 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    transition: background-color .12s ease, color .12s ease;
+  }
+
+  /* Zebra rows for readability */
+  #rankingPanel .ranking-table tbody tr:nth-child(even) td{
+    background: #fcfcff;
+  }
+
+  /* Hover: keep it light to avoid jank */
+  #rankingPanel .ranking-table tr:hover td{
+    background: #eef2ff !important;  /* indigo-50 */
+  }
+
+  /* Disable heavy transforms/shadows from previous rules inside ranking panel */
+  #rankingPanel .ranking-table tr,
+  #rankingPanel .ranking-table td,
+  #rankingPanel .ranking-table th{
+    box-shadow: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  /* Top 3 subtle highlight (kept simple for performance) */
+  #rankingPanel .ranking-table tr.top-1 td { background: #fff7d6 !important; font-weight: 700; }
+  #rankingPanel .ranking-table tr.top-2 td { background: #f3f4f6 !important; font-weight: 700; }
+  #rankingPanel .ranking-table tr.top-3 td { background: #fdf2f8 !important; font-weight: 700; }
+
+  /* Stats card at bottom */
+  #rankingPanel .user-ranking-stats{
+    margin-top: 12px !important;
+    background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: clamp(10px, 1.2vw, 16px) !important;
+    box-shadow: 0 6px 18px rgba(2,6,23,.06) !important;
+  }
+
+  /* Back button area */
+  #rankingPanel #rankingBackButton{
+    margin-top: 12px !important;
+    align-self: center !important;
+    padding: 10px 18px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    background: #0ea5e9 !important; /* sky-500 */
+    color: #fff !important;
+    font-weight: 700 !important;
+    cursor: pointer;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  #rankingPanel #rankingBackButton:hover{ transform: translateY(-1px); opacity:.95; }
+
+  /* Photos column fit */
+  #rankingPanel .ranking-player-photo{ width: 40px !important; height: 40px !important; border-radius: 10px; object-fit: cover; }
+
+  /* Responsive tweaks */
+  @media (max-width: 600px){
+    #rankingPanel{ padding: 12px !important; }
+    #rankingPanel .ranking-table thead th:nth-child(2){ width: 56px; }
+    #rankingPanel .ranking-table thead th:nth-child(5){ display:none; }
+    #rankingPanel .ranking-table tbody td:nth-child(5){ display:none; }
+  }
+</style>
+
+
+<!-- Nova: Readability Fix for 'Genel Sıralama Durumunuz' block -->
+<style id="nova-season-stats-readable">
+  /* Scope strictly to Season Ranking panel to avoid side effects */
+  #rankingPanel .user-ranking-stats{
+    background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: clamp(10px, 1.4vw, 18px) !important;
+    box-shadow: 0 8px 22px rgba(2,6,23,.06) !important;
+    color: #0f172a !important;            /* override earlier 'color:white' */
+  }
+  #rankingPanel .stats-header{
+    color: #0f172a !important;
+    text-shadow: none !important;
+    font-weight: 800 !important;
+    letter-spacing: .2px !important;
+    font-size: clamp(14px, 1.4vw, 18px) !important;
+    margin-bottom: clamp(8px, 1.2vw, 12px) !important;
+  }
+  #rankingPanel .stats-content{
+    display: flex; align-items: center; justify-content: space-between;
+    gap: clamp(10px, 2vw, 24px);
+    padding: clamp(8px, 1.2vw, 12px) !important;
+    background: linear-gradient(90deg, rgba(248,250,252,.9), rgba(241,245,249,.7));
+    border: 1px solid #e2e8f0; border-radius: 12px;
+    backdrop-filter: none !important;      /* remove blur for crisper text */
+  }
+  #rankingPanel .rank-info{ display:flex; align-items:center; gap: clamp(14px, 2.4vw, 32px); }
+  #rankingPanel .rank-label, #rankingPanel .total-label{
+    color:#475569 !important;
+    font-weight: 700 !important;
+    font-size: clamp(11px, 1.1vw, 13px) !important;
+    text-transform: none !important;
+    letter-spacing:.2px !important;
+    background: transparent !important;
+    padding: 0 !important; border: none !important;
+  }
+  #rankingPanel .rank-value, #rankingPanel .total-value, 
+  #rankingPanel #userTrophyCount{
+    color:#0b1220 !important;
+    text-shadow: none !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    font-size: clamp(18px, 2.2vw, 28px) !important;
+  }
+  #rankingPanel .user-trophy{
+    display:flex; align-items:center; gap:8px;
+    background:#fff7ed !important;
+    border:1px solid #ffd7a8 !important;
+    padding: clamp(8px, 1.1vw, 12px) clamp(10px, 1.4vw, 16px) !important;
+    border-radius: 12px !important;
+  }
+  #rankingPanel .trophy-icon{ font-size: clamp(16px, 1.8vw, 22px) !important; }
+  #rankingPanel .trophy-value{ color:#b45309 !important; font-weight: 900 !important; }
+  /* Ensure high contrast regardless of previous global rules */
+  #rankingPanel .user-ranking-stats *{ color: inherit; }
+  /* Small screens: stack blocks */
+  @media (max-width: 520px){
+    #rankingPanel .stats-content{ flex-direction: column; align-items: stretch; }
+    #rankingPanel .user-trophy{ align-self: center; }
+  }
+</style>
+
 </head>
 <body data-nova-back='1'>
 
@@ -6797,7 +6996,7 @@ body > #nova-summary{display:none !important;}
 <button class="back-button">Geri Dön</button>
 </div>
 <!-- Ranking Panel (Yan Panel - Yeni Eklendi) -->
-<div class="ranking-panel" id="rankingPanel" style="display: none;">
+<div class="ranking-panel" id="rankingPanel">
 <h2>Sezon Sıralaması</h2>
 <div class="ranking-table-container">
 <table class="ranking-table" id="ranking-table">
@@ -15444,6 +15643,32 @@ body.nova-dark-duel {
     </script>
     <!-- NOVA_RESULT_SCRIPT_END -->
     
+
+<!-- Nova: Season Ranking open/close behavior -->
+<script id="nova-season-ranking-js">
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    const openBtn = document.getElementById('kupa-siralama-button');
+    const panel   = document.getElementById('rankingPanel');
+    const closeBtn= document.getElementById('rankingBackButton');
+
+    if(openBtn && panel){
+      openBtn.addEventListener('click', function(){
+        panel.style.display = 'flex';
+        document.body.classList.add('no-scroll');
+        try{ if (typeof loadRanking === 'function') loadRanking(); }catch(_){}
+      });
+    }
+    if(closeBtn && panel){
+      closeBtn.addEventListener('click', function(){
+        panel.style.display = 'none';
+        document.body.classList.remove('no-scroll');
+      });
+    }
+  }catch(e){ console.warn('Nova ranking open/close patch:', e); }
+});
+</script>
+
 </body>
 </html>
 
