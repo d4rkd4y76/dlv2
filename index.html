@@ -6197,7 +6197,15 @@ body > #nova-summary{display:none !important;}
 #nova-planet-2{ display:none !important; opacity:0 !important; visibility:hidden !important; }
 </style>
 
-</head>
+<style>
+/* === NOVA Duel Autoscale === */
+#duel-game-screen{ height:100svh; overflow:hidden; }
+#nova-duel-inner{ transform-origin: top center; will-change: transform; margin: 0 auto; }
+@supports (height: 100dvh){
+  #duel-game-screen{ height:100dvh; } /* modern mobile browsers */
+}
+/* === /NOVA Duel Autoscale === */
+</style></head>
 <body data-nova-back='1'>
 <button id="result-back-btn" aria-label="Geri Dön"><span class="ico">←</span>Geri Dön</button>
 
@@ -10153,7 +10161,13 @@ chosen = chosen.map(q => {
     };
 });
 
-
+await currentDuelRef.child('questions').set(chosen);
+                await currentDuelRef.child('gameStarted').set(true);
+                showAlert("Düello Başlatıldı!");
+            } else {
+                showAlert("Bu konuya ait soru bulunamadı.");
+            }
+        });
 
         function startDuelGame(data) {
             // Düello başlarken final ekranı ve skorları resetleyelim
@@ -10162,6 +10176,8 @@ chosen = chosen.map(q => {
 
             duelSelectionScreen.style.display = 'none';
             duelGameScreen.style.display = 'flex';
+            try{ novaPrepareDuelScaler(); novaAutoScaleDuel(); }catch(e){}
+
 
             document.getElementById('duel-player-inviter-photo').src = data.inviter.photo ? data.inviter.photo : "https://via.placeholder.com/80";
             document.getElementById('duel-player-inviter-name').textContent = data.inviter.name;
@@ -10284,6 +10300,8 @@ chosen = chosen.map(q => {
         button.dataset.optionIndex = idx;
         button.addEventListener('click', duelSelectOption);
         duelOptionsContainer.appendChild(button);
+        try{ novaAutoScaleDuel(); }catch(e){}
+
     });
 
     resetDuelTimer();
