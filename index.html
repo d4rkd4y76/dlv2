@@ -15961,68 +15961,6 @@ body.nova-dark-duel {
 
 
 
-
-<!-- Nova Advice Guard: remove advice card outside result screen -->
-<script id="nova-advice-guard">
-(function(){
-  if (window.__novaAdviceGuardInstalled) return;
-  window.__novaAdviceGuardInstalled = true;
-
-  function hideAdvice(){
-    try{
-      var el = document.getElementById('teacher-advice-card');
-      if (el) el.remove();
-    }catch(e){}
-  }
-
-  function observeQuestion(){
-    try{
-      var qc = document.querySelector('.question-container');
-      if (!qc) return;
-      var obs = new MutationObserver(function(){
-        // Any visibility/class changes on question area -> ensure advice is gone
-        hideAdvice();
-      });
-      obs.observe(qc, { attributes: true, attributeFilter: ['style','class'] });
-    }catch(e){}
-  }
-
-  function hook(fnName){
-    try{
-      var fn = window[fnName];
-      if (typeof fn === 'function' && !fn.__novaAdviceKill){
-        var orig = fn;
-        window[fnName] = function(){
-          hideAdvice();
-          return orig.apply(this, arguments);
-        };
-        window[fnName].__novaAdviceKill = true;
-      }
-    }catch(e){}
-  }
-
-  function boot(){
-    hideAdvice();
-    observeQuestion();
-    // Kill card on any step that shows/advances questions
-    ['displayCurrentQuestion','proceedToNextQuestion','startNow','startTimer','findStartButton'].forEach(hook);
-    // Also when clicking any option
-    document.addEventListener('click', function(e){
-      var t = e.target;
-      if (t && (t.closest ? t.closest('.option-btn, .answer-button, .question-container, .next-question-button') : null)){
-        hideAdvice();
-      }
-    }, true);
-  }
-
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', boot, {once:true});
-  } else {
-    boot();
-  }
-})();
-</script>
-
 </body>
 </html>
 
