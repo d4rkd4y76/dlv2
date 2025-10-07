@@ -6661,68 +6661,87 @@ body > #nova-summary{display:none !important;}
 </style>
 <style>
 
-/* === Nova Patch: Fullscreen Duel Containers (portrait & landscape) === */
-html, body {
-  height: 100%;
-  width: 100%;
+/* === NOVA: Wrong Review Öncül (Info) Styles === */
+.nz-info { margin: 8px 0 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nz-info-img {
+  max-width: 180px; max-height: 130px; width: auto; height: auto;
+  border-radius: 12px; border: 1.5px solid #e5e7eb;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+  background: #fff; padding: 6px; object-fit: contain;
 }
-/* Prevent body background layout from causing scroll while duel is active */
-body.nova-duel-fullscreen-active {
-  margin: 0 !important;
-  overflow: hidden !important;
+.nz-info-text {
+  background: #fff7ed; border: 1.5px dashed #f59e0b; color: #7c2d12;
+  padding: 8px 10px; border-radius: 10px; font-size: .95rem; line-height: 1.35;
 }
-/* Make duel selection & game containers fill the viewport and scale safely */
-@media (orientation: portrait), (orientation: landscape) {
-  .duel-selection-container,
-  .duel-game-container {
-    position: fixed !important;
-    inset: 0 !important;
-    max-width: none !important;
-    width: 100vw !important;
-    height: 100dvh !important; /* dynamic viewport units for mobile address bars */
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: clamp(8px, 2.5vw, 28px) !important;
-    overflow: auto !important;
-    background: white; /* keep existing theme clean; avoids transparency artifacts */
-    z-index: 999999; /* ensure on top while active */
-  }
-  /* Make inner rows adapt gracefully */
-  .players-info-row {
-    max-width: min(1100px, 96vw) !important;
-    width: 100% !important;
-    gap: clamp(10px, 2.5vw, 24px) !important;
-    flex-wrap: wrap !important;
-  }
-  /* Keep question card contained and readable */
-  .question-container {
-    max-width: min(900px, 96vw) !important;
-    width: 100% !important;
-    min-height: min(420px, 62vh) !important;
-  }
-  .options-container {
-    max-width: min(1100px, 96vw) !important;
-    width: 100% !important;
-  }
-  .duel-player-score img {
-    width: clamp(56px, 8vw, 80px) !important;
-    height: clamp(56px, 8vw, 80px) !important;
-  }
+@media (max-width: 480px){
+  .nz-info-img { max-width: 44vw; max-height: 28vh; }
 }
 
 </style>
 
-<style id="nova-fit-css">
-/* === NovaFit: Viewport-perfect scaling for DUEL GAME SCREEN only === */
-#novaFitOverlay{
-  position:fixed; inset:0; display:none;
-  align-items:center; justify-content:center;
-  z-index:999999; background:transparent;
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-#novaFitStage{ transform-origin: top center; will-change: transform; }
-html.nova-lock, body.nova-lock{ overflow:hidden; height:100%; }
+<!-- NOVA: Duel Scale Toolbar Styles (safe) -->
+<style id="nova-duel-scale-styles">
+  :root{ --duel-scale: 1; }
+  #nova-duel-scale-wrapper{
+    transform: scale(var(--duel-scale));
+    transform-origin: top center;
+    will-change: transform;
+  }
+  #nova-duel-scale-toolbar{
+    position: fixed;
+    left: 50%; bottom: 10px;
+    transform: translateX(-50%);
+    z-index: 2147483000;
+    width: min(92vw, 820px);
+    padding: 10px 12px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(18,25,48,.82), rgba(28,38,76,.82));
+    box-shadow: 0 10px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
+    color: #cfe3ff;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+  }
+  #nova-duel-scale-toolbar .label{
+    font: 600 12px/1.2 ui-sans-serif,system-ui,Segoe UI,Roboto;
+    opacity: .9; letter-spacing:.3px; white-space: nowrap;
+  }
+  #nova-duel-scale-toolbar .pct{
+    font: 700 12px/1.2 ui-sans-serif,system-ui,Segoe UI,Roboto;
+    min-width: 46px; text-align: right;
+  }
+  #nova-duel-scale-toolbar .btn{
+    appearance: none; border: none; border-radius: 10px;
+    padding: 8px 10px; background: rgba(255,255,255,.08);
+    color: #e7f0ff; cursor: pointer;
+    font: 600 13px/1 ui-sans-serif,system-ui,Segoe UI,Roboto;
+    transition: transform .08s ease, background .2s ease;
+    user-select: none;
+  }
+  #nova-duel-scale-toolbar .btn:active{ transform: translateY(1px) scale(.98); }
+  #nova-duel-scale-toolbar .btn:hover{ background: rgba(255,255,255,.12); }
+  #nova-duel-scale-toolbar .btn.small{ padding: 6px 9px; border-radius: 8px; }
+  #nova-duel-scale-toolbar input[type="range"]{
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px;
+    background: rgba(255,255,255,.18); border-radius: 999px; outline: none;
+  }
+  #nova-duel-scale-toolbar input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: linear-gradient(180deg,#9fd1ff,#6aa6ff);
+    box-shadow: 0 2px 6px rgba(0,0,0,.35); cursor: pointer;
+    border: 1px solid rgba(255,255,255,.5);
+  }
+  #nova-duel-scale-toolbar .group{ display:flex; align-items:center; gap:8px; }
+  #nova-duel-scale-toolbar .grow{ flex:1; }
+  #nova-duel-scale-toolbar .sep{ width:1px; height:22px; background: rgba(255,255,255,.12); margin: 0 2px; }
+  #nova-duel-scale-toolbar .badge{
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+  }
 </style>
 
 </head>
@@ -8042,10 +8061,8 @@ async function updateDuelScore(type, data) {
                         database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
                         database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
                     ]);
-                    const message = winnerId === selectedStudent.studentId ? 
-                        '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
-                        '😔 Maalesef kaybettiniz. (-3 🏆)';
-                    if (typeof showAlert === 'function') await showAlert(message);
+                    // End-of-duel showAlert disabled by Nova
+
                 } else {
                     console.log('GAME_END: puanlar zaten uygulanmış — ikinci yazım engellendi.');
                 }
@@ -13567,6 +13584,35 @@ function showExplanationAndNext(){
   // ====== Data tracker ======
   const NovaTracker = (function(){
     const state = { items: [], total:0, correctCount:0, finished:false };
+    // === Nova: Reset wrong-answers tracker for each NEW game ===
+    function resetTrackerState(){
+      state.items = [];
+      state.total = 0;
+      state.correctCount = 0;
+      state.finished = false;
+    }
+    // Capture clicks on start buttons to reset before a new game begins
+    document.addEventListener('click', function(ev){
+      var t = ev.target && (ev.target.closest ? ev.target.closest('#start-game-button, .start-game-button, .single-start-button, #startSinglePlayerButton, .start-button, #startButton') : null);
+      if (t) { try{ resetTrackerState(); }catch(_){} }
+    }, true);
+    // Wrap common start functions as extra safety
+    ;(function wrapStarts(names){
+      (names||[]).forEach(function(name){
+        try{
+          var fn = window[name];
+          if (typeof fn === 'function' && !fn.__novaResetWrap){
+            var orig = fn;
+            window[name] = function(){
+              try{ resetTrackerState(); }catch(_){}
+              return orig.apply(this, arguments);
+            };
+            window[name].__novaResetWrap = true;
+          }
+        }catch(_){}
+      });
+    })(['startGame','startSinglePlayer','startCountdown','startNow']);
+    
     document.addEventListener('click', function(e){
       const btn = e.target.closest('.option-button, .answer-option, .option, .choice');
       if(!btn) return;
@@ -13583,7 +13629,13 @@ function showExplanationAndNext(){
 
           state.total += 1;
           if(isCorrect){ state.correctCount += 1; }
-          else { state.items.push({ q:qText, chosen:chosenText, correct:correctText, explanation, isCorrect:false }); }
+          else { (function(){
+  const infoImgEl = document.querySelector('.question-info-image');
+  const infoTextEl = document.querySelector('.question-info-text');
+  const infoImage = infoImgEl ? infoImgEl.src : '';
+  const infoText = (!infoImgEl && infoTextEl) ? ((infoTextEl.innerText||infoTextEl.textContent)||'').trim() : '';
+  state.items.push({ q:qText, chosen:chosenText, correct:correctText, explanation, infoImage, infoText, isCorrect:false });
+})(); }
         } catch(err){ console.warn('NovaTracker capture error:', err); }
       }, 250);
     }, true);
@@ -13615,6 +13667,7 @@ function showExplanationAndNext(){
         const div=document.createElement('div'); div.className='nz-item';
         div.innerHTML=`
           <div class="nz-q">${idx+1}. ${escapeHtml(it.q)}</div>
+          ${it.infoImage ? `<div class="nz-info"><img class="nz-info-img" src="${escapeHtml(it.infoImage)}" alt="Öncül"/></div>` : (it.infoText ? `<div class="nz-info nz-info-text">${escapeHtml(it.infoText)}</div>` : ``)}
           <div class="nz-pair"><span class="nz-pill nz-you">Senin Cevabın</span><span>${escapeHtml(it.chosen||'-')}</span></div>
           <div class="nz-pair"><span class="nz-pill nz-true">Doğru Cevap</span><span>${escapeHtml(it.correct||'-')}</span></div>
           ${it.explanation?`<div class="nz-exp">${escapeHtml(it.explanation)}</div>`:''}
@@ -13631,6 +13684,7 @@ function showExplanationAndNext(){
         const div=document.createElement('div'); div.className='nz-item';
         div.innerHTML=`
           <div class="nz-q">${idx+1}. ${escapeHtml(it.q)}</div>
+          ${it.infoImage ? `<div class="nz-info"><img class="nz-info-img" src="${escapeHtml(it.infoImage)}" alt="Öncül"/></div>` : (it.infoText ? `<div class="nz-info nz-info-text">${escapeHtml(it.infoText)}</div>` : ``)}
           <div class="nz-pair"><span class="nz-pill nz-you">Senin Cevabın</span><span>${escapeHtml(it.chosen||'-')}</span></div>
           <div class="nz-pair"><span class="nz-pill nz-true">Doğru Cevap</span><span>${escapeHtml(it.correct||'-')}</span></div>
           ${it.explanation?`<div class="nz-exp">${escapeHtml(it.explanation)}</div>`:''}
@@ -15066,7 +15120,7 @@ body.nova-dark-duel {
         if (btn.classList.contains('option-chosen')) {
           if (btn.classList.contains('correct')) {
             showJudge(true);
-            runPlusToNearestScore(btn);
+            runPlusToMyScore(btn);
           } else if (btn.classList.contains('wrong')) {
             showJudge(false);
           }
@@ -15095,7 +15149,7 @@ body.nova-dark-duel {
     el.classList.add('nova-show', isCorrect ? 'nova-correct' : 'nova-wrong');
   }
 
-  function runPlusToNearestScore(sourceBtn){
+  function runPlusToMyScore(sourceBtn){
     try {
       const rect = sourceBtn.getBoundingClientRect();
       const sx = rect.left + rect.width/2;
@@ -15119,6 +15173,52 @@ body.nova-dark-duel {
       spawnPlus(sx, sy, best.x, best.y);
     } catch(e){ /* fail silently */ }
   }
+
+
+function runPlusToMyScore(sourceBtn){
+  try {
+    const rect = sourceBtn.getBoundingClientRect();
+    const sx = rect.left + rect.width/2;
+    const sy = rect.top + rect.height/2;
+
+    // inviter = sol HUD, invited = sağ HUD
+    const localIsInviter = (typeof window.isInviter !== 'undefined')
+      ? !!window.isInviter
+      : (typeof isInviter !== 'undefined' ? !!isInviter : null);
+
+    let targetEl = null;
+    if (localIsInviter !== null) {
+      targetEl = document.getElementById(localIsInviter ? 'novaLeftCount' : 'novaRightCount');
+    }
+
+    // HUD görünmüyorsa alttaki sayaçlara düş
+    if (!targetEl || getComputedStyle(targetEl).display === 'none') {
+      targetEl = document.getElementById(localIsInviter ? 'inviter-correct-count' : 'invited-correct-count');
+    }
+
+    if (!targetEl) {
+      // En son çare: en yakın hedef
+      const counters = Array.from(document.querySelectorAll('.duel-player-correct-count, .nova-hp-count'));
+      if (!counters.length){ spawnPlus(sx, sy, sx+260, sy-240); return; }
+      let best = counters[0], bestd2 = Infinity;
+      counters.forEach(el => {
+        const r = el.getBoundingClientRect();
+        const x = r.left + r.width/2, y = r.top + r.height/2;
+        const d2 = (x - sx) * (x - sx) + (y - sy) * (y - sy);
+        if (d2 < bestd2) { bestd2 = d2; best = el; }
+      });
+      const r = best.getBoundingClientRect();
+      spawnPlus(sx, sy, r.left + r.width/2, r.top + r.height/2);
+      return;
+    }
+
+    const tr = targetEl.getBoundingClientRect();
+    spawnPlus(sx, sy, tr.left + tr.width/2, tr.top + tr.height/2);
+  } catch (e) { /* silent */ }
+}
+
+
+
 
   function spawnPlus(sx, sy, tx, ty){
     const plus = d.createElement('div');
@@ -15890,140 +15990,83 @@ body.nova-dark-duel {
 </script>
 
 
-<script>
-// === Nova Patch: Suppress end-of-duel showAlert popups ===
-(function(){
-  // Capture the original showAlert if it exists at this moment (likely defined above)
-  var __orig = (typeof window.showAlert === 'function') ? window.showAlert.bind(window) : null;
-
-  // Replace with a guarded wrapper that suppresses specific end-of-duel messages only
-  window.showAlert = async function(msg){
-    try {
-      if (typeof msg === 'string') {
-        if (msg.includes('Tebrikler! Düelloyu kazandınız') || msg.includes('Maalesef kaybettiniz')) {
-          // Swallow end-of-duel alerts silently
-          return;
-        }
-      }
-    } catch (e) { /* no-op */ }
-    // Fallback to original for all other alerts (if any)
-    if (__orig) { return __orig(msg); }
-    // Otherwise just resolve
-    return;
-  };
-
-  // Add a class to body while duel containers are visible to avoid page scroll
-  function setFullscreenActive(active){
-    try {
-      document.body.classList.toggle('nova-duel-fullscreen-active', !!active);
-    } catch(e){}
-  }
-
-  // Observe visibility toggles of duel containers to manage body scroll lock
-  function initObserver(){
-    try{
-      var sel = document.querySelector('.duel-selection-container');
-      var game = document.querySelector('.duel-game-container');
-      var obs = new MutationObserver(function(){
-        var active = (sel && getComputedStyle(sel).display !== 'none') ||
-                     (game && getComputedStyle(game).display !== 'none');
-        setFullscreenActive(active);
-      });
-      [sel, game].forEach(function(el){
-        if (el) obs.observe(el, { attributes:true, attributeFilter:['style','class'] });
-      });
-      // Initial state
-      var activeInit = (sel && getComputedStyle(sel).display !== 'none') ||
-                       (game && getComputedStyle(game).display !== 'none');
-      setFullscreenActive(activeInit);
-    }catch(e){}
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initObserver, { once:true });
-  } else {
-    initObserver();
-  }
-})();
-</script>
-
-
-
-<!-- Nova Reload Patch v2: 'Geri Dön' -> hard navigate to base (homepage) URL -->
-
-<!-- Nova Reload Patch v3: 'Geri Dön' -> hard refresh (F5) -->
-<script id="nova-single-reload-hook">
-(function(){
-  if (window.__novaSingleReloadHookInstalledV3) return;
-  window.__novaSingleReloadHookInstalledV3 = true;
-
-  document.addEventListener('click', function(ev){
-    try {
-      var t = ev.target;
-      var btn = t && (t.closest ? t.closest('.end-game-button, .single-end-back-button, #endGameBackButton') : null);
-      if (btn) {
-        if (typeof ev.stopImmediatePropagation === 'function') ev.stopImmediatePropagation();
-        ev.stopPropagation();
-        ev.preventDefault();
-        try { window.location.reload(); } catch(e) { location.reload(); }
-      }
-    } catch(_){}
-  }, true);
-})();
-</script>
-
-
-
-
-<!-- Nova Advice Guard: remove advice card outside result screen -->
+<!-- Nova Advice Guard v2: show ONLY on result screen -->
 <script id="nova-advice-guard">
 (function(){
-  if (window.__novaAdviceGuardInstalled) return;
-  window.__novaAdviceGuardInstalled = true;
+  if (window.__novaAdviceGuardInstalledV2) return;
+  window.__novaAdviceGuardInstalledV2 = true;
+
+  function isVisible(el){
+    if(!el) return false;
+    var cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+    if ((el.offsetWidth|0) === 0 && (el.offsetHeight|0) === 0) return false;
+    return true;
+  }
+
+  function resultVisible(){
+    var sc = document.getElementById('score-container') ||
+             document.querySelector('.score-container, .result-screen, #resultScreen');
+    return isVisible(sc);
+  }
 
   function hideAdvice(){
     try{
-      var el = document.getElementById('teacher-advice-card');
-      if (el) el.remove();
+      // Remove both id and class variants if exist
+      var byId = document.getElementById('teacher-advice-card');
+      if (byId) byId.remove();
+      document.querySelectorAll('.teacher-advice-card').forEach(function(el){ el.remove(); });
     }catch(e){}
   }
 
-  function observeQuestion(){
-    try{
-      var qc = document.querySelector('.question-container');
-      if (!qc) return;
-      var obs = new MutationObserver(function(){
-        // Any visibility/class changes on question area -> ensure advice is gone
-        hideAdvice();
-      });
-      obs.observe(qc, { attributes: true, attributeFilter: ['style','class'] });
-    }catch(e){}
+  function enforce(){
+    if (!resultVisible()) hideAdvice();
   }
 
-  function hook(fnName){
+  function observeRoots(){
+    var roots = [
+      document.body,
+      document.querySelector('.question-container'),
+      document.querySelector('.single-player-game-container'),
+      document.querySelector('.duel-game-container'),
+      document.querySelector('.matchmaking-screen'),
+      document.getElementById('score-container')
+    ].filter(Boolean);
+    roots.forEach(function(el){
+      try{
+        var obs = new MutationObserver(enforce);
+        obs.observe(el, { attributes:true, childList:true, subtree:true });
+      }catch(_){}
+    });
+  }
+
+  function hook(name){
     try{
-      var fn = window[fnName];
-      if (typeof fn === 'function' && !fn.__novaAdviceKill){
+      var fn = window[name];
+      if (typeof fn === 'function' && !fn.__novaAdviceV2){
         var orig = fn;
-        window[fnName] = function(){
-          hideAdvice();
-          return orig.apply(this, arguments);
+        window[name] = function(){
+          var r = orig.apply(this, arguments);
+          setTimeout(enforce, 0);
+          return r;
         };
-        window[fnName].__novaAdviceKill = true;
+        window[name].__novaAdviceV2 = true;
       }
-    }catch(e){}
+    }catch(_){}
   }
 
   function boot(){
-    hideAdvice();
-    observeQuestion();
-    // Kill card on any step that shows/advances questions
-    ['displayCurrentQuestion','proceedToNextQuestion','startNow','startTimer','findStartButton'].forEach(hook);
-    // Also when clicking any option
+    enforce();
+    observeRoots();
+    [
+      'displayCurrentQuestion','proceedToNextQuestion','startNow','startTimer','findStartButton',
+      'startGame','startSinglePlayer','startCountdown','startDuelGame','endGame','showResults'
+    ].forEach(hook);
+
     document.addEventListener('click', function(e){
       var t = e.target;
-      if (t && (t.closest ? t.closest('.option-btn, .answer-button, .question-container, .next-question-button') : null)){
-        hideAdvice();
+      if (t && (t.closest ? t.closest('.option-button, .option-btn, .answer-button, .next-question-button, .question-container, #start-game-button') : null)){
+        enforce();
       }
     }, true);
   }
@@ -16037,118 +16080,134 @@ body.nova-dark-duel {
 </script>
 
 
-<script id="nova-fit-js">
-/* === NovaFit v1.0 — auto-scale .duel-game-container to fit ANY viewport without cropping === */
+<!-- NOVA: Duel Scale Toolbar Script (safe) -->
+<script id="nova-duel-scale-script">
 (function(){
-  var overlay, stage, duel, placeholder, originalParent, active=false;
+  const DUEL_ID = 'duel-game-screen';
+  const WRAP_ID = 'nova-duel-scale-wrapper';
+  const TOOL_ID = 'nova-duel-scale-toolbar';
+  const RANGE_ID = 'nova-duel-scale-range';
+  const PCT_ID = 'nova-duel-scale-pct';
+  const LS_KEY = 'novaDuelScale';
 
-  function ensureOverlay(){
-    if(!overlay){
-      overlay = document.createElement('div'); overlay.id = 'novaFitOverlay';
-      stage = document.createElement('div'); stage.id = 'novaFitStage';
-      overlay.appendChild(stage);
-      document.body.appendChild(overlay);
+  function getEl(id){ return document.getElementById(id); }
+
+  function setScale(k){
+    if (isNaN(k)) k = 1;
+    k = Math.max(0.70, Math.min(1.20, k));
+    document.documentElement.style.setProperty('--duel-scale', String(k));
+    const pct = Math.round(k*100);
+    const pctEl = getEl(PCT_ID); if (pctEl) pctEl.textContent = pct + '%';
+    const rng = getEl(RANGE_ID); if (rng) rng.value = String(pct);
+    try{ localStorage.setItem(LS_KEY, String(k)); }catch(_){}
+  }
+  function getScale(){
+    const val = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--duel-scale'));
+    if (!isNaN(val) && val>0) return val;
+    try { const v = parseFloat(localStorage.getItem(LS_KEY)); return isNaN(v)?1:v; } catch(_){}
+    return 1;
+  }
+
+  function ensureWrapper(){
+    const duel = getEl(DUEL_ID);
+    if (!duel || !duel.parentElement) return;
+    if (duel.parentElement.id === WRAP_ID) return;
+    const wrap = document.createElement('div');
+    wrap.id = WRAP_ID;
+    wrap.style.width = '100%';
+    wrap.style.display = 'block';
+    wrap.style.transformOrigin = 'top center';
+    duel.parentElement.insertBefore(wrap, duel);
+    wrap.appendChild(duel);
+  }
+
+  function isVisible(el){
+    if (!el) return false;
+    const st = getComputedStyle(el);
+    if (st.display === 'none' || st.visibility === 'hidden') return false;
+    const r = el.getBoundingClientRect();
+    return (r.width>1 && r.height>1);
+  }
+
+  function showToolbar(show){
+    const t = getEl(TOOL_ID);
+    if (!t) return;
+    t.style.display = show ? 'flex' : 'none';
+    t.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+
+  function fitToViewport(){
+    const duel = getEl(DUEL_ID);
+    if (!duel) return;
+    const prev = getScale();
+    setScale(1);
+    const rect = duel.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const availH = vh - 70;
+    const k = Math.max(0.70, Math.min(1.20, Math.min(vw/rect.width, availH/rect.height)));
+    setScale(k);
+  }
+
+  function mountToolbarOnce(){
+    if (getEl(TOOL_ID)) return true;
+    document.body.insertAdjacentHTML('beforeend', `
+<!-- NOVA: Duel Scale Toolbar -->
+<div id="nova-duel-scale-toolbar" aria-hidden="true">
+  <span class="label">Ölçek</span>
+  <div class="group grow">
+    <button class="btn small" data-act="minus">−</button>
+    <input id="nova-duel-scale-range" type="range" min="70" max="120" value="100" step="1" />
+    <button class="btn small" data-act="plus">+</button>
+  </div>
+  <span class="pct badge" id="nova-duel-scale-pct">100%</span>
+  <div class="sep"></div>
+  <button class="btn" data-act="fit">Sığdır</button>
+  <button class="btn" data-act="reset">Sıfırla</button>
+</div>
+`);
+    const rng = getEl(RANGE_ID);
+    if (rng){
+      rng.addEventListener('input', ()=>{
+        const pct = parseInt(rng.value, 10);
+        setScale(pct/100);
+      });
     }
+    document.body.addEventListener('click', (e)=>{
+      const btn = e.target.closest('#'+TOOL_ID+' [data-act]');
+      if (!btn) return;
+      const act = btn.getAttribute('data-act');
+      let k = getScale();
+      if (act==='minus') setScale((Math.round(k*100)-1)/100);
+      else if (act==='plus') setScale((Math.round(k*100)+1)/100);
+      else if (act==='reset') setScale(1);
+      else if (act==='fit') fitToViewport();
+    });
+    return true;
   }
 
-  function measure(el){
-    // Temporarily reset any previous transform for accurate measurement
-    el.style.transform = '';
-    // Use current layout size as "natural" size
-    var rect = el.getBoundingClientRect();
-    return { w: rect.width || el.scrollWidth || 1, h: rect.height || el.scrollHeight || 1 };
-  }
-
-  function applyScale(){
-    if(!active || !duel) return;
-    // If for some reason duel vanished, bail
-    if(!document.body.contains(duel)){ deactivate(); return; }
-    // Make sure overlay stretches to current viewport (accounts for mobile UI changes)
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-
-    // Measure the duel screen in its current layout
-    var rect = measure(duel);
-    var vw = Math.max(1, window.innerWidth || document.documentElement.clientWidth || rect.w);
-    var vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || rect.h);
-
-    var sx = vw / rect.w;
-    var sy = vh / rect.h;
-    var s = Math.min(1, sx, sy); // never upscale above 1 to keep crisp UI
-
-    // Apply
-    stage.style.transform = 'scale(' + s + ')';
-  }
-
-  function activate(){
-    if(active) return;
-    duel = document.querySelector('.duel-game-container');
-    if(!duel) return;
-    // Only activate when duel screen is actually shown
-    var style = getComputedStyle(duel);
-    var visible = style.display !== 'none' && duel.offsetParent !== null;
-    if(!visible) return;
-
-    ensureOverlay();
-    originalParent = duel.parentNode;
-    placeholder = document.createElement('div');
-    placeholder.id = 'novaFitPlaceholder';
-    placeholder.style.display = 'none';
-    originalParent.insertBefore(placeholder, duel);
-    stage.appendChild(duel);
-
-    overlay.style.display = 'flex';
-    document.documentElement.classList.add('nova-lock');
-    document.body.classList.add('nova-lock');
-    active = true;
-    // Let layout settle then scale
-    requestAnimationFrame(applyScale);
-  }
-
-  function deactivate(){
-    if(!active) return;
-    overlay.style.display = 'none';
-    try{
-      if(placeholder && placeholder.parentNode && originalParent){
-        originalParent.insertBefore(duel, placeholder);
-        placeholder.remove();
+  (function init(){
+    mountToolbarOnce();
+    ensureWrapper();
+    setScale(getScale());
+    let lastShown = false;
+    setInterval(()=>{
+      const duel = getEl(DUEL_ID);
+      const shouldShow = isVisible(duel);
+      if (shouldShow !== lastShown){
+        showToolbar(shouldShow);
+        if (shouldShow){ ensureWrapper(); setScale(getScale()); }
+        lastShown = shouldShow;
       }
-    }catch(e){ /* no-op */ }
-    document.documentElement.classList.remove('nova-lock');
-    document.body.classList.remove('nova-lock');
-    if(stage) stage.style.transform = '';
-    active = false;
-  }
+    }, 700);
+  })();
 
-  function check(){
-    // Detect whether duel game screen became visible/hidden
-    var current = document.querySelector('.duel-game-container');
-    if(!current){ deactivate(); return; }
-    var visible = getComputedStyle(current).display !== 'none' && current.offsetParent !== null;
-    if(visible && !active) activate();
-    else if(!visible && active) deactivate();
-    else if(visible && active) requestAnimationFrame(applyScale);
-  }
-
-  // Observe DOM changes to react when app switches screens
-  var obs = new MutationObserver(function(){ check(); });
-  obs.observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
-
-  // Handle viewport changes
-  window.addEventListener('resize', function(){ if(active) applyScale(); }, {passive:true});
-  window.addEventListener('orientationchange', function(){ setTimeout(applyScale, 150); });
-
-  // Run once after DOM is ready
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', check);
-  }else{
-    check();
-  }
-
-  // Optional manual hooks for debugging
-  window.NovaFit = { activate: activate, deactivate: deactivate, apply: applyScale };
-})();
-</script>
+  window.addEventListener('resize', function(){
+    const t = getEl(TOOL_ID);
+    if (t && t.style.display !== 'none'){
+      // kullanıcı manuel ayarı korunur
+    }
+  });
+})();</script>
 
 </body>
 </html>
