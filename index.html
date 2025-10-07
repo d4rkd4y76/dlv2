@@ -6659,49 +6659,70 @@ body > #nova-summary{display:none !important;}
 @keyframes novaFlash{ 0%{opacity:1} 100%{opacity:0} }
 [data-nova-hide]{ display:none !important; }
 </style>
+<style>
 
-<style id="nova-duel-fullscreen-scale-v3">
-/* === NOVA v3: Sadece SORU ekranında — Tam Ekran + Non-intrusive Ölçekleme (DOM taşımadan) === */
-html, body { height: 100%; }
-body.nova-fs-active { background:#000 !important; overflow:hidden !important; margin:0 !important; padding:0 !important; }
+/* === Nova Patch: Fullscreen Duel Containers (portrait & landscape) === */
+html, body {
+  height: 100%;
+  width: 100%;
+}
+/* Prevent body background layout from causing scroll while duel is active */
+body.nova-duel-fullscreen-active {
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+/* Make duel selection & game containers fill the viewport and scale safely */
+@media (orientation: portrait), (orientation: landscape) {
+  .duel-selection-container,
+  .duel-game-container {
+    position: fixed !important;
+    inset: 0 !important;
+    max-width: none !important;
+    width: 100vw !important;
+    height: 100dvh !important; /* dynamic viewport units for mobile address bars */
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: clamp(8px, 2.5vw, 28px) !important;
+    overflow: auto !important;
+    background: white; /* keep existing theme clean; avoids transparency artifacts */
+    z-index: 999999; /* ensure on top while active */
+  }
+  /* Make inner rows adapt gracefully */
+  .players-info-row {
+    max-width: min(1100px, 96vw) !important;
+    width: 100% !important;
+    gap: clamp(10px, 2.5vw, 24px) !important;
+    flex-wrap: wrap !important;
+  }
+  /* Keep question card contained and readable */
+  .question-container {
+    max-width: min(900px, 96vw) !important;
+    width: 100% !important;
+    min-height: min(420px, 62vh) !important;
+  }
+  .options-container {
+    max-width: min(1100px, 96vw) !important;
+    width: 100% !important;
+  }
+  .duel-player-score img {
+    width: clamp(56px, 8vw, 80px) !important;
+    height: clamp(56px, 8vw, 80px) !important;
+  }
+}
 
-/* Fullscreen sırasında sayfayı kaydırmayı engelle */
-:root.nova-fs-root { overflow:hidden !important; }
+</style>
 
-/* Ölçek değeri CSS değişkeniyle taşınıyor; zoom (Chromium/WebKit) + transform (Gecko fallback) */
-.duel-game-container {
-  transform-origin: top left !important;
+<style id="nova-fit-css">
+/* === NovaFit: Viewport-perfect scaling for DUEL GAME SCREEN only === */
+#novaFitOverlay{
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  z-index:999999; background:transparent;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-body.nova-scale-on .duel-game-container {
-  /* Chromium/WebKit */
-  zoom: var(--novaScale, 1);
-  /* Firefox fallback */
-  transform: scale(var(--novaScale, 1));
-}
-
-/* Tam ekran izin paneli: sadece gerektiğinde görünür, aksi hâlde pointer eventi kapalı */
-#novaTapToFullscreenFSv3 {
-  position: fixed; inset: 0;
-  background: radial-gradient(1200px 600px at 50% 110%, #0a0a0f 0%, #000 65%);
-  display: none; align-items: center; justify-content: center;
-  z-index: 2147483647;
-  pointer-events: none; /* görünmezken alttaki içeriği engelleme */
-}
-#novaTapToFullscreenFSv3.visible { display:flex; pointer-events: auto; }
-#novaTapToFullscreenFSv3 .panel {
-  width: min(92vw, 520px);
-  border-radius: 18px; padding: 20px; text-align: center;
-  background: rgba(12,18,30,0.92);
-  border: 1px solid rgba(0,255,255,0.3);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 0 24px rgba(0,255,255,0.15);
-  color: #e6f6ff; font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans';
-}
-#novaTapToFullscreenFSv3 .panel button {
-  margin-top: 8px; font-weight: 800;
-  border: 0; border-radius: 12px; padding: 12px 18px; cursor: pointer;
-  background: linear-gradient(180deg, rgba(28,40,72,1), rgba(10,16,30,1));
-  color: #e9f4ff;
-}
+#novaFitStage{ transform-origin: top center; will-change: transform; }
+html.nova-lock, body.nova-lock{ overflow:hidden; height:100%; }
 </style>
 
 </head>
@@ -15869,149 +15890,263 @@ body.nova-dark-duel {
 </script>
 
 
-<script id="nova-duel-fullscreen-scale-js-v3">
-/* === NOVA v3: DOM'u taşımadan, sadece soru fazında === */
+<script>
+// === Nova Patch: Suppress end-of-duel showAlert popups ===
 (function(){
-  const Q_SELECTORS = [
-    '.question-container', '.question-card', '.question', '#question', '#questionArea',
-    '.options-container', '.answers', '#answers', '.option', '.option-btn', '.secenek', '.cevap'
-  ];
+  // Capture the original showAlert if it exists at this moment (likely defined above)
+  var __orig = (typeof window.showAlert === 'function') ? window.showAlert.bind(window) : null;
 
-  const state = {
-    active:false,
-    lastCheck:0,
-    raf:null,
-    overlay:null
+  // Replace with a guarded wrapper that suppresses specific end-of-duel messages only
+  window.showAlert = async function(msg){
+    try {
+      if (typeof msg === 'string') {
+        if (msg.includes('Tebrikler! Düelloyu kazandınız') || msg.includes('Maalesef kaybettiniz')) {
+          // Swallow end-of-duel alerts silently
+          return;
+        }
+      }
+    } catch (e) { /* no-op */ }
+    // Fallback to original for all other alerts (if any)
+    if (__orig) { return __orig(msg); }
+    // Otherwise just resolve
+    return;
   };
 
-  function qs(s, root=document){ return root.querySelector(s); }
-  function shown(el){
-    if(!el) return false;
-    const cs = getComputedStyle(el);
-    if (cs.display==='none' || cs.visibility==='hidden' || +cs.opacity===0) return false;
-    const r = el.getBoundingClientRect();
-    return r.width>0 && r.height>0;
+  // Add a class to body while duel containers are visible to avoid page scroll
+  function setFullscreenActive(active){
+    try {
+      document.body.classList.toggle('nova-duel-fullscreen-active', !!active);
+    } catch(e){}
   }
 
-  function duelContainer(){
-    return qs('.duel-game-container');
-  }
-
-  function inQuestionPhase(){
-    const duel = duelContainer();
-    if(!shown(duel)) return false;
-
-    // Intro/sayaç ekranlarını atla; sadece soru/şıklar görünürse true
-    const hasQuestion = Q_SELECTORS.some(sel => shown(qs(sel, duel)));
-    const text = (duel.textContent || '').toLowerCase();
-    const introWords = ['başlıyor', 'starting', 'countdown'];
-    const isIntro = introWords.some(w => text.includes(w));
-    return hasQuestion && !isIntro;
-  }
-
-  function measureScale(){
-    const duel = duelContainer();
-    if(!duel) return 1;
-    // İçeriğin doğal boyutu
-    const cw = duel.scrollWidth || duel.getBoundingClientRect().width || innerWidth;
-    const ch = duel.scrollHeight || duel.getBoundingClientRect().height || innerHeight;
-    const vw = Math.max(document.documentElement.clientWidth, innerWidth || 0);
-    const vh = Math.max(document.documentElement.clientHeight, innerHeight || 0);
-    const s = Math.min(vw/cw, vh/ch);
-    return Math.max(0.25, Math.min(s, 2.0)); // güvenli sınırlar
-  }
-
-  async function enterFS(){
-    document.documentElement.classList.add('nova-fs-root');
-    document.body.classList.add('nova-fs-active','nova-scale-on');
-    // Ölçek uygula
-    const s = measureScale();
-    document.body.style.setProperty('--novaScale', s.toString());
-
-    // Tam ekran dene
+  // Observe visibility toggles of duel containers to manage body scroll lock
+  function initObserver(){
     try{
-      const el = document.documentElement;
-      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-      if(req) await req.call(el);
-      hideOverlay();
-    }catch(e){
-      showOverlay();
-    }
-    state.active = true;
-  }
-
-  function leaveFS(){
-    if(!state.active) return;
-    state.active = false;
-    document.body.classList.remove('nova-fs-active','nova-scale-on');
-    document.documentElement.classList.remove('nova-fs-root');
-    document.body.style.removeProperty('--novaScale');
-    try{
-      const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
-      if(ex) ex.call(document);
+      var sel = document.querySelector('.duel-selection-container');
+      var game = document.querySelector('.duel-game-container');
+      var obs = new MutationObserver(function(){
+        var active = (sel && getComputedStyle(sel).display !== 'none') ||
+                     (game && getComputedStyle(game).display !== 'none');
+        setFullscreenActive(active);
+      });
+      [sel, game].forEach(function(el){
+        if (el) obs.observe(el, { attributes:true, attributeFilter:['style','class'] });
+      });
+      // Initial state
+      var activeInit = (sel && getComputedStyle(sel).display !== 'none') ||
+                       (game && getComputedStyle(game).display !== 'none');
+      setFullscreenActive(activeInit);
     }catch(e){}
-    hideOverlay();
   }
 
-  function rescale(){
-    if(!state.active) return;
-    const s = measureScale();
-    document.body.style.setProperty('--novaScale', s.toString());
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initObserver, { once:true });
+  } else {
+    initObserver();
+  }
+})();
+</script>
+
+
+
+<!-- Nova Reload Patch v2: 'Geri Dön' -> hard navigate to base (homepage) URL -->
+
+<!-- Nova Reload Patch v3: 'Geri Dön' -> hard refresh (F5) -->
+<script id="nova-single-reload-hook">
+(function(){
+  if (window.__novaSingleReloadHookInstalledV3) return;
+  window.__novaSingleReloadHookInstalledV3 = true;
+
+  document.addEventListener('click', function(ev){
+    try {
+      var t = ev.target;
+      var btn = t && (t.closest ? t.closest('.end-game-button, .single-end-back-button, #endGameBackButton') : null);
+      if (btn) {
+        if (typeof ev.stopImmediatePropagation === 'function') ev.stopImmediatePropagation();
+        ev.stopPropagation();
+        ev.preventDefault();
+        try { window.location.reload(); } catch(e) { location.reload(); }
+      }
+    } catch(_){}
+  }, true);
+})();
+</script>
+
+
+
+
+<!-- Nova Advice Guard: remove advice card outside result screen -->
+<script id="nova-advice-guard">
+(function(){
+  if (window.__novaAdviceGuardInstalled) return;
+  window.__novaAdviceGuardInstalled = true;
+
+  function hideAdvice(){
+    try{
+      var el = document.getElementById('teacher-advice-card');
+      if (el) el.remove();
+    }catch(e){}
   }
 
-  function showOverlay(){
-    ensureOverlay();
-    state.overlay.classList.add('visible');
+  function observeQuestion(){
+    try{
+      var qc = document.querySelector('.question-container');
+      if (!qc) return;
+      var obs = new MutationObserver(function(){
+        // Any visibility/class changes on question area -> ensure advice is gone
+        hideAdvice();
+      });
+      obs.observe(qc, { attributes: true, attributeFilter: ['style','class'] });
+    }catch(e){}
   }
-  function hideOverlay(){
-    if(state.overlay) state.overlay.classList.remove('visible');
+
+  function hook(fnName){
+    try{
+      var fn = window[fnName];
+      if (typeof fn === 'function' && !fn.__novaAdviceKill){
+        var orig = fn;
+        window[fnName] = function(){
+          hideAdvice();
+          return orig.apply(this, arguments);
+        };
+        window[fnName].__novaAdviceKill = true;
+      }
+    }catch(e){}
   }
+
+  function boot(){
+    hideAdvice();
+    observeQuestion();
+    // Kill card on any step that shows/advances questions
+    ['displayCurrentQuestion','proceedToNextQuestion','startNow','startTimer','findStartButton'].forEach(hook);
+    // Also when clicking any option
+    document.addEventListener('click', function(e){
+      var t = e.target;
+      if (t && (t.closest ? t.closest('.option-btn, .answer-button, .question-container, .next-question-button') : null)){
+        hideAdvice();
+      }
+    }, true);
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot, {once:true});
+  } else {
+    boot();
+  }
+})();
+</script>
+
+
+<script id="nova-fit-js">
+/* === NovaFit v1.0 — auto-scale .duel-game-container to fit ANY viewport without cropping === */
+(function(){
+  var overlay, stage, duel, placeholder, originalParent, active=false;
+
   function ensureOverlay(){
-    if(state.overlay) return;
-    const d = document.createElement('div');
-    d.id = 'novaTapToFullscreenFSv3';
-    d.innerHTML = `
-      <div class="panel">
-        <div><strong>📺 Tam Ekran</strong></div>
-        <div>Tarayıcı otomatik tam ekranı engelledi.</div>
-        <button type="button" id="novaTapAllowFSv3">Tam Ekrana Geç</button>
-      </div>`;
-    document.body.appendChild(d);
-    state.overlay = d;
-    d.addEventListener('click', ()=>enterFS());
-    const b = d.querySelector('#novaTapAllowFSv3');
-    if(b) b.addEventListener('click', (e)=>{ e.stopPropagation(); enterFS(); });
-  }
-
-  // Debounce/tick — 120ms
-  let tickTimer = null;
-  function scheduleTick(){
-    if(tickTimer) return;
-    tickTimer = setTimeout(()=>{ tickTimer=null; tick(); }, 120);
-  }
-
-  function tick(){
-    if (inQuestionPhase()) {
-      if(!state.active) enterFS();
-      else rescale();
-    } else {
-      leaveFS();
+    if(!overlay){
+      overlay = document.createElement('div'); overlay.id = 'novaFitOverlay';
+      stage = document.createElement('div'); stage.id = 'novaFitStage';
+      overlay.appendChild(stage);
+      document.body.appendChild(overlay);
     }
   }
 
-  // Gözlemciler
-  const mo = new MutationObserver(scheduleTick);
-  mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
-  ['resize','orientationchange'].forEach(ev => addEventListener(ev, scheduleTick, {passive:true}));
-  ['click','touchstart','keydown'].forEach(ev => addEventListener(ev, ()=>{ if(inQuestionPhase() && !document.fullscreenElement) enterFS(); }, {capture:true, passive:true}));
-  document.addEventListener('fullscreenchange', ()=>{ if(!document.fullscreenElement) leaveFS(false); });
-
-  // İlk çalıştırma
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scheduleTick, {once:true});
-  } else {
-    scheduleTick();
+  function measure(el){
+    // Temporarily reset any previous transform for accurate measurement
+    el.style.transform = '';
+    // Use current layout size as "natural" size
+    var rect = el.getBoundingClientRect();
+    return { w: rect.width || el.scrollWidth || 1, h: rect.height || el.scrollHeight || 1 };
   }
+
+  function applyScale(){
+    if(!active || !duel) return;
+    // If for some reason duel vanished, bail
+    if(!document.body.contains(duel)){ deactivate(); return; }
+    // Make sure overlay stretches to current viewport (accounts for mobile UI changes)
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+
+    // Measure the duel screen in its current layout
+    var rect = measure(duel);
+    var vw = Math.max(1, window.innerWidth || document.documentElement.clientWidth || rect.w);
+    var vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || rect.h);
+
+    var sx = vw / rect.w;
+    var sy = vh / rect.h;
+    var s = Math.min(1, sx, sy); // never upscale above 1 to keep crisp UI
+
+    // Apply
+    stage.style.transform = 'scale(' + s + ')';
+  }
+
+  function activate(){
+    if(active) return;
+    duel = document.querySelector('.duel-game-container');
+    if(!duel) return;
+    // Only activate when duel screen is actually shown
+    var style = getComputedStyle(duel);
+    var visible = style.display !== 'none' && duel.offsetParent !== null;
+    if(!visible) return;
+
+    ensureOverlay();
+    originalParent = duel.parentNode;
+    placeholder = document.createElement('div');
+    placeholder.id = 'novaFitPlaceholder';
+    placeholder.style.display = 'none';
+    originalParent.insertBefore(placeholder, duel);
+    stage.appendChild(duel);
+
+    overlay.style.display = 'flex';
+    document.documentElement.classList.add('nova-lock');
+    document.body.classList.add('nova-lock');
+    active = true;
+    // Let layout settle then scale
+    requestAnimationFrame(applyScale);
+  }
+
+  function deactivate(){
+    if(!active) return;
+    overlay.style.display = 'none';
+    try{
+      if(placeholder && placeholder.parentNode && originalParent){
+        originalParent.insertBefore(duel, placeholder);
+        placeholder.remove();
+      }
+    }catch(e){ /* no-op */ }
+    document.documentElement.classList.remove('nova-lock');
+    document.body.classList.remove('nova-lock');
+    if(stage) stage.style.transform = '';
+    active = false;
+  }
+
+  function check(){
+    // Detect whether duel game screen became visible/hidden
+    var current = document.querySelector('.duel-game-container');
+    if(!current){ deactivate(); return; }
+    var visible = getComputedStyle(current).display !== 'none' && current.offsetParent !== null;
+    if(visible && !active) activate();
+    else if(!visible && active) deactivate();
+    else if(visible && active) requestAnimationFrame(applyScale);
+  }
+
+  // Observe DOM changes to react when app switches screens
+  var obs = new MutationObserver(function(){ check(); });
+  obs.observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
+
+  // Handle viewport changes
+  window.addEventListener('resize', function(){ if(active) applyScale(); }, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(applyScale, 150); });
+
+  // Run once after DOM is ready
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', check);
+  }else{
+    check();
+  }
+
+  // Optional manual hooks for debugging
+  window.NovaFit = { activate: activate, deactivate: deactivate, apply: applyScale };
 })();
 </script>
 
