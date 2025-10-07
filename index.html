@@ -6659,6 +6659,59 @@ body > #nova-summary{display:none !important;}
 @keyframes novaFlash{ 0%{opacity:1} 100%{opacity:0} }
 [data-nova-hide]{ display:none !important; }
 </style>
+<style>
+
+/* === Nova Patch: Fullscreen Duel Containers (portrait & landscape) === */
+html, body {
+  height: 100%;
+  width: 100%;
+}
+/* Prevent body background layout from causing scroll while duel is active */
+body.nova-duel-fullscreen-active {
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+/* Make duel selection & game containers fill the viewport and scale safely */
+@media (orientation: portrait), (orientation: landscape) {
+  .duel-selection-container,
+  .duel-game-container {
+    position: fixed !important;
+    inset: 0 !important;
+    max-width: none !important;
+    width: 100vw !important;
+    height: 100dvh !important; /* dynamic viewport units for mobile address bars */
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: clamp(8px, 2.5vw, 28px) !important;
+    overflow: auto !important;
+    background: white; /* keep existing theme clean; avoids transparency artifacts */
+    z-index: 999999; /* ensure on top while active */
+  }
+  /* Make inner rows adapt gracefully */
+  .players-info-row {
+    max-width: min(1100px, 96vw) !important;
+    width: 100% !important;
+    gap: clamp(10px, 2.5vw, 24px) !important;
+    flex-wrap: wrap !important;
+  }
+  /* Keep question card contained and readable */
+  .question-container {
+    max-width: min(900px, 96vw) !important;
+    width: 100% !important;
+    min-height: min(420px, 62vh) !important;
+  }
+  .options-container {
+    max-width: min(1100px, 96vw) !important;
+    width: 100% !important;
+  }
+  .duel-player-score img {
+    width: clamp(56px, 8vw, 80px) !important;
+    height: clamp(56px, 8vw, 80px) !important;
+  }
+}
+
+</style>
 </head>
 <body data-nova-back='1'>
 
@@ -15820,6 +15873,153 @@ body.nova-dark-duel {
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') init();
   else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+
+<script>
+// === Nova Patch: Suppress end-of-duel showAlert popups ===
+(function(){
+  // Capture the original showAlert if it exists at this moment (likely defined above)
+  var __orig = (typeof window.showAlert === 'function') ? window.showAlert.bind(window) : null;
+
+  // Replace with a guarded wrapper that suppresses specific end-of-duel messages only
+  window.showAlert = async function(msg){
+    try {
+      if (typeof msg === 'string') {
+        if (msg.includes('Tebrikler! Düelloyu kazandınız') || msg.includes('Maalesef kaybettiniz')) {
+          // Swallow end-of-duel alerts silently
+          return;
+        }
+      }
+    } catch (e) { /* no-op */ }
+    // Fallback to original for all other alerts (if any)
+    if (__orig) { return __orig(msg); }
+    // Otherwise just resolve
+    return;
+  };
+
+  // Add a class to body while duel containers are visible to avoid page scroll
+  function setFullscreenActive(active){
+    try {
+      document.body.classList.toggle('nova-duel-fullscreen-active', !!active);
+    } catch(e){}
+  }
+
+  // Observe visibility toggles of duel containers to manage body scroll lock
+  function initObserver(){
+    try{
+      var sel = document.querySelector('.duel-selection-container');
+      var game = document.querySelector('.duel-game-container');
+      var obs = new MutationObserver(function(){
+        var active = (sel && getComputedStyle(sel).display !== 'none') ||
+                     (game && getComputedStyle(game).display !== 'none');
+        setFullscreenActive(active);
+      });
+      [sel, game].forEach(function(el){
+        if (el) obs.observe(el, { attributes:true, attributeFilter:['style','class'] });
+      });
+      // Initial state
+      var activeInit = (sel && getComputedStyle(sel).display !== 'none') ||
+                       (game && getComputedStyle(game).display !== 'none');
+      setFullscreenActive(activeInit);
+    }catch(e){}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initObserver, { once:true });
+  } else {
+    initObserver();
+  }
+})();
+</script>
+
+
+
+<!-- Nova Reload Patch v2: 'Geri Dön' -> hard navigate to base (homepage) URL -->
+
+<!-- Nova Reload Patch v3: 'Geri Dön' -> hard refresh (F5) -->
+<script id="nova-single-reload-hook">
+(function(){
+  if (window.__novaSingleReloadHookInstalledV3) return;
+  window.__novaSingleReloadHookInstalledV3 = true;
+
+  document.addEventListener('click', function(ev){
+    try {
+      var t = ev.target;
+      var btn = t && (t.closest ? t.closest('.end-game-button, .single-end-back-button, #endGameBackButton') : null);
+      if (btn) {
+        if (typeof ev.stopImmediatePropagation === 'function') ev.stopImmediatePropagation();
+        ev.stopPropagation();
+        ev.preventDefault();
+        try { window.location.reload(); } catch(e) { location.reload(); }
+      }
+    } catch(_){}
+  }, true);
+})();
+</script>
+
+
+
+
+<!-- Nova Advice Guard: remove advice card outside result screen -->
+<script id="nova-advice-guard">
+(function(){
+  if (window.__novaAdviceGuardInstalled) return;
+  window.__novaAdviceGuardInstalled = true;
+
+  function hideAdvice(){
+    try{
+      var el = document.getElementById('teacher-advice-card');
+      if (el) el.remove();
+    }catch(e){}
+  }
+
+  function observeQuestion(){
+    try{
+      var qc = document.querySelector('.question-container');
+      if (!qc) return;
+      var obs = new MutationObserver(function(){
+        // Any visibility/class changes on question area -> ensure advice is gone
+        hideAdvice();
+      });
+      obs.observe(qc, { attributes: true, attributeFilter: ['style','class'] });
+    }catch(e){}
+  }
+
+  function hook(fnName){
+    try{
+      var fn = window[fnName];
+      if (typeof fn === 'function' && !fn.__novaAdviceKill){
+        var orig = fn;
+        window[fnName] = function(){
+          hideAdvice();
+          return orig.apply(this, arguments);
+        };
+        window[fnName].__novaAdviceKill = true;
+      }
+    }catch(e){}
+  }
+
+  function boot(){
+    hideAdvice();
+    observeQuestion();
+    // Kill card on any step that shows/advances questions
+    ['displayCurrentQuestion','proceedToNextQuestion','startNow','startTimer','findStartButton'].forEach(hook);
+    // Also when clicking any option
+    document.addEventListener('click', function(e){
+      var t = e.target;
+      if (t && (t.closest ? t.closest('.option-btn, .answer-button, .question-container, .next-question-button') : null)){
+        hideAdvice();
+      }
+    }, true);
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot, {once:true});
+  } else {
+    boot();
+  }
 })();
 </script>
 
