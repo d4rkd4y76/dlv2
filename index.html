@@ -6678,32 +6678,92 @@ body > #nova-summary{display:none !important;}
 }
 
 </style>
-<style>
 
-/* === NOVA: Question image cap (max 2x intrinsic) === */
-.question-image,
-#question-image,
-.question-info-image {
-  width: auto !important;
-  height: auto !important;
-  object-fit: contain !important;
-}
+<!-- NOVA: Duel Scale Toolbar Styles (safe) -->
 
+
+
+<!-- NOVA: Duel Scale Styles v3 (apply transform directly to duel screen) -->
+<style id="nova-duel-scale-styles">
+  :root{ --duel-scale: 1; }
+  /* Scale only when the duel screen is active & we add the class */
+  #duel-game-screen.nova-scaled{
+    transform: scale(var(--duel-scale));
+    transform-origin: top center;
+    will-change: transform;
+  }
+  #nova-duel-scale-toolbar{
+    position: fixed;
+    left: 50%; bottom: 10px;
+    transform: translateX(-50%);
+    z-index: 2147483000;
+    width: min(92vw, 820px);
+    padding: 10px 12px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, rgba(18,25,48,.82), rgba(28,38,76,.82));
+    box-shadow: 0 10px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
+    color: #cfe3ff;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+  }
+  #nova-duel-scale-toolbar .label{
+    font: 600 12px/1.2 ui-sans-serif,system-ui,Segoe UI,Roboto;
+    opacity: .9; letter-spacing:.3px; white-space: nowrap;
+  }
+  #nova-duel-scale-toolbar .pct{
+    font: 700 12px/1.2 ui-sans-serif,system-ui,Segoe UI,Roboto;
+    min-width: 46px; text-align: right;
+  }
+  #nova-duel-scale-toolbar .btn{
+    appearance: none; border: none; border-radius: 10px;
+    padding: 8px 10px; background: rgba(255,255,255,.08);
+    color: #e7f0ff; cursor: pointer;
+    font: 600 13px/1 ui-sans-serif,system-ui,Segoe UI,Roboto;
+    transition: transform .08s ease, background .2s ease;
+    user-select: none;
+  }
+  #nova-duel-scale-toolbar .btn:active{ transform: translateY(1px) scale(.98); }
+  #nova-duel-scale-toolbar .btn:hover{ background: rgba(255,255,255,.12); }
+  #nova-duel-scale-toolbar .btn.small{ padding: 6px 9px; border-radius: 8px; }
+  #nova-duel-scale-toolbar input[type="range"]{
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px;
+    background: rgba(255,255,255,.18); border-radius: 999px; outline: none;
+  }
+  #nova-duel-scale-toolbar input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: linear-gradient(180deg,#9fd1ff,#6aa6ff);
+    box-shadow: 0 2px 6px rgba(0,0,0,.35); cursor: pointer;
+    border: 1px solid rgba(255,255,255,.5);
+  }
+  #nova-duel-scale-toolbar .group{ display:flex; align-items:center; gap:8px; }
+  #nova-duel-scale-toolbar .grow{ flex:1; }
+  #nova-duel-scale-toolbar .sep{ width:1px; height:22px; background: rgba(255,255,255,.12); margin: 0 2px; }
+  #nova-duel-scale-toolbar .badge{
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+  }
 </style>
-<style>
 
-/* === NOVA: Center question images === */
-.question-image,
-#question-image,
+<style id="nova-image-center-css">
+
+/* === NOVA: Center question images (single & duel) === */
+#question-image, .question-image,
+#duel-question-image, .duel-question-image,
 .question-info-image {
   display: block !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  object-fit: contain !important;
+  height: auto !important;
+  width: auto !important;
 }
-/* Ensure the container doesn't fight centering */
-.question-container {
-  text-align: center;
-}
+/* Container text align center as a light hint (non-destructive) */
+.question-container { text-align: center; }
 
 </style>
 </head>
@@ -8023,10 +8083,8 @@ async function updateDuelScore(type, data) {
                         database.ref(`classes/${winnerClassId}/students/${winnerId}/gameCup`).transaction(current => (current || 0) + 6),
                         database.ref(`classes/${loserClassId}/students/${loserId}/gameCup`).transaction(current => Math.max((current || 0) - 3, 0))
                     ]);
-                    const message = winnerId === selectedStudent.studentId ? 
-                        '🎉 Tebrikler! Düelloyu kazandınız! (+6 🏆)' :
-                        '😔 Maalesef kaybettiniz. (-3 🏆)';
-                    if (typeof showAlert === 'function') await showAlert(message);
+                    // End-of-duel showAlert disabled by Nova
+
                 } else {
                     console.log('GAME_END: puanlar zaten uygulanmış — ikinci yazım engellendi.');
                 }
@@ -13518,10 +13576,10 @@ function showExplanationAndNext(){
   function findQuestionText(){
     const root = document.querySelector('.question-container, #question-container, .soru-container, .quiz-question, .game-question, .question-area, .questionWrap, .question-wrapper') || document;
     const selectors = [
-      '.question-actual-text',
-      '.question-text', '.question-title', '.question', '#question', '#question-text',
-      '.soru-text', '.soruMetni', '.soru', '.prompt', '.quiz-question h2', '.quiz-question h3'
-    ];
+  '.question-actual-text',
+  '.question-text', '.question-title', '.question', '#question', '#question-text',
+  '.soru-text', '.soruMetni', '.soru', '.prompt', '.quiz-question h2', '.quiz-question h3'
+];
     for (const sel of selectors){
       const el = root.querySelector(sel);
       if (el && (el.innerText||el.textContent||'').trim().length>8){
@@ -13531,7 +13589,11 @@ function showExplanationAndNext(){
     // Fallback: take the longest textual node inside root but not within options
     const options = new Set(Array.from(root.querySelectorAll('.options, .choices, .answers, .option, .option-button, button, .answer-option, .choice, .secenek'))
       .map(e=>e));
-    function isInsideOptions(node){
+    function isInsideInfo(node){
+  try { return node && node.closest && node.closest('.question-info-text'); }
+  catch(_) { return null; }
+}
+function isInsideOptions(node){
       let p=node; while(p){ if(options.has(p)) return true; p=p.parentNode; }
       return false;
     }
@@ -15085,7 +15147,7 @@ body.nova-dark-duel {
         if (btn.classList.contains('option-chosen')) {
           if (btn.classList.contains('correct')) {
             showJudge(true);
-            runPlusToNearestScore(btn);
+            runPlusToMyScore(btn);
           } else if (btn.classList.contains('wrong')) {
             showJudge(false);
           }
@@ -15114,7 +15176,7 @@ body.nova-dark-duel {
     el.classList.add('nova-show', isCorrect ? 'nova-correct' : 'nova-wrong');
   }
 
-  function runPlusToNearestScore(sourceBtn){
+  function runPlusToMyScore(sourceBtn){
     try {
       const rect = sourceBtn.getBoundingClientRect();
       const sx = rect.left + rect.width/2;
@@ -15138,6 +15200,52 @@ body.nova-dark-duel {
       spawnPlus(sx, sy, best.x, best.y);
     } catch(e){ /* fail silently */ }
   }
+
+
+function runPlusToMyScore(sourceBtn){
+  try {
+    const rect = sourceBtn.getBoundingClientRect();
+    const sx = rect.left + rect.width/2;
+    const sy = rect.top + rect.height/2;
+
+    // inviter = sol HUD, invited = sağ HUD
+    const localIsInviter = (typeof window.isInviter !== 'undefined')
+      ? !!window.isInviter
+      : (typeof isInviter !== 'undefined' ? !!isInviter : null);
+
+    let targetEl = null;
+    if (localIsInviter !== null) {
+      targetEl = document.getElementById(localIsInviter ? 'novaLeftCount' : 'novaRightCount');
+    }
+
+    // HUD görünmüyorsa alttaki sayaçlara düş
+    if (!targetEl || getComputedStyle(targetEl).display === 'none') {
+      targetEl = document.getElementById(localIsInviter ? 'inviter-correct-count' : 'invited-correct-count');
+    }
+
+    if (!targetEl) {
+      // En son çare: en yakın hedef
+      const counters = Array.from(document.querySelectorAll('.duel-player-correct-count, .nova-hp-count'));
+      if (!counters.length){ spawnPlus(sx, sy, sx+260, sy-240); return; }
+      let best = counters[0], bestd2 = Infinity;
+      counters.forEach(el => {
+        const r = el.getBoundingClientRect();
+        const x = r.left + r.width/2, y = r.top + r.height/2;
+        const d2 = (x - sx) * (x - sx) + (y - sy) * (y - sy);
+        if (d2 < bestd2) { bestd2 = d2; best = el; }
+      });
+      const r = best.getBoundingClientRect();
+      spawnPlus(sx, sy, r.left + r.width/2, r.top + r.height/2);
+      return;
+    }
+
+    const tr = targetEl.getBoundingClientRect();
+    spawnPlus(sx, sy, tr.left + tr.width/2, tr.top + tr.height/2);
+  } catch (e) { /* silent */ }
+}
+
+
+
 
   function spawnPlus(sx, sy, tx, ty){
     const plus = d.createElement('div');
@@ -15999,35 +16107,180 @@ body.nova-dark-duel {
 </script>
 
 
-<!-- NOVA: Limit question images to at most 2× intrinsic size -->
+<!-- NOVA: Duel Scale Toolbar Script (safe) -->
 
-<script id="nova-image-cap">
+
+
+<!-- NOVA: Duel Scale Script v3 (no wrapper; scale element directly) -->
+<script id="nova-duel-scale-script">
 (function(){
-  if (window.__novaImageCapInstalledV2) return;
-  window.__novaImageCapInstalledV2 = true;
+  const DUEL_ID = 'duel-game-screen';
+  const TOOL_ID = 'nova-duel-scale-toolbar';
+  const RANGE_ID = 'nova-duel-scale-range';
+  const PCT_ID = 'nova-duel-scale-pct';
+  const LS_KEY = 'novaDuelScale';
+
+  function getEl(id){ return document.getElementById(id); }
+
+  function unwrapIfWrapped(){
+    const duel = getEl(DUEL_ID);
+    if (!duel) return;
+    const p = duel.parentElement;
+    if (p && p.id === 'nova-duel-scale-wrapper'){
+      // Move duel out and remove wrapper to avoid affecting other screens
+      p.parentElement.insertBefore(duel, p);
+      p.remove();
+    }
+  }
+
+  function setScale(k){
+    if (isNaN(k)) k = 1;
+    k = Math.max(0.70, Math.min(1.20, k));
+    document.documentElement.style.setProperty('--duel-scale', String(k));
+    const pct = Math.round(k*100);
+    const pctEl = getEl(PCT_ID); if (pctEl) pctEl.textContent = pct + '%';
+    const rng = getEl(RANGE_ID); if (rng) rng.value = String(pct);
+    try{ localStorage.setItem(LS_KEY, String(k)); }catch(_){}
+  }
+  function getScale(){
+    const val = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--duel-scale'));
+    if (!isNaN(val) && val>0) return val;
+    try { const v = parseFloat(localStorage.getItem(LS_KEY)); return isNaN(v)?1:v; } catch(_){}
+    return 1;
+  }
+  function isVisible(el){
+    if (!el) return false;
+    const st = getComputedStyle(el);
+    if (st.display === 'none' || st.visibility === 'hidden') return false;
+    const r = el.getBoundingClientRect();
+    return (r.width>1 && r.height>1);
+  }
+  function showToolbar(show){
+    const t = getEl(TOOL_ID);
+    if (!t) return;
+    t.style.display = show ? 'flex' : 'none';
+    t.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+  function fitToViewport(){
+    const duel = getEl(DUEL_ID);
+    if (!duel) return;
+    const prev = getScale();
+    setScale(1);
+    const rect = duel.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const availH = vh - 70;
+    const k = Math.max(0.70, Math.min(1.20, Math.min(vw/rect.width, availH/rect.height)));
+    setScale(k);
+  }
+  function mountToolbarOnce(){
+    if (getEl(TOOL_ID)) return true;
+    document.body.insertAdjacentHTML('beforeend', `
+<!-- NOVA: Duel Scale Toolbar -->
+<div id="nova-duel-scale-toolbar" aria-hidden="true">
+  <span class="label">Ölçek</span>
+  <div class="group grow">
+    <button class="btn small" data-act="minus">−</button>
+    <input id="nova-duel-scale-range" type="range" min="70" max="120" value="100" step="1" />
+    <button class="btn small" data-act="plus">+</button>
+  </div>
+  <span class="pct badge" id="nova-duel-scale-pct">100%</span>
+  <div class="sep"></div>
+  <button class="btn" data-act="fit">Sığdır</button>
+  <button class="btn" data-act="reset">Sıfırla</button>
+</div>
+`);
+    const rng = getEl(RANGE_ID);
+    if (rng){
+      rng.addEventListener('input', ()=>{
+        const pct = parseInt(rng.value, 10);
+        setScale(pct/100);
+      });
+    }
+    document.body.addEventListener('click', (e)=>{
+      const btn = e.target.closest('#'+TOOL_ID+' [data-act]');
+      if (!btn) return;
+      const act = btn.getAttribute('data-act');
+      let k = getScale();
+      if (act==='minus') setScale((Math.round(k*100)-1)/100);
+      else if (act==='plus') setScale((Math.round(k*100)+1)/100);
+      else if (act==='reset') setScale(1);
+      else if (act==='fit') fitToViewport();
+    });
+    return true;
+  }
+
+  (function init(){
+    mountToolbarOnce();
+    unwrapIfWrapped(); // migrate from v1/v2, remove wrapper if present
+    setScale(getScale());
+    let lastShown = false;
+    setInterval(()=>{
+      const duel = getEl(DUEL_ID);
+      const shouldShow = isVisible(duel);
+      if (shouldShow !== lastShown){
+        showToolbar(shouldShow);
+        // Only add scale class when visible to avoid affecting other screens
+        if (duel){
+          if (shouldShow) duel.classList.add('nova-scaled');
+          else duel.classList.remove('nova-scaled');
+        }
+        lastShown = shouldShow;
+      }
+    }, 700);
+  })();
+
+  window.addEventListener('resize', function(){
+    const t = getEl(TOOL_ID);
+    if (t && t.style.display !== 'none'){
+      // kullanıcı manuel ayarı korunur
+    }
+  });
+})();</script>
+
+
+<!-- NOVA: Duel Scale Toolbar -->
+<div id="nova-duel-scale-toolbar" aria-hidden="true">
+  <span class="label">Ölçek</span>
+  <div class="group grow">
+    <button class="btn small" data-act="minus">−</button>
+    <input id="nova-duel-scale-range" type="range" min="70" max="120" value="100" step="1" />
+    <button class="btn small" data-act="plus">+</button>
+  </div>
+  <span class="pct badge" id="nova-duel-scale-pct">100%</span>
+  <div class="sep"></div>
+  <button class="btn" data-act="fit">Sığdır</button>
+  <button class="btn" data-act="reset">Sıfırla</button>
+</div>
+
+
+<script id="nova-image-cap-js">
+(function(){
+  if (window.__novaImageCapInstalledV3) return;
+  window.__novaImageCapInstalledV3 = true;
 
   function capImage(img){
     try{
-      if (!img || !img.naturalWidth) return;
-      // Baseline: min(natural, 250px). Max: 2x baseline.
+      if (!img || !img.naturalWidth || img.classList.contains('nz-info-img')) return;
+      // Baseline = min(natural, 250px); cap = 2× baseline
       var baseW = Math.min(img.naturalWidth, 250);
       var baseH = Math.min(img.naturalHeight, 250);
       var maxW = baseW * 2;
       var maxH = baseH * 2;
 
-      // Container & viewport constraints
-      var container = img.closest('.question-container') || document.body;
-      var cw = container.clientWidth || window.innerWidth;
-      var ch = container.clientHeight || Math.floor(window.innerHeight * 0.75);
+      // Also respect viewport (keep fully visible)
       var vpW = Math.floor(window.innerWidth * 0.95);
       var vpH = Math.floor(window.innerHeight * 0.75);
 
+      // If inside a question container, don't exceed its width too much
+      var container = img.closest('.question-container');
+      var cw = container ? Math.max(1, container.clientWidth) : vpW;
+
       img.style.width = 'auto';
       img.style.height = 'auto';
-      img.style.maxWidth  = Math.min(maxW, cw*0.95, vpW) + 'px';
-      img.style.maxHeight = Math.min(maxH, ch*0.6,  vpH) + 'px';
+      img.style.maxWidth  = Math.min(maxW, cw, vpW) + 'px';
+      img.style.maxHeight = Math.min(maxH, vpH) + 'px';
       img.style.objectFit = 'contain';
-      // Centering
+      // center (safety)
       img.style.display = 'block';
       img.style.marginLeft = 'auto';
       img.style.marginRight = 'auto';
@@ -16047,10 +16300,11 @@ body.nova-dark-duel {
   }
 
   function scan(){
-    var imgs = document.querySelectorAll('#question-image, .question-image, .question-info-image, .question-media img');
-    imgs.forEach(hook);
+    var sel = '#question-image, .question-image, #duel-question-image, .duel-question-image, .question-media img, .question-info-image';
+    document.querySelectorAll(sel).forEach(hook);
   }
 
+  // Observe DOM changes (questions change dynamically)
   var mo = new MutationObserver(scan);
   mo.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['src','class','style'] });
   window.addEventListener('resize', scan, { passive:true });
@@ -16062,7 +16316,6 @@ body.nova-dark-duel {
   }
 })();
 </script>
-
 
 </body>
 </html>
