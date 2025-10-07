@@ -6659,6 +6659,51 @@ body > #nova-summary{display:none !important;}
 @keyframes novaFlash{ 0%{opacity:1} 100%{opacity:0} }
 [data-nova-hide]{ display:none !important; }
 </style>
+
+<style id="nova-duel-fullscreen-scale-v3">
+/* === NOVA v3: Sadece SORU ekranında — Tam Ekran + Non-intrusive Ölçekleme (DOM taşımadan) === */
+html, body { height: 100%; }
+body.nova-fs-active { background:#000 !important; overflow:hidden !important; margin:0 !important; padding:0 !important; }
+
+/* Fullscreen sırasında sayfayı kaydırmayı engelle */
+:root.nova-fs-root { overflow:hidden !important; }
+
+/* Ölçek değeri CSS değişkeniyle taşınıyor; zoom (Chromium/WebKit) + transform (Gecko fallback) */
+.duel-game-container {
+  transform-origin: top left !important;
+}
+body.nova-scale-on .duel-game-container {
+  /* Chromium/WebKit */
+  zoom: var(--novaScale, 1);
+  /* Firefox fallback */
+  transform: scale(var(--novaScale, 1));
+}
+
+/* Tam ekran izin paneli: sadece gerektiğinde görünür, aksi hâlde pointer eventi kapalı */
+#novaTapToFullscreenFSv3 {
+  position: fixed; inset: 0;
+  background: radial-gradient(1200px 600px at 50% 110%, #0a0a0f 0%, #000 65%);
+  display: none; align-items: center; justify-content: center;
+  z-index: 2147483647;
+  pointer-events: none; /* görünmezken alttaki içeriği engelleme */
+}
+#novaTapToFullscreenFSv3.visible { display:flex; pointer-events: auto; }
+#novaTapToFullscreenFSv3 .panel {
+  width: min(92vw, 520px);
+  border-radius: 18px; padding: 20px; text-align: center;
+  background: rgba(12,18,30,0.92);
+  border: 1px solid rgba(0,255,255,0.3);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 0 24px rgba(0,255,255,0.15);
+  color: #e6f6ff; font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans';
+}
+#novaTapToFullscreenFSv3 .panel button {
+  margin-top: 8px; font-weight: 800;
+  border: 0; border-radius: 12px; padding: 12px 18px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(28,40,72,1), rgba(10,16,30,1));
+  color: #e9f4ff;
+}
+</style>
+
 </head>
 <body data-nova-back='1'>
 
@@ -15820,6 +15865,153 @@ body.nova-dark-duel {
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') init();
   else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+
+<script id="nova-duel-fullscreen-scale-js-v3">
+/* === NOVA v3: DOM'u taşımadan, sadece soru fazında === */
+(function(){
+  const Q_SELECTORS = [
+    '.question-container', '.question-card', '.question', '#question', '#questionArea',
+    '.options-container', '.answers', '#answers', '.option', '.option-btn', '.secenek', '.cevap'
+  ];
+
+  const state = {
+    active:false,
+    lastCheck:0,
+    raf:null,
+    overlay:null
+  };
+
+  function qs(s, root=document){ return root.querySelector(s); }
+  function shown(el){
+    if(!el) return false;
+    const cs = getComputedStyle(el);
+    if (cs.display==='none' || cs.visibility==='hidden' || +cs.opacity===0) return false;
+    const r = el.getBoundingClientRect();
+    return r.width>0 && r.height>0;
+  }
+
+  function duelContainer(){
+    return qs('.duel-game-container');
+  }
+
+  function inQuestionPhase(){
+    const duel = duelContainer();
+    if(!shown(duel)) return false;
+
+    // Intro/sayaç ekranlarını atla; sadece soru/şıklar görünürse true
+    const hasQuestion = Q_SELECTORS.some(sel => shown(qs(sel, duel)));
+    const text = (duel.textContent || '').toLowerCase();
+    const introWords = ['başlıyor', 'starting', 'countdown'];
+    const isIntro = introWords.some(w => text.includes(w));
+    return hasQuestion && !isIntro;
+  }
+
+  function measureScale(){
+    const duel = duelContainer();
+    if(!duel) return 1;
+    // İçeriğin doğal boyutu
+    const cw = duel.scrollWidth || duel.getBoundingClientRect().width || innerWidth;
+    const ch = duel.scrollHeight || duel.getBoundingClientRect().height || innerHeight;
+    const vw = Math.max(document.documentElement.clientWidth, innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight, innerHeight || 0);
+    const s = Math.min(vw/cw, vh/ch);
+    return Math.max(0.25, Math.min(s, 2.0)); // güvenli sınırlar
+  }
+
+  async function enterFS(){
+    document.documentElement.classList.add('nova-fs-root');
+    document.body.classList.add('nova-fs-active','nova-scale-on');
+    // Ölçek uygula
+    const s = measureScale();
+    document.body.style.setProperty('--novaScale', s.toString());
+
+    // Tam ekran dene
+    try{
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+      if(req) await req.call(el);
+      hideOverlay();
+    }catch(e){
+      showOverlay();
+    }
+    state.active = true;
+  }
+
+  function leaveFS(){
+    if(!state.active) return;
+    state.active = false;
+    document.body.classList.remove('nova-fs-active','nova-scale-on');
+    document.documentElement.classList.remove('nova-fs-root');
+    document.body.style.removeProperty('--novaScale');
+    try{
+      const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if(ex) ex.call(document);
+    }catch(e){}
+    hideOverlay();
+  }
+
+  function rescale(){
+    if(!state.active) return;
+    const s = measureScale();
+    document.body.style.setProperty('--novaScale', s.toString());
+  }
+
+  function showOverlay(){
+    ensureOverlay();
+    state.overlay.classList.add('visible');
+  }
+  function hideOverlay(){
+    if(state.overlay) state.overlay.classList.remove('visible');
+  }
+  function ensureOverlay(){
+    if(state.overlay) return;
+    const d = document.createElement('div');
+    d.id = 'novaTapToFullscreenFSv3';
+    d.innerHTML = `
+      <div class="panel">
+        <div><strong>📺 Tam Ekran</strong></div>
+        <div>Tarayıcı otomatik tam ekranı engelledi.</div>
+        <button type="button" id="novaTapAllowFSv3">Tam Ekrana Geç</button>
+      </div>`;
+    document.body.appendChild(d);
+    state.overlay = d;
+    d.addEventListener('click', ()=>enterFS());
+    const b = d.querySelector('#novaTapAllowFSv3');
+    if(b) b.addEventListener('click', (e)=>{ e.stopPropagation(); enterFS(); });
+  }
+
+  // Debounce/tick — 120ms
+  let tickTimer = null;
+  function scheduleTick(){
+    if(tickTimer) return;
+    tickTimer = setTimeout(()=>{ tickTimer=null; tick(); }, 120);
+  }
+
+  function tick(){
+    if (inQuestionPhase()) {
+      if(!state.active) enterFS();
+      else rescale();
+    } else {
+      leaveFS();
+    }
+  }
+
+  // Gözlemciler
+  const mo = new MutationObserver(scheduleTick);
+  mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
+  ['resize','orientationchange'].forEach(ev => addEventListener(ev, scheduleTick, {passive:true}));
+  ['click','touchstart','keydown'].forEach(ev => addEventListener(ev, ()=>{ if(inQuestionPhase() && !document.fullscreenElement) enterFS(); }, {capture:true, passive:true}));
+  document.addEventListener('fullscreenchange', ()=>{ if(!document.fullscreenElement) leaveFS(false); });
+
+  // İlk çalıştırma
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleTick, {once:true});
+  } else {
+    scheduleTick();
+  }
 })();
 </script>
 
