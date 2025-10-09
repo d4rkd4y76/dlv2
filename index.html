@@ -6766,6 +6766,24 @@ body > #nova-summary{display:none !important;}
 .question-container { text-align: center; }
 
 </style>
+
+<style id="nova-homework-above-photo">
+/* Place existing ÖDEV button just above the profile photo on the main screen.
+   Do NOT change its behavior; only its layout. */
+#main-screen .homework-above-photo{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin: 6px 0 6px 0;
+  width:100%;
+}
+#main-screen #homework_fab{
+  position: static !important;
+  inset: auto !important;
+  margin: 0 auto !important;
+}
+</style>
+
 </head>
 <body data-nova-back='1'>
 
@@ -8971,12 +8989,12 @@ const formattedQuestion = {
                 allQuestions.push(formattedQuestion);
             });
 
-            if (allQuestions.length < 10) {
+            if (allQuestions.length < (window.NOVA_Q_LIMIT||10)) {
                 showAlert('Bu konuya ait yeterli soru yok.');
                 return;
             }
 
-            gameQuestions = shuffleArray(allQuestions).slice(0, 10);
+            gameQuestions = shuffleArray(allQuestions).slice(0, (window.NOVA_Q_LIMIT||10));
             currentQuestionIndex = 0;
             score = 0;
 
@@ -9019,8 +9037,8 @@ const formattedQuestion = {
     }
 
     const currentQuestion = gameQuestions[currentQuestionIndex];
-    questionNumber.textContent = `Soru ${currentQuestionIndex + 1}/10`;
-    const progressPercentage = ((currentQuestionIndex) / 10) * 100;
+    questionNumber.textContent = `Soru ${currentQuestionIndex + 1}/${window.NOVA_Q_LIMIT||10}`;
+    const progressPercentage = ((currentQuestionIndex) / (window.NOVA_Q_LIMIT||10)) * 100;
     progressBarInner.style.width = `${progressPercentage}%`;
 
 // Soru konteynerini temizle
@@ -9202,7 +9220,40 @@ questionContainer.appendChild(textContainer);
                     console.error("Kazanan müziği çalınamadı:", error);
                 });
             }
-        }
+        
+            // NOVA: Homework result writeback
+            try {
+                if (window.NOVA_ACTIVE_HOMEWORK) {
+                    (async function(){
+                        try{
+                            var d = (typeof firebase!=='undefined' && firebase.database) ? firebase.database() : null;
+                            var s = (typeof selectedStudent!=='undefined' && selectedStudent && selectedStudent.studentId) ? selectedStudent.studentId : null;
+                            if(d && s){
+                                var hw = window.NOVA_ACTIVE_HOMEWORK;
+                                var total = Array.isArray(window.gameQuestions) ? window.gameQuestions.length : (window.NOVA_Q_LIMIT||10);
+                                var correct = Number(window.score||0);
+                                var startedAt = window.NOVA_HW_STARTED_AT || Date.now();
+                                var finishedAt = Date.now();
+                                var payload = { correct: correct, total: total, startedAt: startedAt, finishedAt: finishedAt, durationMs: Math.max(0, finishedAt - startedAt) };
+                                await d.ref('homeworkResults/'+hw.hwId+'/'+s).set(payload);
+                                await d.ref('studentHomework/'+s+'/'+hw.hwId).update({ status:'completed', completedAt: finishedAt, correct: correct, total: total });
+                            }
+                        }catch(e){ console.warn('Homework write failed', e); }
+                        finally{
+                            window.NOVA_ACTIVE_HOMEWORK = null;
+    // NOVA_HW_BACK_HOOK: Ensure back button is visible on results
+    try{
+      var endBtn = document.getElementById('final-back-button');
+      if (endBtn) endBtn.style.display = 'inline-flex';
+    }catch(_){}
+    
+                            window.NOVA_Q_LIMIT = null;
+                            window.NOVA_HW_STARTED_AT = null;
+                        }
+                    })();
+                }
+            } catch(_){}
+}
 
         // "Geri Dön" butonu için event listener
         finalBackButton.addEventListener('click', () => {
@@ -16314,6 +16365,287 @@ function runPlusToMyScore(sourceBtn){
   } else {
     scan();
   }
+})();
+</script>
+
+
+<!-- === NOVA HOMEWORK MODULE === -->
+<style>
+  .homework-fab{
+    position:fixed; right:18px; top:calc(16px + env(safe-area-inset-top, 0px)); z-index:9999;
+    background:linear-gradient(135deg,#ff9d00,#ff4d4d);
+    color:#fff; border:none; border-radius:16px; padding:12px 18px;
+    font-weight:800; letter-spacing:.3px; box-shadow:0 12px 24px rgba(0,0,0,.30);
+    cursor:pointer; transform:translateZ(0); transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    display:inline-flex; align-items:center; gap:10px;
+  }
+  .homework-fab:hover{ transform:translateY(-1px); box-shadow:0 14px 24px rgba(0,0,0,.28); filter:brightness(1.05); }
+  .homework-fab:active{ transform:translateY(0); }
+  .homework-fab .hw-badge{
+    position:absolute; top:-6px; right:-6px; min-width:22px; height:22px; padding:0 6px;
+    background:#ff2d55; color:#fff; border-radius:999px; font-size:12px; font-weight:900;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 3px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.3);
+  }
+  #homework-screen{ display:none; position:fixed; inset:0; z-index:9999; background:radial-gradient(1200px 600px at 80% -10%, rgba(255,77,77,.18), transparent 60%), #0d0f14; color:#e7ecf7; }
+  .hw-wrap{ height:100%; display:grid; grid-template-columns: 320px 1fr; gap:16px; padding:20px; }
+  .hw-left{ background:#0c111b; border:1px solid rgba(255,255,255,.06); border-radius:18px; overflow:auto; }
+  .hw-right{ background:#0c111b; border:1px solid rgba(255,255,255,.06); border-radius:18px; display:flex; flex-direction:column; }
+  .hw-title{ font-size:22px; font-weight:800; padding:16px 18px 4px; }
+  .hw-desc{ font-size:14px; opacity:.9; padding:0 18px 16px; line-height:1.55 }
+  .hw-actions{ margin-top:auto; display:flex; gap:12px; padding:18px; border-top:1px solid rgba(255,255,255,.06) }
+  .hw-btn{ background:#1a6cff; border:none; color:#fff; font-weight:700; padding:12px 16px; border-radius:12px; cursor:pointer }
+  .hw-btn.secondary{ background:#162136; color:#bdd3ff }
+  .hw-list{ list-style:none; padding:10px; margin:0 }
+  .hw-list li{ padding:10px 12px; border-radius:12px; margin:6px; background:#0a0f18; border:1px solid rgba(255,255,255,.06); cursor:pointer; display:flex; justify-content:space-between; align-items:center }
+  .hw-list li.active{ outline:2px solid #1a6cff }
+  .hw-meta{ font-size:12px; opacity:.8 }
+  .hw-topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.06) }
+  .hw-close{ background:transparent; border:none; color:#9fb4d8; font-size:18px; cursor:pointer }
+  @media (max-width: 900px){
+    .hw-wrap{ grid-template-columns: 1fr; }
+    .homework-fab{ position:fixed; right:14px; bottom:16px; top:auto; }
+  }
+</style>
+<div id="homework-screen" role="dialog" aria-modal="true" aria-labelledby="hw_title">
+  <div class="hw-wrap">
+    <aside class="hw-left">
+      <div class="hw-topbar">
+        <div style="font-weight:800; letter-spacing:.4px">📚 Ödevlerim</div>
+        <button class="hw-close" id="hw_close">✖</button>
+      </div>
+      <ul class="hw-list" id="hw_list"></ul>
+    </aside>
+    <section class="hw-right">
+      <div class="hw-title" id="hw_title">Ödev seçiniz</div>
+      <div class="hw-desc" id="hw_desc">Öğretmeninizin verdiği ödev burada görünecek.</div>
+      <div style="padding:0 18px 8px">
+        <div class="hw-meta" id="hw_meta"></div>
+      </div>
+      <div class="hw-actions">
+        <button class="hw-btn secondary" id="hw_video">🎬 Ders Videosu</button>
+        <button class="hw-btn" id="hw_start">🚀 Sorulara Geç</button>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+  // Create FAB once main screen is visible
+  const ensureFab = ()=>{
+    const ms = document.getElementById('main-screen');
+    if(!ms) return;
+    if(!document.getElementById('homework_fab')){
+      const btn = document.createElement('button');
+      btn.id = 'homework_fab';
+      btn.className = 'homework-fab';
+      btn.innerHTML = 'ÖDEV<span id="homework_badge" class="hw-badge" hidden>0</span>';
+      btn.addEventListener('click', openHomeworkScreen);
+      ms.appendChild(btn);
+      try{ subscribeHomeworkBadge(); }catch(_){}
+    }
+  };
+
+  // Subscribe badge to pending homework count
+  function subscribeHomeworkBadge(){
+    const badge = document.getElementById('homework_badge');
+    function db(){ try{ return firebase.database(); }catch(_){ return null; } }
+    function sid(){ try{ return selectedStudent && selectedStudent.studentId; }catch(_){ return null; } }
+    const d = db(); const s = sid();
+    if (!badge || !d || !s) return;
+    d.ref('studentHomework/'+s).on('value', (snap)=>{
+      try{
+        const val = snap.exists()? snap.val() : {};
+        const items = Object.values(val||{});
+        const pending = items.filter(it => (it && it.status)!=='completed').length;
+        if (pending>0){
+          badge.textContent = pending > 99 ? '99+' : String(pending);
+          badge.hidden = false;
+        } else {
+          badge.hidden = true;
+        }
+      }catch(e){ /* noop */ }
+    });
+  }
+  // Observe main-screen visibility toggles
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      const fab = document.getElementById('homework_fab');
+      if(!fab) return;
+      // Show FAB only when main-screen is visible
+      fab.style.display = e.isIntersecting ? 'inline-flex' : 'none';
+    });
+  }, {threshold: .1});
+  window.addEventListener('load', ()=>{
+    ensureFab();
+    const ms = document.getElementById('main-screen');
+    if(ms) io.observe(ms);
+  });
+
+  const hwListEl = document.getElementById('hw_list');
+  const hwTitleEl = document.getElementById('hw_title');
+  const hwDescEl = document.getElementById('hw_desc');
+  const hwMetaEl = document.getElementById('hw_meta');
+  const hwVideoBtn = document.getElementById('hw_video');
+  const hwStartBtn = document.getElementById('hw_start');
+  const hwScreen = document.getElementById('homework-screen');
+  const hwClose = document.getElementById('hw_close');
+  let selectedHw = null;
+  let hwCache = {};
+
+  function db(){ try{ return firebase.database(); }catch(_){ return null; } }
+  function sid(){ try{ return selectedStudent && selectedStudent.studentId; }catch(_){ return null; } }
+
+  function openHomeworkScreen(){
+    hwScreen.style.display = 'block';
+    document.body.style.overflow='hidden';
+    loadStudentHomeworks();
+  }
+  hwClose.addEventListener('click', ()=>{ hwScreen.style.display='none'; document.body.style.overflow=''; });
+
+  async function loadStudentHomeworks(){
+    try{
+      hwListEl.innerHTML = '<li>Yükleniyor…</li>';
+      const s = sid(); const d = db(); if(!s||!d){ hwListEl.innerHTML='<li>Giriş yapınız.</li>'; return; }
+      const snap = await d.ref('studentHomework/'+s).get();
+      const list = snap.exists()? snap.val() : {};
+      const items = Object.entries(list).map(([hwId, info])=>({hwId, status: info?.status||'assigned', assignedAt: info?.assignedAt||0}));
+      if(!items.length){ hwListEl.innerHTML = '<li>Şu an ödev yok.</li>'; hwTitleEl.textContent='Ödev yok'; hwDescEl.textContent='Yeni ödev verildiğinde burada göreceksiniz.'; return; }
+
+      // Load details
+      const details = {};
+      for (const it of items){
+        const hwSnap = await d.ref('homeworks/'+it.hwId).get();
+        if(hwSnap.exists()) details[it.hwId] = hwSnap.val();
+      }
+      hwCache = details;
+
+      // Render list
+      hwListEl.innerHTML = '';
+      items.forEach(it=>{
+        const hw = details[it.hwId]||{};
+        const li = document.createElement('li');
+        li.setAttribute('data-id', it.hwId);
+        const badge = it.status==='completed' ? '✅' : (it.status==='assigned' ? '🟡' : '⏳');
+        li.innerHTML = '<div><div style="font-weight:700">'+(hw.title||'Ödev')+'</div><div class="hw-meta">'+(new Date(hw.createdAt||Date.now())).toLocaleString('tr-TR')+'</div></div><div>'+badge+'</div>';
+        li.addEventListener('click', ()=> selectHw(it.hwId));
+        hwListEl.appendChild(li);
+      });
+
+      // Select first pending or first item
+      const firstPending = items.find(x=>x.status!=='completed') || items[0];
+      selectHw(firstPending.hwId);
+    }catch(e){
+      console.warn('loadStudentHomeworks', e);
+      hwListEl.innerHTML = '<li>Ödevler alınamadı.</li>';
+    }
+  }
+
+  function selectHw(hwId){
+    selectedHw = { id: hwId, detail: hwCache[hwId]||{} };
+    const d = selectedHw.detail;
+    hwTitleEl.textContent = d.title || 'Ödev';
+    hwDescEl.textContent = d.description || '';
+    const q = d.questionCount || 10;
+    hwMetaEl.textContent = 'Soru sayısı: '+q;
+    document.querySelectorAll('#hw_list li').forEach(li=> li.classList.toggle('active', li.getAttribute('data-id')===hwId));
+  }
+
+  // Video open
+  hwVideoBtn.addEventListener('click', async ()=>{
+    if(!selectedHw) return;
+    const d = selectedHw.detail||{};
+    const h = d.headingId, l = d.lessonId, t = d.topicId;
+    try{
+      // Set selection for breadcrumbs and DB resolver
+      window.__novaSelection__ = Object.assign({}, window.__novaSelection__||{}, {
+        classId: h||'',
+        subjectId: l||'',
+        topicId: t||'',
+        // text fields optional; resolver can work with IDs
+      });
+      // Use the same flow as single player
+      if (typeof openVideo === 'function') {
+        openVideo();
+      } else {
+        // Dispatch Nova hook if defined
+        try{ window.dispatchEvent(new Event('nova:open-lesson-video')); }catch(_) {}
+      }
+    }catch(e){ console.warn('video open fail', e); }
+  });// Start homework game
+  hwStartBtn.addEventListener('click', async ()=>{
+    if(!selectedHw) return;
+    const d = selectedHw.detail||{};
+    window.NOVA_Q_LIMIT = Number(d.questionCount||10);
+    window.NOVA_ACTIVE_HOMEWORK = { hwId: selectedHw.id, selection: { headingId: d.headingId, lessonId: d.lessonId, topicId: d.topicId } };
+    window.NOVA_HW_STARTED_AT = Date.now();
+    try{
+      // Hide homework UI and kick off the single‑player flow with predefined selection
+      const h=d.headingId, l=d.lessonId, t=d.topicId;
+      if (typeof fetchQuestions === 'function'){
+        
+        // Hide all multi-screen panels and open the question screen as a new full screen
+        try{
+          ['main-screen','duel-selection-screen','duel-game-screen','rankingPanel','lesson-video-screen','single-player-screen'].forEach(id=>{
+            const el = document.getElementById(id); if (el) el.style.display='none';
+          });
+          const game = document.getElementById('single-player-game-screen');
+          if (game){ game.style.display='flex'; window.scrollTo({top:0, behavior:'auto'}); }
+        }catch(_){}
+    document.getElementById('single-player-screen').style.display = 'none';
+        document.getElementById('homework-screen').style.display = 'none';
+        document.body.style.overflow='';
+        // Ensure the game screen shows
+        fetchQuestions(h, l, t);
+      }
+    }catch(e){ console.warn('start hw', e); }
+  });
+})();</script>
+<!-- === /NOVA HOMEWORK MODULE === -->
+
+
+<script id="nova-move-homework-above-photo">
+(function(){
+  function moveFab(){
+    try{
+      var ms = document.getElementById('main-screen');
+      if(!ms) return false;
+      var photo = ms.querySelector('.student-photo');
+      var btn = document.getElementById('homework_fab');
+      if(!photo || !btn) return false;
+      // Insert a row right above the photo if not present
+      var row = document.getElementById('homework_above_photo_row');
+      if(!row){
+        row = document.createElement('div');
+        row.id = 'homework_above_photo_row';
+        row.className = 'homework-above-photo';
+        photo.parentNode.insertBefore(row, photo);
+      }
+      if(btn.parentNode !== row){
+        row.appendChild(btn); // this preserves all existing listeners and behavior
+      }
+      // Ensure layout wins over any fixed rules scoped elsewhere
+      btn.style.position = 'static';
+      btn.style.inset = 'auto';
+      btn.style.margin = '0 auto';
+      return true;
+    }catch(e){ return false; }
+  }
+  // Try a few times during initial load (in case the button/photo render later)
+  var tries = 0;
+  var timer = setInterval(function(){
+    if(moveFab()){ /* keep trying a bit in case DOM reorders */ }
+    if(++tries > 40) clearInterval(timer);
+  }, 200);
+  // Watch for DOM changes inside main-screen to re-apply the placement without touching behavior
+  var ms = document.getElementById('main-screen');
+  if(ms){
+    var mo = new MutationObserver(function(){ moveFab(); });
+    mo.observe(ms, {childList:true, subtree:true, attributes:true, attributeFilter:['style','class']});
+  }
+  // Also run on resize and after a brief delay
+  window.addEventListener('resize', moveFab);
+  window.addEventListener('load', moveFab, {once:true});
+  setTimeout(moveFab, 1200);
 })();
 </script>
 
