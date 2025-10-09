@@ -6787,6 +6787,61 @@ body > #nova-summary{display:none !important;}
 </head>
 <body data-nova-back='1'>
 
+<style id="nova-duel-intro-column">
+/* === Nova Duel Intro: vertical stack for meta (rank & cups under stars) === */
+#duel-intro-overlay .player-meta{
+  display:flex !important;
+  flex-direction: column !important;   /* force vertical stacking */
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;        /* no horizontal packing */
+  min-width: 0 !important;
+}
+#duel-intro-overlay .player-meta > .star-frame{
+  order: 1;
+  width: 100%;
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+}
+#duel-intro-overlay .player-meta > .rank-label{ order: 2; }
+#duel-intro-overlay .player-meta > .cup-pill{ order: 3; }
+</style>
+
+<style id="nova-duel-intro-wrap">
+/* === Nova Duel Intro Overflow Fix (wrap & clamp) === */
+#duel-intro-overlay .player-card{ overflow: hidden; }
+#duel-intro-overlay .player-meta{
+  display:flex;
+  flex-wrap: wrap;           /* allow second row for rank/cups when stars are many */
+  justify-content: center;
+  align-items: center;
+  row-gap: 6px;
+  column-gap: 8px;
+  min-width: 0;              /* let flex children shrink inside */
+}
+#duel-intro-overlay .player-meta > .star-frame{
+  flex: 1 1 100%;
+  display:flex;
+  flex-wrap: wrap;           /* wrap stars to next line */
+  justify-content: center;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;          /* hard clamp any visual spill */
+}
+#duel-intro-overlay .player-meta > .rank-label,
+#duel-intro-overlay .player-meta > .cup-pill{
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+#duel-intro-overlay .star-badges .star{
+  font-size: 14px;           /* a touch smaller inside intro overlay */
+  line-height: 1;
+}
+</style>
+
 <style id="nova-available-name-color">
 /* Nova tweak: Available players name color (theme-friendly, readable) */
 .matchmaking-screen.nova-duel-arena .players-list .player-name{
@@ -12325,11 +12380,11 @@ function _starLevelFromCount(count){
 }
 function _rankTextFromLevel(n){
     switch(n){
-        case 1: return 'uzman';
-        case 2: return 'yüzbaşı';
-        case 3: return 'binbaşı';
-        case 4: return 'albay';
-        case 5: return 'general';
+        case 1: return 'Çırak';
+        case 2: return 'Gözcü';
+        case 3: return 'Lider';
+        case 4: return 'Kaptan';
+        case 5: return 'PRO';
         default: return 'acemi';
     }
 }
