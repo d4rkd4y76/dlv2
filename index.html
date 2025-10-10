@@ -16606,73 +16606,144 @@ function runPlusToMyScore(sourceBtn){
   }
 
   // Video open
-  hwVideoBtn.addEventListener('click', async ()=>{
+  
+hwVideoBtn.addEventListener('click', async ()=>{
   if(!selectedHw) return;
   const d = selectedHw.detail||{};
 
-  // 1) If admin set a videoOverride, open it directly in the same full-screen video UI
-  if (d.videoOverride && typeof d.videoOverride === 'string') {
-    try {
-      // Minimal conversion to embeddable URL
-      let embedUrl = d.videoOverride.trim();
-      if (embedUrl.includes('watch?v=')) {
-        embedUrl = embedUrl.replace('watch?v=', 'embed/');
-      } else if (embedUrl.includes('youtu.be/')) {
-        const vid = embedUrl.split('youtu.be/')[1].split(/[?&#]/)[0];
-        embedUrl = 'https://www.youtube.com/embed/' + vid;
-      }
-      // Safety: only allow youtube embed
-      const ok = /^https:\/\/www\.youtube\.com\/embed\//.test(embedUrl) || /^https:\/\/youtube\.com\/embed\//.test(embedUrl);
-      if (!ok) {
-        // fall back to generic resolver flow if override isn't a YouTube embed
-        throw new Error('override-not-embed');
-      }
-
-      // Update breadcrumb from selection if available
-      try {
-        const crumb = document.getElementById('lesson-video-breadcrumb');
-        const title = document.getElementById('lesson-video-title');
-        if (title) title.textContent = 'Ders Videosu';
-        const parts = [];
-        if (d.headingName) parts.push(d.headingName);
-        if (d.lessonName) parts.push(d.lessonName);
-        if (d.topicName) parts.push(d.topicName);
-        if (crumb) crumb.textContent = parts.length ? parts.join(' • ') : 'Ders & Konu';
-      } catch (_) {}
-
-      // Show the shared lesson video screen
-      try {
-        window.scrollTo({top:0, behavior:'auto'});
-      } catch(_){}
-      if (typeof videoIframe !== 'undefined' && videoIframe) videoIframe.src = embedUrl;
-      if (typeof showOnly === 'function' && typeof videoScreen !== 'undefined') {
-        showOnly(videoScreen);
-      } else {
-        // last resort: open in a new tab
-        window.open(embedUrl, '_blank', 'noopener,noreferrer');
-      }
-      return; // done
-    } catch (e) {
-      // Fall through to normal resolution if something goes wrong
-      console.warn('videoOverride failed, falling back to resolver', e);
+  // Helper: normalize to YouTube /embed/ URL if possible
+  function toEmbed(u){
+    if (!u || typeof u !== 'string') return null;
+    let s = u.trim();
+    if (s.includes('watch?v=')) s = s.replace('watch?v=', 'embed/');
+    else if (s.includes('youtu.be/')) {
+      const vid = s.split('youtu.be/')[1].split(/[?&#]/)[0];
+      s = 'https://www.youtube.com/embed/' + vid;
     }
+    if (!/^https:\/\/(www\.)?youtube\.com\/embed\//.test(s) && !/^https:\/\/youtube\.com\/embed\//.test(s)) return null;
+    return s;
   }
 
-  // 2) Otherwise, use the same flow as single player (DB lookup / topic video / lessonVideoLookup)
+  // Helper: ensure we have an in-app viewer; prefer existing "lesson video screen", otherwise build overlay
+  function openInApp(embedUrl, breadcrumbParts){
+    // Try the shared lesson video screen first (same UI as single player)
+    try {
+      const title = document.getElementById('lesson-video-title');
+      if (title) title.textContent = 'Ders Videosu';
+      const crumb = document.getElementById('lesson-video-breadcrumb');
+      if (crumb) crumb.textContent = (breadcrumbParts && breadcrumbParts.length) ? breadcrumbParts.join(' • ') : 'Ders & Konu';
+
+      if (typeof videoIframe !== 'undefined' && videoIframe && typeof showOnly === 'function' && typeof videoScreen !== 'undefined') {
+        videoIframe.src = embedUrl;
+        try { window.scrollTo({top:0, behavior:'auto'}); } catch(_){}
+        showOnly(videoScreen);
+        return true;
+      }
+    } catch(_) {}
+
+    // If shared screen infra isn't present, build a lightweight overlay viewer inside the app
+    let overlay = document.getElementById('nova-video-overlay');
+    if (!overlay){
+      overlay = document.createElement('div');
+      overlay.id = 'nova-video-overlay';
+      overlay.setAttribute('role','dialog');
+      overlay.setAttribute('aria-modal','true');
+      overlay.style.position = 'fixed';
+      overlay.style.inset = '0';
+      overlay.style.background = 'rgba(0,0,0,.8)';
+      overlay.style.zIndex = '9999';
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.padding = '2rem';
+
+      const wrap = document.createElement('div');
+      wrap.style.width = 'min(92vw, 1200px)';
+      wrap.style.aspectRatio = '16 / 9';
+      wrap.style.background = '#000';
+      wrap.style.position = 'relative';
+      wrap.style.borderRadius = '12px';
+      wrap.style.boxShadow = '0 10px 40px rgba(0,0,0,.5)';
+      wrap.style.overflow = 'hidden';
+
+      const btn = document.createElement('button');
+      btn.textContent = '✕';
+      btn.setAttribute('aria-label','Kapat');
+      btn.style.position = 'absolute';
+      btn.style.top = '8px';
+      btn.style.right = '10px';
+      btn.style.fontSize = '20px';
+      btn.style.lineHeight = '1';
+      btn.style.padding = '6px 10px';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '8px';
+      btn.style.cursor = 'pointer';
+      btn.style.background = 'rgba(255,255,255,.85)';
+      btn.style.backdropFilter = 'blur(6px)';
+      btn.addEventListener('click', ()=>{
+        try { overlay.remove(); } catch(_){}
+      });
+
+      const iframe = document.createElement('iframe');
+      iframe.id = 'nova-video-iframe';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = '0';
+
+      wrap.appendChild(iframe);
+      wrap.appendChild(btn);
+      overlay.appendChild(wrap);
+      document.body.appendChild(overlay);
+    }
+    const iframe = overlay.querySelector('iframe#nova-video-iframe');
+    if (iframe) iframe.src = embedUrl;
+    overlay.style.display = 'flex';
+    try { window.scrollTo({top:0, behavior:'auto'}); } catch(_){}
+    return true;
+  }
+
+  // 1) Prefer admin override
+  if (d.videoOverride){
+    const embed = toEmbed(d.videoOverride);
+    if (embed){
+      const parts = [];
+      if (d.headingName) parts.push(d.headingName);
+      if (d.lessonName) parts.push(d.lessonName);
+      if (d.topicName) parts.push(d.topicName);
+      openInApp(embed, parts);
+      return;
+    }
+    console.warn('videoOverride provided but not a valid YouTube URL; falling back to resolver.');
+  }
+
+  // 2) Fallback to the same resolver as single-player (stays in-app)
   try{
-    // Set selection for breadcrumbs and DB resolver
     window.__novaSelection__ = Object.assign({}, window.__novaSelection__||{}, {
       classId: d.headingId||'',
       subjectId: d.lessonId||'',
       topicId: d.topicId||'',
     });
     if (typeof openVideo === 'function') {
-      openVideo();
+      openVideo(); // expected to use shared video screen
     } else {
-      try{ window.dispatchEvent(new Event('nova:open-lesson-video')); }catch(_) {}
+      // minimal in-app fallback: if resolver publishes a custom event with a URL, capture it
+      const handler = (ev)=>{
+        if (!ev || !ev.detail || !ev.detail.url) return;
+        const embed = toEmbed(ev.detail.url);
+        if (embed) openInApp(embed, []);
+        window.removeEventListener('nova:resolved-lesson-video', handler);
+      };
+      window.addEventListener('nova:resolved-lesson-video', handler, {once:true});
+      try{ window.dispatchEvent(new Event('nova:open-lesson-video')); }catch(_){}
     }
-  }catch(e){ console.warn('video open fail', e); }
+  }catch(e){
+    console.warn('Video open error', e);
+  }
 }); // Start homework game
+
   hwStartBtn.addEventListener('click', async ()=>{
     if(!selectedHw) return;
     const d = selectedHw.detail||{};
