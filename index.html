@@ -16607,26 +16607,72 @@ function runPlusToMyScore(sourceBtn){
 
   // Video open
   hwVideoBtn.addEventListener('click', async ()=>{
-    if(!selectedHw) return;
-    const d = selectedHw.detail||{};
-    const h = d.headingId, l = d.lessonId, t = d.topicId;
-    try{
-      // Set selection for breadcrumbs and DB resolver
-      window.__novaSelection__ = Object.assign({}, window.__novaSelection__||{}, {
-        classId: h||'',
-        subjectId: l||'',
-        topicId: t||'',
-        // text fields optional; resolver can work with IDs
-      });
-      // Use the same flow as single player
-      if (typeof openVideo === 'function') {
-        openVideo();
-      } else {
-        // Dispatch Nova hook if defined
-        try{ window.dispatchEvent(new Event('nova:open-lesson-video')); }catch(_) {}
+  if(!selectedHw) return;
+  const d = selectedHw.detail||{};
+
+  // 1) If admin set a videoOverride, open it directly in the same full-screen video UI
+  if (d.videoOverride && typeof d.videoOverride === 'string') {
+    try {
+      // Minimal conversion to embeddable URL
+      let embedUrl = d.videoOverride.trim();
+      if (embedUrl.includes('watch?v=')) {
+        embedUrl = embedUrl.replace('watch?v=', 'embed/');
+      } else if (embedUrl.includes('youtu.be/')) {
+        const vid = embedUrl.split('youtu.be/')[1].split(/[?&#]/)[0];
+        embedUrl = 'https://www.youtube.com/embed/' + vid;
       }
-    }catch(e){ console.warn('video open fail', e); }
-  });// Start homework game
+      // Safety: only allow youtube embed
+      const ok = /^https:\/\/www\.youtube\.com\/embed\//.test(embedUrl) || /^https:\/\/youtube\.com\/embed\//.test(embedUrl);
+      if (!ok) {
+        // fall back to generic resolver flow if override isn't a YouTube embed
+        throw new Error('override-not-embed');
+      }
+
+      // Update breadcrumb from selection if available
+      try {
+        const crumb = document.getElementById('lesson-video-breadcrumb');
+        const title = document.getElementById('lesson-video-title');
+        if (title) title.textContent = 'Ders Videosu';
+        const parts = [];
+        if (d.headingName) parts.push(d.headingName);
+        if (d.lessonName) parts.push(d.lessonName);
+        if (d.topicName) parts.push(d.topicName);
+        if (crumb) crumb.textContent = parts.length ? parts.join(' • ') : 'Ders & Konu';
+      } catch (_) {}
+
+      // Show the shared lesson video screen
+      try {
+        window.scrollTo({top:0, behavior:'auto'});
+      } catch(_){}
+      if (typeof videoIframe !== 'undefined' && videoIframe) videoIframe.src = embedUrl;
+      if (typeof showOnly === 'function' && typeof videoScreen !== 'undefined') {
+        showOnly(videoScreen);
+      } else {
+        // last resort: open in a new tab
+        window.open(embedUrl, '_blank', 'noopener,noreferrer');
+      }
+      return; // done
+    } catch (e) {
+      // Fall through to normal resolution if something goes wrong
+      console.warn('videoOverride failed, falling back to resolver', e);
+    }
+  }
+
+  // 2) Otherwise, use the same flow as single player (DB lookup / topic video / lessonVideoLookup)
+  try{
+    // Set selection for breadcrumbs and DB resolver
+    window.__novaSelection__ = Object.assign({}, window.__novaSelection__||{}, {
+      classId: d.headingId||'',
+      subjectId: d.lessonId||'',
+      topicId: d.topicId||'',
+    });
+    if (typeof openVideo === 'function') {
+      openVideo();
+    } else {
+      try{ window.dispatchEvent(new Event('nova:open-lesson-video')); }catch(_) {}
+    }
+  }catch(e){ console.warn('video open fail', e); }
+}); // Start homework game
   hwStartBtn.addEventListener('click', async ()=>{
     if(!selectedHw) return;
     const d = selectedHw.detail||{};
