@@ -16555,7 +16555,7 @@ function runPlusToMyScore(sourceBtn){
     document.body.style.overflow='hidden';
     loadStudentHomeworks();
   }
-  hwClose.addEventListener('click', ()=>{ hwScreen.style.display='none'; document.body.style.overflow=''; });
+  hwClose.addEventListener('click', ()=>{ window.location.reload(); });
 
   async function loadStudentHomeworks(){
     try{
