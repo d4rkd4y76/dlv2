@@ -8837,8 +8837,10 @@ async function fetchTopics(classId, lessonId, topicSelectElement) {
         if (snapshot.exists()) {
             const topicsData = [];
             snapshot.forEach(childSnapshot => {
+                const v = childSnapshot.val() || {};
+                if (v.active === false) return; // gizli konu
                 const topicId = childSnapshot.key;
-                const topicName = childSnapshot.val().name || 'No name';
+                const topicName = v.name || 'No name';
                 topicsData.push({ id: topicId, name: topicName });
             });
 
@@ -10661,9 +10663,11 @@ async function getTopicOptions(classId, lessonId) {
    let options = '<option value="">Seçiniz</option>';
    if (snapshot.exists()) {
        snapshot.forEach(childSnapshot => {
-           const topicName = childSnapshot.val().name;
-           options += `<option value="${childSnapshot.key}">${topicName}</option>`;
-       });
+            const v = childSnapshot.val() || {};
+            if (v.active === false) return; // gizli konu
+            const topicName = v.name;
+            options += `<option value="${childSnapshot.key}">${topicName}</option>`;
+        });
    }
    return options;
 }
