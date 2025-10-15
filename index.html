@@ -9214,14 +9214,19 @@ questionContainer.appendChild(textContainer);
             showExplanationAndNext();
         }
 
-        function proceedToNextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < 10) {
-                displayCurrentQuestion();
-            } else {
-                endGame();
-            }
-        }
+function proceedToNextQuestion() {
+    currentQuestionIndex++;
+    const limit = Array.isArray(window.gameQuestions)
+      ? window.gameQuestions.length
+      : (window.NOVA_Q_LIMIT || 10);
+
+    if (currentQuestionIndex < limit) {
+        displayCurrentQuestion();
+    } else {
+        endGame();
+    }
+}
+
 
         function endGame() {
             questionNumber.style.display = 'none';
@@ -9230,10 +9235,19 @@ questionContainer.appendChild(textContainer);
             document.querySelector('.question-container').style.display = 'none';
             optionsContainer.style.display = 'none';
 
-            scoreContainer.style.display = 'flex';
-            try{ (function prune(){ const sc=document.querySelector('.single-player-game-container .score-container'); if(sc){ sc.querySelectorAll('div').forEach(n=>{ if(n.id==='score-message'||n.id==='score'||n.id==='score-image') return; const hasChildren=n.children&&n.children.length>0; const t=(n.textContent||'').trim(); if(!hasChildren && !t) n.remove(); }); } })(); }catch(e){};scoreDisplay.textContent = `Doğru Sayısı: ${score}/10`;
+scoreContainer.style.display = 'flex';
+try{ (function prune(){ const sc=document.querySelector('.single-player-game-container .score-container'); if(sc){ sc.querySelectorAll('div').forEach(n=>{ if(n.id==='score-message'||n.id==='score'||n.id==='score-image') return; const hasChildren=n.children&&n.children.length>0; const t=(n.textContent||'').trim(); if(!hasChildren && !t) n.remove(); }); } })(); }catch(e){};
 
-            try{ document.getElementById('score')?.setAttribute('data-score', String(score)); }catch(e){};window.score = score; window.singleScore = score; window.totalQuestions = 10;let message = '';
+const totalQ = Array.isArray(window.gameQuestions)
+  ? window.gameQuestions.length
+  : (window.NOVA_Q_LIMIT || 10);
+scoreDisplay.textContent = `Doğru Sayısı: ${score}/${totalQ}`;
+
+try{ document.getElementById('score')?.setAttribute('data-score', String(score)); }catch(e){}
+window.score = score;
+window.singleScore = score;
+window.totalQuestions = totalQ; let message = '';
+
             let messageClass = '';
             let imageUrl = '';
             scoreMessage.style.display = 'block';
@@ -12184,7 +12198,7 @@ submitRegistration.addEventListener('click', async () => {
             name: username,
             password: password,
             email: email,
-	    duelCredits: 0,
+	    duelCredits: 300,
             diamond: 1500,
             photo: "https://cdn.pixabay.com/photo/2025/01/08/21/09/giraffe-9320109_640.jpg",
             gameCup: 0,
