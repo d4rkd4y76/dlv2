@@ -6896,7 +6896,7 @@ body > #nova-summary{display:none !important;}
 <section aria-label="Giriş paneli" class="card">
 <div class="toprow">
 <div class="brand"><span class="dot"></span> <span>Şampiyonlar Düellosu</span></div>
-
+<button aria-label="Kayıt Ol" class="register-link" id="register-button" type="button">Kayıt Ol</button>
 </div>
 <p class="subtitle">Sınıfını seç, kullanıcı adını ve şifreni gir.</p>
 <form novalidate="">
@@ -6944,7 +6944,7 @@ body > #nova-summary{display:none !important;}
 <!-- === NOVA: Sürpriz Kutu (her 5 düello) === -->
 <div class="surprise-box locked" id="surprise-box" title="Sürpriz kutu">
 <img alt="Sürpriz Kutu" decoding="async" id="surprise-box-img" loading="lazy" src="https://i.giphy.com/ojujiWCHxud7s3cY4F.webp"/>
-<div class="surprise-box-counter" id="surprise-box-counter">Kalan maç: 5</div>
+<div class="surprise-box-counter" id="surprise-box-counter">...</div>
 </div>
 <!-- === /NOVA Sürpriz Kutu === -->
 <div class="student-info">
@@ -11220,23 +11220,29 @@ function endDuelGame() {
         }
 
       // Update scores
+// Update scores
 if (winnerId && loserId) {
-    try {
-        await updateDuelScore('GAME_END', {
-            winnerId,
-            winnerClassId,
-            loserId,
-            loserClassId
-        });
+  try {
+    await updateDuelScore('GAME_END', {
+      winnerId,
+      winnerClassId,
+      loserId,
+      loserClassId
+    });
 
-        // Puanları görsel olarak güncelle
-        if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
-            fetchAndDisplayGameCup();
-        }
-    } catch (error) {
-        console.error("Puan güncelleme hatası:", error);
-        await showAlert('❌ Puan güncellenirken bir hata oluştu!');
+    // ✅ Kazanan için sürpriz kutuyu hazırla (tek galibiyet → hazır)
+    await database
+      .ref(`classes/${winnerClassId}/students/${winnerId}/surpriseReady`)
+      .set(true);
+
+    // Puanları görsel olarak güncelle
+    if (selectedStudent.studentId === winnerId || selectedStudent.studentId === loserId) {
+      fetchAndDisplayGameCup();
     }
+  } catch (error) {
+    console.error("Puan güncelleme hatası:", error);
+    await showAlert('❌ Puan güncellenirken bir hata oluştu!');
+  }
 }
 
         // Remove old trophies if exist
@@ -12638,73 +12644,70 @@ Emin misiniz?`);
 </script>
 <script>
 
-// === NOVA: Sürpriz Kutu Mantığı (her 5 düello) ===
+
+// === NOVA: Sürpriz Kutu Mantığı (tek galibiyet) ===
 let sbListenersAttached = false;
-async function initSurpriseBox(){
+function initSurpriseBox(){
   try{
     if(!selectedStudent?.studentId) return;
     const box = document.getElementById('surprise-box');
     const counterEl = document.getElementById('surprise-box-counter');
     if(!box || !counterEl) return;
 
-    // Realtime listen user's duelCredits + openedCount
+    // Kullanıcı düğümü
     const userRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
+
+    // UI sadece surpriseReady ile beslensin
     const updateUI = (snap)=>{
       const data = snap.val() || {};
-      const totalMatches = data.duelCredits || 0; // toplam maç
-      const opened = data.surpriseOpenedCount || 0; // bugüne kadar açılan kutu sayısı
-      const eligible = Math.floor(totalMatches / 5) > opened;
-      const rem = (5 - (totalMatches % 5)) % 5; // 0..4
-
-      counterEl.textContent = eligible ? "Hazır!" : `Kalan : ${rem===0?5:rem}`;
-      box.classList.toggle('active', eligible);
-      box.classList.toggle('locked', !eligible);
+      const ready = !!data.surpriseReady;
+      counterEl.textContent = ready ? "Hazır!" : "Hazır değil";
+      box.classList.toggle('active', ready);
+      box.classList.toggle('locked', !ready);
     };
     userRef.on('value', updateUI);
 
-    if(!sbListenersAttached){
-      sbListenersAttached = true;
+    if(!window.__sbListenersAttached){
+      window.__sbListenersAttached = true;
       box.addEventListener('click', async ()=>{
-        const snap = await database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`).once('value');
+        const snap = await userRef.once('value');
         const data = snap.val() || {};
-        const totalMatches = data.duelCredits || 0;
-        const opened = data.surpriseOpenedCount || 0;
-        const eligible = Math.floor(totalMatches / 5) > opened;
-        if(!eligible){ await showAlert("🔒 Bu kutu için yeterli maçınız yok."); return; }
+        const ready = !!data.surpriseReady;
 
-        // RNG — dağılım: %5→500, %10→100, %30→50, %50→30, aksi 10 (garanti alt ödül)
+        if(!ready){
+          await showAlert("Kutuyu açmanız için 1 düello galibiyeti gereklidir.");
+          return;
+        }
+
+        // Ödül RNG (istediğiniz dağılımı koruyorum)
         const r = Math.random() * 100;
         let reward = 10;
-        if(r < 5){ reward = 200; }
+        if(r < 5){ reward = 100; }
         else if(r < 15){ reward = 50; }
         else if(r < 45){ reward = 30; }
         else if(r < 95){ reward = 20; }
-        // aksi halde 10
 
-        // DB update (atomic-ish)
-        const userRef = database.ref(`classes/${selectedStudent.classId}/students/${selectedStudent.studentId}`);
-        await userRef.transaction(u => {
+        // Hakkı tüket + ödülü ver (tek transaction)
+        await userRef.transaction(u=>{
           if(!u) u = {};
-          const cur = u.diamond || 0;
-          const opened = u.surpriseOpenedCount || 0;
-          const canOpen = Math.floor((u.duelCredits||0)/5) > opened;
-          if(!canOpen) return u; // guard
-          u.diamond = cur + reward;
-          u.surpriseOpenedCount = opened + 1;
+          if(!u.surpriseReady) return u; // yeniden okuma/yarış durumu
+          u.surpriseReady = false;
+          u.surpriseOpenedCount = (u.surpriseOpenedCount||0) + 1;
+          u.diamond = (u.diamond||0) + reward;
           u.lastSurpriseAt = Date.now();
           return u;
         });
 
-        // Fancy animation overlay
         playSurpriseAnimation(reward);
-
-        // UI update will come via the 'value' listener; also refresh diamond UI
         document.getElementById('diamond-value')?.textContent && updateDiamondCount?.();
         await showAlert(`🎁 Tebrikler! ${reward} 💎 kazandınız!`);
       });
     }
   }catch(e){ console.error("Sürpriz kutu init hatası:", e); }
 }
+
+
+
 
 function playSurpriseAnimation(amount){
   const overlay = document.createElement('div');
@@ -12764,9 +12767,15 @@ async function novaSafeIncrementMatchCountOnce(){
       d.invited ? {id: d.invited.studentId, classId: d.invited.classId} : null,
     ].filter(Boolean);
 
-    await Promise.all(players.map(pl => 
-      database.ref(`classes/${pl.classId}/students/${pl.id}/duelCredits`).transaction(v => (v||0)+1)
-    ));
+await Promise.all(players.map(pl => 
+  database.ref(`classes/${pl.classId}/students/${pl.id}`).transaction(u => {
+    if (!u) u = {};
+    u.duelCredits = (u.duelCredits || 0) + 1;          // mevcut davranış korunur
+    u.duelCreditsEarned = (u.duelCreditsEarned || 0) + 1; // toplam kazanım (monoton)
+    return u;
+  })
+));
+
     await flagRef.set(true);
 
     // update local UI if this user is one of them
