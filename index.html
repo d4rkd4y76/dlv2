@@ -1,3 +1,4 @@
+<!-- Nova injected default purchasedPhotos key into 1 registration write(s). -->
 <!DOCTYPE html>
 
 <html lang="tr">
@@ -12204,13 +12205,16 @@ submitRegistration.addEventListener('click', async () => {
             name: username,
             password: password,
             email: email,
-	    duelCredits: 300,
-            diamond: 1500,
+	    duelCredits: 0,
+            diamond: 0,
             photo: "https://cdn.pixabay.com/photo/2025/01/08/21/09/giraffe-9320109_640.jpg",
             gameCup: 0,
             inDuel: false,
-            lastDiamondUpdate: firebase.database.ServerValue.TIMESTAMP
-        });
+            lastDiamondUpdate: firebase.database.ServerValue.TIMESTAMP,
+            purchasedPhotos: {
+                "aHR0cHM6Ly9zLmNhZmViYXphYXIuaXIvaW1hZ2VzL2ljb25zL2NvbS50cnRjb2N1ay5yYWZhZGFudGF5ZmFtYWhhbGxlbWVzZWxlc2ktZThkZTMyNWMtZWE1My00MDdlLWFhMzEtZmVjZjUzODRlNGNiXzUxMng1MTIucG5nP3gtaW1nPXYxL3Jlc2l6ZSxoXzI1Nix3XzI1Nixsb3NzbGVzc19mYWxzZS9vcHRpbWl6ZQ==": true
+            }
+        })
 
         // Kayıt formunu kapat, doğrulama ekranını göster
         registrationOverlay.style.display = 'none';
