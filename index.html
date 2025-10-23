@@ -8100,6 +8100,36 @@ async function updateDuelScore(type, data) {
         const localId = currentStudentId || currentUid || selectedId;
 
         const isLeaver = (localId && (localId === dcId));
+        // NOVA: Terk anında otomatik -10 / +3 düello kredisi (tek taraf uygular)
+        try {
+            const invId = data && (data.inviterId || data.hostId);
+            const invClassId = data && (data.inviterClassId || data.hostClassId);
+            const inId = data && (data.invitedId || data.guestId);
+            const inClassId = data && (data.invitedClassId || data.guestClassId);
+            const dcId = data && (data.disconnectedId || data.playerId || data.uid || data.studentId);
+            const dcClassId = data && (data.disconnectedClassId || data.classId || data.classID);
+
+            if (!isLeaver && (dcId)) {
+                // Kazanan, ayrılanın karşısındaki oyuncudur
+                let winnerId = null, winnerClassId = null, leaverId = dcId, leaverClassId = dcClassId || null;
+                if (invId && inId) {
+                    if (dcId === invId) { winnerId = inId; winnerClassId = inClassId; leaverClassId = leaverClassId || invClassId; }
+                    else if (dcId === inId) { winnerId = invId; winnerClassId = invClassId; leaverClassId = leaverClassId || inClassId; }
+                }
+
+                if (leaverId && leaverClassId) {
+                    await database.ref(`classes/${leaverClassId}/students/${leaverId}/duelCredits`).transaction(v => {
+                        v = (v || 0) - 10; return v < 0 ? 0 : v;
+                    });
+                }
+                if (winnerId && winnerClassId) {
+                    await database.ref(`classes/${winnerClassId}/students/${winnerId}/duelCredits`).transaction(v => (v || 0) + 3);
+                }
+            }
+        } catch (e) {
+            console.warn('DISCONNECTED kredi dağıtımı hatası:', e);
+        }
+
 
         if (isLeaver) {
             // YALNIZCA ayrılan istemcide ban yaz ve uyarı göster
@@ -12774,9 +12804,9 @@ async function novaSafeIncrementMatchCountOnce(){
 await Promise.all(players.map(pl => 
   database.ref(`classes/${pl.classId}/students/${pl.id}`).transaction(u => {
     if (!u) u = {};
-    u.duelCredits = (u.duelCredits || 0) + 1;          // mevcut davranış korunur
-    u.duelCreditsEarned = (u.duelCreditsEarned || 0) + 1; // toplam kazanım (monoton)
-    return u;
+    u.duelCredits = (u.duelCredits || 0) + 2;          // mevcut davranış korunur
+    u.duelCreditsEarned = (u.duelCreditsEarned || 0) + 2; // toplam kazanım (monoton)
+    return u;ss
   })
 ));
 
