@@ -8151,7 +8151,7 @@ async function updateDuelScore(type, data) {
         } else {
             // Bu istemci ayrılan kişi DEĞİL → sadece bilgi ver (ban yazma!)
             if (typeof showAlert === 'function') {
-                await showAlert('Rakibiniz oyundan ayrıldı. Kupa değişmedi.');
+                await showAlert('Rakibiniz oyundan ayrıldı.Bu davranışı için kredi puanı düşürülecek.');
             }
         }
     } catch (err) {
@@ -8834,70 +8834,82 @@ async function fetchLessons(classId, subjectSelectElement) {
 }
 
 async function fetchTopics(classId, lessonId, topicSelectElement) {
-    const CACHE_KEY = `cachedTopics_${classId}_${lessonId}`;
-    const CACHE_TIMESTAMP_KEY = `cachedTopicsTimestamp_${classId}_${lessonId}`;
-    const CACHE_DURATION = 15 * 60 * 1000;
+  const CACHE_KEY = `cachedTopics_${classId}_${lessonId}`;
+  const CACHE_TIMESTAMP_KEY = `cachedTopicsTimestamp_${classId}_${lessonId}`;
+  const CACHE_DURATION = 15 * 60 * 1000;
 
-    topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
-    if (!classId || !lessonId) return false;
+  topicSelectElement.innerHTML = '<option value="">Seçiniz</option>';
+  if (!classId || !lessonId) return false;
 
-    try {
-        // Önce seçimleri Firebase'den kontrol et (davet edilen için)
-        if (!isInviter && currentDuelRef) {
-            const selectionsSnapshot = await currentDuelRef.child('selections').once('value');
-            if (selectionsSnapshot.exists()) {
-                const selections = selectionsSnapshot.val();
-                if (selections.topic) {
-                    // Cache'i kontrol et
-                    const cachedTopics = localStorage.getItem(CACHE_KEY);
-                    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-                    const now = Date.now();
-
-                    if (cachedTopics && cachedTimestamp && (now - parseInt(cachedTimestamp, 10)) < CACHE_DURATION) {
-                        const parsedTopics = JSON.parse(cachedTopics);
-                        populateTopicsSelect(parsedTopics, topicSelectElement);
-                        topicSelectElement.value = selections.topic;
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // Firebase'den konuları çek
-        const snapshot = await database.ref(`championData/headings/${classId}/lessons/${lessonId}/topics`).once('value');
-        if (snapshot.exists()) {
-            const topicsData = [];
-            snapshot.forEach(childSnapshot => {
-                const v = childSnapshot.val() || {};
-                if (v.active === false) return; // gizli konu
-                const topicId = childSnapshot.key;
-                const topicName = v.name || 'No name';
-                topicsData.push({ id: topicId, name: topicName });
-            });
-
-            // Cache'e kaydet
-            localStorage.setItem(CACHE_KEY, JSON.stringify(topicsData));
-            localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-
-            // Select'i doldur
-            populateTopicsSelect(topicsData, topicSelectElement);
-
-            // Davet edilen için seçili konuyu ayarla
-            if (!isInviter && currentDuelRef) {
-                const selections = (await currentDuelRef.child('selections').once('value')).val();
-                if (selections && selections.topic) {
-                    topicSelectElement.value = selections.topic;
-                }
-            }
-
+  try {
+    // Davetli için cache kontrolü
+    if (!isInviter && currentDuelRef) {
+      const selectionsSnapshot = await currentDuelRef.child('selections').once('value');
+      if (selectionsSnapshot.exists()) {
+        const selections = selectionsSnapshot.val();
+        if (selections.topic) {
+          const cachedTopics = localStorage.getItem(CACHE_KEY);
+          const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+          const now = Date.now();
+          if (cachedTopics && cachedTimestamp && (now - parseInt(cachedTimestamp, 10)) < CACHE_DURATION) {
+            const parsedTopics = JSON.parse(cachedTopics);
+            populateTopicsSelect(parsedTopics, topicSelectElement);
+            topicSelectElement.value = selections.topic;
             return true;
+          }
         }
-        return false;
-    } catch (error) {
-        console.error("Konular yüklenirken hata:", error);
-        return false;
+      }
     }
+
+    // Konuları çek
+    const snapshot = await database
+      .ref(`championData/headings/${classId}/lessons/${lessonId}/topics`)
+      .once('value');
+
+    if (!snapshot.exists()) return false;
+
+    const topicsData = [];
+    snapshot.forEach(childSnapshot => {
+      const v = childSnapshot.val() || {};
+      if (v.active === false) return; // gizli konu
+      const topicId = childSnapshot.key;
+      const topicName = v.name || 'No name';
+      topicsData.push({ id: topicId, name: topicName });
+    });
+
+    // *** YENİ: Tek kişilik ekranda (#topic-select) baştaki sayıya göre sırala ***
+    if (topicSelectElement && topicSelectElement.id === 'topic-select') {
+      const getNum = (s) => {
+        const m = String(s || '').trim().match(/^(\d+)\s*[-.)]/);
+        return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
+      };
+      topicsData.sort((a, b) => {
+        const na = getNum(a.name), nb = getNum(b.name);
+        if (na !== nb) return na - nb; // 1-), 2-), 3.) ... sıraya göre
+        return (a.name || '').localeCompare(b.name || '', 'tr', { numeric: true, sensitivity: 'base' });
+      });
+    }
+
+    // Cache ve select doldurma
+    localStorage.setItem(CACHE_KEY, JSON.stringify(topicsData));
+    localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+    populateTopicsSelect(topicsData, topicSelectElement);
+
+    // Davetli için seçimi geri yaz
+    if (!isInviter && currentDuelRef) {
+      const selections = (await currentDuelRef.child('selections').once('value')).val();
+      if (selections && selections.topic) {
+        topicSelectElement.value = selections.topic;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Konular yüklenirken hata:", error);
+    return false;
+  }
 }
+
 
 // populateSelect fonksiyonları aynı kalabilir
 function populateLessonsSelect(lessonsData, subjectSelectElement) {
