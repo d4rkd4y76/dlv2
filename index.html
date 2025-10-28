@@ -10483,7 +10483,7 @@ duelRef.child('gameStarted').on('value', snapshot => {
         const countdownEl = document.getElementById('duelCountdown');
         if (countdownEl) countdownEl.style.display = 'none';
     }
-});
+}); try{hideWaitOverlay();}catch(e){};
 
 
 
@@ -12612,7 +12612,7 @@ async function safeShowConfirm(msg){
       const closeBtn = document.getElementById('novaConfirmClose');
       msgEl.textContent = msg;
       ov.style.display = 'flex';
-      const cleanup = () => {
+      try{hideWaitOverlay();}catch(e){}; const cleanup = () => {
         ov.style.display = 'none';
         okBtn.onclick = null;
         cancelBtn.onclick = null;
@@ -14974,9 +14974,7 @@ class="nz-badge-mini">BRONZ</div></div>`;
       const visible = window.getComputedStyle(gameScreen).display !== 'none';
       if(!visible) return;
 
-      ensureTopbar();
-      const ov = ensureIntro();
-      // Pull names/photos from existing DOM (fallback safe)
+      ensureTopbar(); const ov = ensureIntro(); // Pull names/photos from existing DOM (fallback safe)
       const lName = ($('#duel-player-inviter-name')?.textContent || $('#duel-inviter-name')?.textContent || 'Oyuncu 1').trim();
       const rName = ($('#duel-player-invited-name')?.textContent || $('#duel-invited-name')?.textContent || 'Oyuncu 2').trim();
       const lPhoto = ($('#duel-player-inviter-photo') || $('#duel-inviter-photo'))?.getAttribute('src') || '';
@@ -14990,7 +14988,7 @@ class="nz-badge-mini">BRONZ</div></div>`;
       $('#tb-right').textContent = rName || 'Oyuncu 2';
 
       ov.style.display = 'flex';
-      // countdown 3-2-1
+      try{hideWaitOverlay();}catch(e){}; // countdown 3-2-1
       const cnt = $('#introCount');
       let n = 3;
       const tick = setInterval(()=>{
@@ -14999,7 +14997,7 @@ class="nz-badge-mini">BRONZ</div></div>`;
           clearInterval(tick);
           // dismiss overlay and start
           ov.classList.add('dismissed');
-          ov.style.display = 'none';
+          ov.style.display = 'none'; try{hideWaitOverlay();}catch(e){};
           introPlayedThisRound = true;
           animateQuestionNow();
         } else {
@@ -16055,6 +16053,35 @@ function runPlusToMyScore(sourceBtn){
   }
 
   async function enrichFromFirebase(domData){
+  // Step 0: If duel data already exists under currentDuelRef, use it directly (no heavy lookups).
+  try {
+    if (typeof currentDuelRef !== 'undefined' && currentDuelRef) {
+      const snap = await currentDuelRef.once('value');
+      const d = snap && snap.val ? snap.val() : null;
+      if (d && d.inviter && d.invited) {
+        const a = d.inviter || {};
+        const b = d.invited || {};
+        updateSide('a', {
+          name: a.name || '',
+          photo: a.photo || '',
+          cups: (typeof a.gameCup === 'number') ? a.gameCup : (typeof a.cups === 'number' ? a.cups : null),
+          duelCredits: (typeof a.duelCredits === 'number') ? a.duelCredits : undefined,
+          rank: a.rank || undefined,
+          classId: a.classId, studentId: a.studentId
+        });
+        updateSide('b', {
+          name: b.name || '',
+          photo: b.photo || '',
+          cups: (typeof b.gameCup === 'number') ? b.gameCup : (typeof b.cups === 'number' ? b.cups : null),
+          duelCredits: (typeof b.duelCredits === 'number') ? b.duelCredits : undefined,
+          rank: b.rank || undefined,
+          classId: b.classId, studentId: b.studentId
+        });
+        return; // ✅ We are done; keep rest of logic as fallback only.
+      }
+    }
+  } catch(e) { console && console.warn && console.warn('Intro prefill from duel failed:', e); }
+
     const result = { a:null, b:null };
     // 1) if IDs present in DOM, use them
     if (domData){
@@ -16148,7 +16175,7 @@ function runPlusToMyScore(sourceBtn){
 
   function startNow(){
     if (novaTimer) cancelAnimationFrame(novaTimer);
-    hideIntro();
+    try{showWaitOverlay();}catch(e){}; hideIntro();
     const btn = findStartButton();
     if (btn && btn.classList.contains('active')) btn.click();
     else document.dispatchEvent(new CustomEvent('nova:duelIntroDone'));
@@ -17327,6 +17354,45 @@ function showHomeworkRewardOverlay(amount, percent){
   setTimeout(()=>{ if (el.style.display==='flex') el.style.display='none'; }, 3500);
 }
 </script>
+
+<!-- NOVA: Duel Wait Overlay (covers gap between 10s intro and 3-2-1 intro) -->
+<style id="nova-wait-style">
+  #duel-wait-overlay{
+    position:fixed; inset:0; display:none;
+    align-items:center; justify-content:center; flex-direction:column;
+    background: radial-gradient(1200px 600px at 50% -10%, rgba(13,17,23,.95), rgba(2,6,23,.98) 40%, rgba(0,0,0,.99) 70%);
+    backdrop-filter: blur(2px);
+    z-index: 2147483000; /* above everything */
+    color:#e5e7eb; font-weight:900; letter-spacing:1.5px; text-align:center;
+  }
+  #duel-wait-overlay .wait-spinner{
+    width:64px; height:64px; border-radius:50%;
+    border:6px solid rgba(255,255,255,.15);
+    border-top-color:#ff8a00;
+    animation: novaSpin 1s linear infinite;
+    margin-bottom:18px;
+  }
+  #duel-wait-overlay .wait-text{
+    font-size: clamp(18px, 2.6vw, 28px);
+    text-shadow: 0 0 8px rgba(255,138,0,.25);
+  }
+  @keyframes novaSpin{ to{ transform: rotate(360deg); } }
+</style>
+<div id="duel-wait-overlay" role="alert" aria-live="polite" aria-label="Lütfen bekleyiniz">
+  <div class="wait-spinner"></div>
+  <div class="wait-text">LÜTFEN BEKLEYİNİZ...</div>
+</div>
+<script id="nova-wait-script">
+(function(){
+  if (window.__novaWaitInstalled) return; window.__novaWaitInstalled = true;
+  const ov = ()=> document.getElementById('duel-wait-overlay');
+  window.showWaitOverlay = function(){ try{ const el = ov(); if(el) el.style.display = 'flex'; }catch(e){ console.warn(e);} };
+  window.hideWaitOverlay = function(){ try{ const el = ov(); if(el) el.style.display = 'none'; }catch(e){ console.warn(e);} };
+  // Fallback: in case something goes wrong, auto-hide after 12s
+  window.addEventListener('nova:duelIntroDone', ()=>{ setTimeout(()=>hideWaitOverlay(), 12000); }, { once:false });
+})();
+</script>
+
 </body>
 </html>
 
