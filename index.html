@@ -17512,10 +17512,10 @@ async function awardHomeworkDiamonds(hwId, correct, total, sObj){
   try{
     const p = Math.round((Number(correct||0)/Math.max(1, Number(total||0))) * 100);
     let amount = 0;
-    if (p >= 95) amount = 500;
-    else if (p >= 80) amount = 250;
-    else if (p >= 50) amount = 100;
-    else if (p >= 40) amount = 20;
+    if (p >= 95) amount = 1000;
+    else if (p >= 80) amount = 500;
+    else if (p >= 50) amount = 200;
+    else if (p >= 40) amount = 40;
     else amount = 0;
     /* Mark first completion regardless of amount */
     const s = (sObj && sObj.studentId) ? sObj.studentId : (window.selectedStudent && selectedStudent.studentId);
