@@ -1,0 +1,12 @@
+/* Mağaza kartlarındaki görsel oranını 440x550 (w:h=1:1.25) yap */
+.profile-photo {
+  width: 120px !important;
+  height: 150px !important; /* 120 * 1.25 */
+  border-radius: 12px !important;
+  object-fit: cover !important;
+}
+/* Güvenlik: grid içindeki tüm img'lere de uygula */
+.profile-photos-container img {
+  border-radius: 12px !important;
+  object-fit: cover !important;
+}

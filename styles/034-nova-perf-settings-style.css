@@ -1,0 +1,50 @@
+.nova-settings-chip{
+  border:1px solid rgba(255,255,255,.28); border-radius:12px; padding:8px 10px;
+  background:linear-gradient(180deg,#1f2937,#0f172a); color:#fff; font-weight:800;
+  cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+.nova-settings-chip:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+#nova_perf_open_btn.kupa-siralama-button{
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(236,72,153,.35) !important;
+  border: 1px solid rgba(255,255,255,.25) !important;
+}
+#nova_perf_open_btn.kupa-siralama-button:hover{
+  filter: brightness(1.07) !important;
+  transform: translateY(-1px) !important;
+}
+#nova_perf_overlay{ position:fixed; inset:0; z-index:100020; display:none; align-items:center; justify-content:center; background:rgba(2,8,23,.58); }
+#nova_perf_overlay .nova-perf-card{
+  width:min(520px,92vw); background:linear-gradient(180deg,#0f172a,#111827); color:#e5e7eb;
+  border:1px solid rgba(148,163,184,.36); border-radius:16px; padding:16px;
+}
+.nova-perf-row{ display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid rgba(148,163,184,.28); border-radius:12px; margin-top:8px; cursor:pointer; }
+.nova-perf-row input{ transform:scale(1.1); }
+.nova-perf-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+.nova-perf-btn{ border:0; border-radius:10px; padding:9px 12px; font-weight:800; cursor:pointer; }
+.nova-perf-btn.ok{ background:#22c55e; color:#fff; }
+.nova-perf-btn.cancel{ background:#334155; color:#fff; }
+body.nova-perf-performance .fb-confetti,
+body.nova-perf-performance .dp-confetti,
+body.nova-perf-performance .confetti,
+body.nova-perf-performance .particle{ animation-duration:.45s !important; opacity:.75 !important; }
+body.nova-perf-performance .avatar-framed{ animation-duration:3.2s !important; filter:none !important; }
+body.nova-perf-performance .match-link{ animation:none !important; stroke-dasharray:0 !important; }
+body.nova-perf-performance *{ transition-duration:.12s !important; }
+body.nova-perf-performance .card,
+body.nova-perf-performance .profile-change-content,
+body.nova-perf-performance .duel-game-container{ box-shadow:none !important; }
+body.nova-perf-ultra .fb-confetti,
+body.nova-perf-ultra .dp-confetti,
+body.nova-perf-ultra .confetti,
+body.nova-perf-ultra .particle{ display:none !important; }
+body.nova-perf-ultra .avatar-framed,
+body.nova-perf-ultra .match-link,
+body.nova-perf-ultra .surprise-box{ animation:none !important; filter:none !important; }
+body.nova-perf-ultra *{
+  backdrop-filter:none !important;
+  transition:none !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+}

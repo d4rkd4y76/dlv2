@@ -1,0 +1,12 @@
+/* NOVA SAFE PATCH: Only hide visuals; keep DOM for scripts */
+#nova-end-root #nova-summary .nz-row:first-of-type { display:none !important; } /* KPI cards */
+#nova-end-root .nz-gauge, 
+#nova-end-root #nzBadge { 
+  visibility:hidden !important; 
+  height:0 !important; 
+  margin:0 !important; 
+  padding:0 !important; 
+  border:0 !important; 
+  overflow:hidden !important; 
+}
+#premium-summary, .metric-grid { display:none !important; } /* bottom premium block */

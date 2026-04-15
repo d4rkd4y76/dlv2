@@ -1,0 +1,1089 @@
+<!-- Nova injected default purchasedPhotos key into 1 registration write(s). -->
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<!-- NOVA SAFE HEAD -->
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/layout.css" />
+<link rel="stylesheet" href="styles/components.css" />
+<link rel="stylesheet" href="styles/features.css" />
+<link rel="stylesheet" href="styles/001-nova-space-arena-style.css" />
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Şampiyonlar Düellosu</title>
+<!-- Comfortaa Font -->
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles/002-style-002.css" />
+<link rel="stylesheet" href="styles/003-style-003.css" />
+<link rel="stylesheet" href="styles/004-style-004.css" />
+<link rel="stylesheet" href="styles/005-nova-rank-centering-fix.css" />
+<link rel="stylesheet" href="styles/006-nova-store-title-top.css" />
+<link rel="stylesheet" href="styles/007-nova-placement-fix.css" />
+<link rel="stylesheet" href="styles/008-nova-perf.css" />
+<link rel="stylesheet" href="styles/009-style-009.css" />
+<link rel="stylesheet" href="styles/010-style-010.css" />
+<link rel="stylesheet" href="styles/011-nova-profile-frame-override.css" />
+<link rel="stylesheet" href="styles/012-nova-extra-frames.css" />
+<link rel="stylesheet" href="styles/013-nova-ranking-table-photo-override.css" />
+<link rel="stylesheet" href="styles/014-nova-store-fix.css" />
+<link rel="stylesheet" href="styles/015-style-015.css" />
+<link rel="stylesheet" href="styles/016-style-016.css" />
+<link rel="stylesheet" href="styles/017-style-017.css" />
+<link rel="stylesheet" href="styles/018-nova-storebar-fix-20251002.css" />
+<link rel="stylesheet" href="styles/019-nova-store-premium-ui.css" />
+<link rel="stylesheet" href="styles/020-nova-store-boutique-v3.css" />
+<link rel="stylesheet" href="styles/021-nova-name-frame-styles.css" />
+<link rel="stylesheet" href="styles/022-style-022.css" />
+<link rel="stylesheet" href="styles/023-style-023.css" />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/><link rel="stylesheet" href="styles/024-nova-kids-login-styles.css" />
+<link rel="stylesheet" href="styles/059-login-premium.css" />
+<!-- === Nova: Result Screen Cleanup & Premium Summary (CSS v3) === -->
+<link rel="stylesheet" href="styles/025-style-025.css" />
+<link rel="stylesheet" href="styles/026-style-026.css" /><link rel="stylesheet" href="styles/027-style-027.css" />
+<link rel="stylesheet" href="styles/028-style-028.css" />
+<link rel="stylesheet" href="styles/029-style-029.css" />
+<link rel="stylesheet" href="styles/030-style-030.css" />
+<link rel="stylesheet" href="styles/031-style-031.css" />
+
+<!-- NOVA_DUEL_ENHANCEMENTS_START -->
+<link rel="stylesheet" href="styles/032-style-032.css" />
+<!-- NOVA_DUEL_ENHANCEMENTS_END -->
+
+
+<!-- NOVA: Duel Screen Lighten + Orb Removal (scoped) -->
+<link rel="stylesheet" href="styles/033-nova-duel-lighten-overrides.css" />
+<script src="js/screens/001-nova-duel-lighten-script.js"></script>
+
+<script src="js/core/002-script-002.js"></script>
+<script src="js/core/003-nova-matching-game.js"></script>
+<link rel="stylesheet" href="styles/034-nova-perf-settings-style.css" />
+<script src="js/ui/004-nova-perf-settings-script.js"></script>
+<script src="js/core/005-nova-daily-puzzle.js"></script>
+<script src="js/core/006-script-006.js"></script>
+
+
+<link rel="stylesheet" href="styles/035-nova-duel-hotfix-20251006-v3.css" />
+
+<link rel="stylesheet" href="styles/036-style-036.css" />
+<link rel="stylesheet" href="styles/037-nova-matchmaking-skin.css" />
+
+
+<link rel="stylesheet" href="styles/038-nova-duel-start-pack.css" />
+
+
+    <!-- NOVA_RESULT_STYLES_START -->
+    <link rel="stylesheet" href="styles/039-style-039.css" />
+    <!-- NOVA_RESULT_STYLES_END -->
+    
+
+<link rel="stylesheet" href="styles/040-style-040.css" />
+<link rel="stylesheet" href="styles/041-style-041.css" />
+
+<!-- NOVA: Duel Scale Toolbar Styles (safe) -->
+
+
+
+<!-- NOVA: Duel Scale Styles v3 (apply transform directly to duel screen) -->
+<link rel="stylesheet" href="styles/042-nova-duel-scale-styles.css" />
+
+<link rel="stylesheet" href="styles/043-nova-image-center-css.css" />
+
+<link rel="stylesheet" href="styles/044-nova-homework-above-photo.css" />
+
+</head>
+<body data-nova-back='1'>
+
+<link rel="stylesheet" href="styles/045-nova-duel-intro-column.css" />
+
+<link rel="stylesheet" href="styles/046-nova-duel-intro-wrap.css" />
+
+<link rel="stylesheet" href="styles/047-nova-available-name-color.css" />
+<button id="result-back-btn" aria-label="Geri Dön"><span class="ico">←</span>Geri Dön</button>
+
+<!-- Oyundakiler Modal -->
+<div class="players-overlay" id="playersOverlay">
+<div class="players-content">
+<div class="players-header">
+<h3>Oyundakiler</h3>
+<button class="players-close" id="playersCloseButton">✖</button>
+</div>
+<ul class="players-list" id="playersList"></ul>
+</div>
+</div>
+<!-- Öğrenci Seçimi Ekranı -->
+<div aria-labelledby="kidsLoginTitle" class="nova-kids-login" id="student-selection-screen" role="region" style="display:none">
+<div class="grid">
+<!-- Left: friendly hero -->
+<section class="hero">
+<span class="badge">🎒 Öğrenci Dostu • Hızlı Giriş</span>
+<h1 id="kidsLoginTitle">Şampiyonlar Düellosu’na Hoş Geldin!</h1>
+<p class="lead">Sınıfını seç, adını yaz, şifreni gir. Hemen oyuna başla! Hem telefonda hem bilgisayarda pırıl pırıl.</p>
+<div aria-hidden="true" class="stickers">
+<div class="sticker">🏆 Başarı Rozeti</div>
+<div class="sticker" style="background:#ecfeff;border-color:#bae6fd;color:#0c4a6e">🧠 Zihin Egzersizi</div>
+<div class="sticker" style="background:#f0fdf4;border-color:#bbf7d0;color:#065f46">⏱️ Hızlı Başlangıç</div>
+</div>
+<!-- simple SVG mascot -->
+<svg aria-hidden="true" class="mascot" fill="none" viewbox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<circle cx="60" cy="60" fill="#FFCF5A" opacity=".6" r="50"></circle>
+<circle cx="45" cy="50" fill="#0b1220" r="6"></circle>
+<circle cx="75" cy="50" fill="#0b1220" r="6"></circle>
+<path d="M40 78 C 56 90, 64 90, 80 78" stroke="#0b1220" stroke-linecap="round" stroke-width="6"></path>
+</svg>
+</section>
+<!-- Right: login card -->
+<section aria-label="Giriş paneli" class="card">
+<div class="toprow">
+<div class="brand"><span class="dot"></span> <span>Şampiyonlar Düellosu</span></div>
+<button aria-label="Kayıt Ol" class="register-link" id="register-button" type="button">Kayıt Ol</button>
+</div>
+<p class="subtitle">Sınıfını seç, kullanıcı adını ve şifreni gir.</p>
+<form novalidate="">
+<div class="field">
+<span aria-hidden="true" class="ico">🏫</span>
+<label class="sr" for="selection-class-select">Sınıf</label>
+<select id="selection-class-select">
+<option value="">Sınıfını Seç</option>
+</select>
+</div>
+<div class="row">
+<div class="field">
+<span aria-hidden="true" class="ico">👤</span>
+<label class="sr" for="selection-name-input">Kullanıcı Adı</label>
+<input autocomplete="username" id="selection-name-input" inputmode="text" placeholder="Kullanıcı adın" type="text"/>
+</div>
+<div class="field">
+<span aria-hidden="true" class="ico">🔒</span>
+<label class="sr" for="student-password-input">Şifre</label>
+<input autocomplete="current-password" id="student-password-input" placeholder="Şifre" type="password"/>
+<span aria-label="Şifreyi göster/gizle" class="eye" id="togglePwd" role="button">👁️</span>
+</div>
+</div>
+<div class="actions">
+<label class="muted" style="display:flex;align-items:center;gap:8px">
+<input id="rememberMe" style="accent-color:#5b8cff" type="checkbox"/> Beni hatırla
+          </label>
+<button class="link" id="forgot" type="button">Şifremi Unuttum?</button>
+</div>
+<button class="cta" disabled="" id="login-button" type="button">Hemen Başla</button>
+<div aria-live="polite" class="error" id="student-selection-error" role="alert"></div>
+<div aria-live="polite" class="helper">
+<span>📌</span>
+<span>İpucu: Alanları doldurunca buton aktif olur. Enter’a basarak da başlayabilirsin.</span>
+</div>
+</form>
+</section>
+</div>
+</div>
+<link rel="stylesheet" href="styles/048-nova-main-hud-layout.css" />
+<!-- Ana Ekran -->
+<div class="container" id="main-screen" style="display: none; position: relative;">
+<div class="app-duyuru-strip" id="app-duyuru-strip" hidden>
+<div class="app-duyuru-strip__viewport">
+<div class="app-duyuru-strip__track" id="app-duyuru-track">
+<span class="app-duyuru-strip__chunk" id="app-duyuru-c1"></span><span class="app-duyuru-strip__chunk" id="app-duyuru-c2"></span>
+</div>
+</div>
+</div>
+<div class="main-screen-top-bar" id="main-screen-top-bar">
+<div class="main-screen-odev-anchor" id="main-screen-odev-slot">
+<button type="button" class="nova-character-chip" id="nova_character_open_btn" aria-label="Karakter sandığı — avatarlar ve çerçeveler">
+<span class="char-chip-ring" aria-hidden="true"></span>
+<span class="char-chip-sparkles" aria-hidden="true"></span>
+<span class="char-chip-icon" aria-hidden="true">🎒</span>
+<span class="char-chip-label">KARAKTER</span>
+</button>
+</div>
+<div class="main-screen-deneme-slot" id="main-screen-deneme-slot"></div>
+<div class="main-screen-store-anchor" id="main-screen-hud-right">
+<div class="profile-icon-container nova-store-chip" role="button" tabindex="0" aria-label="Mağaza">
+<span class="store-chip-ring" aria-hidden="true"></span>
+<img alt="" class="profile-icon" decoding="async" id="profile-icon" loading="lazy" src="https://i.pinimg.com/originals/66/22/ab/6622ab37c6db6ac166dfec760a2f2939.gif"/>
+<span class="store-chip-label">Mağaza</span>
+</div>
+</div>
+</div>
+<div class="main-profile-hero" id="main-profile-hero">
+<div class="main-screen-hero-left" id="main-screen-hud-left">
+<span class="puzzle-fab-wrap" id="puzzle_fab_wrap">
+<button type="button" class="puzzle-fab" id="puzzle_fab" title="Doğru çözümde +100 elmas">🧩 BULMACA</button>
+<span class="nova-fab-reward-tag" aria-hidden="true">+100 💎</span>
+</span>
+</div>
+<div class="main-screen-hero-center">
+<div class="student-info">
+<img alt="Öğrenci Fotoğrafı" class="student-photo" id="student-photo" src="" style="display: none;"/>
+<div class="student-name" id="student-name"></div>
+<div class="star-frame" id="student-stars"></div>
+<div class="rank-label" id="student-rank"></div>
+<div class="student-stats-container">
+<div class="student-stats">
+<div class="stats-item trophy-stats">
+<div class="stats-glow trophy-glow"></div>
+<span class="stats-icon">🏆</span>
+<span class="stats-value trophy-value" id="game-cup-score">0</span>
+</div>
+<div class="stats-item diamond-stats">
+<div class="stats-glow diamond-glow"></div>
+<span class="stats-icon">💎</span>
+<span class="stats-value diamond-value" id="diamond-value">0</span>
+</div>
+<div class="stats-item credits-stats" id="credits-stats">
+<div class="stats-glow credits-glow"></div>
+<span class="stats-icon">⚔️</span>
+<span class="stats-value credits-value" id="duel-credits-value">0</span>
+<div class="tip-title" style="display: none;">Düello Hakkı</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="main-screen-hero-right" id="main-screen-quest-slot">
+<!-- === NOVA: Sürpriz Kutu (GÖREV altında) === -->
+<div class="surprise-box locked" id="surprise-box" title="Sürpriz kutu">
+<img alt="Sürpriz Kutu" decoding="async" id="surprise-box-img" loading="lazy" src="https://i.giphy.com/ojujiWCHxud7s3cY4F.webp"/>
+<div class="surprise-box-counter" id="surprise-box-counter">...</div>
+</div>
+<!-- === /NOVA Sürpriz Kutu === -->
+</div>
+</div>
+<div class="buttons">
+<button class="single-player">Tek Kişilik Oyun</button>
+<button class="find-duel-button" id="findDuelButton">
+<span class="button-content">
+<i class="duel-icon">⚔️</i>
+<span>Düello Ara</span>
+</span>
+<div class="button-glow"></div>
+</button>
+<div class="duel-entry-gate-note" id="duel-entry-gate-note" aria-live="polite">Düello için gerekli: en az 3 kupa ve 15 kredi.</div>
+<!-- Yeni Eklenen "Kupa Sıralaması" Butonu -->
+<button class="kupa-siralama-button" id="kupa-siralama-button" onclick="window.openSeasonRankingPanel && window.openSeasonRankingPanel(); return false;">
+                🏆 Sezon Sıralaması
+            </button>
+<button class="logout-button" id="logout-button">Çıkış Yap</button>
+</div>
+<div class="nask-game-signature" aria-hidden="true">NASK GAME</div>
+</div>
+<!-- Giriş panosu (DOM’da erken: Firebase cache ile yarışmayı önler) -->
+<div id="giris-panosu-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Giriş panosu">
+  <div id="giris-panosu-inner">
+    <button type="button" id="giris-panosu-close" aria-label="Kapat" disabled>✕</button>
+    <p id="giris-panosu-wait" class="giris-panosu-wait"></p>
+    <img id="giris-panosu-img" alt="" decoding="async" width="1080" height="1920"/>
+    <video id="giris-panosu-video" playsinline preload="metadata"></video>
+    <div id="giris-panosu-iframe-wrap">
+      <iframe id="giris-panosu-iframe" title="Giriş videosu" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+  </div>
+</div>
+<!-- === NOVA: Günün bulmacası === -->
+<div id="daily-puzzle-screen" aria-hidden="true">
+<div class="dp-card" id="daily_puzzle_card">
+<div class="dp-head">
+<div>
+<div class="dp-title">Günün Bulmacası</div>
+<div class="dp-sub" id="dp_date_label"></div>
+</div>
+<button type="button" class="dp-close" id="dp_close_btn">Kapat</button>
+</div>
+<div id="dp_play_area">
+<div class="dp-hint" id="dp_hint"></div>
+<div class="dp-slots" id="dp_slots"></div>
+<div class="dp-pool" id="dp_pool"></div>
+<div class="dp-actions">
+<button type="button" class="dp-btn dp-btn-del" id="dp_back_btn">← Sil</button>
+<button type="button" class="dp-btn dp-btn-check" id="dp_check_btn">Kontrol Et</button>
+</div>
+<div class="dp-msg" id="dp_msg"></div>
+</div>
+<div id="dp_done_area" style="display:none" class="dp-done"></div>
+</div>
+</div>
+<!-- Ranking Panel (Sezon sıralaması — görünürlük .open ile) -->
+<div class="ranking-panel" id="rankingPanel" aria-hidden="true">
+<h2>Sezon Sıralaması</h2>
+<div class="ranking-table-container">
+<table class="ranking-table" id="ranking-table">
+<colgroup>
+  <col class="ranking-col-rank">
+  <col class="ranking-col-photo">
+  <col class="ranking-col-name">
+  <col class="ranking-col-class">
+  <col class="ranking-col-dk">
+  <col class="ranking-col-cup">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" title="Sıra">#</th>
+<th scope="col" title="Fotoğraf">Foto</th>
+<th scope="col" title="İsim">İsim</th>
+<th scope="col" title="Sınıf">Sınıf</th>
+<th scope="col" title="Düello kredisi">DK</th>
+<th scope="col" title="Kupa sayısı">Kupa</th>
+</tr>
+</thead>
+<tbody id="ranking-table-body">
+<!-- Sıralama verileri buraya eklenecek -->
+</tbody>
+</table>
+</div>
+<div class="user-ranking-stats">
+<div class="stats-header">Genel Sıralama Durumunuz</div>
+<div class="stats-content">
+<div class="rank-info">
+<div class="rank-number" id="userRankNumber">
+<span class="rank-label">Sıralama</span>
+<span class="rank-value">-</span>
+</div>
+<div class="total-players" id="totalPlayers">
+<span class="total-label">Toplam Oyuncu</span>
+<span class="total-value">-</span>
+</div>
+</div>
+<div class="user-trophy">
+<span class="trophy-icon">🏆</span>
+<span class="trophy-value" id="userTrophyCount">-</span>
+</div>
+</div>
+</div>
+<button class="ranking-back-button" id="rankingBackButton" onclick="window.closeSeasonRankingPanel && window.closeSeasonRankingPanel(); return false;">Geri Dön</button>
+</div>
+<!-- Tek Kişilik Oyun Ekranı -->
+<div class="game-container" id="single-player-screen">
+<h2>Tek Kişilik Oyun</h2>
+<div class="table-section">
+<h3>Konu Belirleme</h3>
+<label for="class-select">Sınıf Seç:</label>
+<select id="class-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="subject-select">Ders Seç:</label>
+<select id="subject-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="topic-select">Konu Seç:</label>
+<select id="topic-select">
+<option value="">Seçiniz</option>
+</select>
+</div>
+<button class="start-game-button" disabled="" id="start-game-button">Oyuna Başla</button>
+<button class="back-button">Geri Dön</button>
+</div>
+<!-- Tek Kişilik Oyun Sorular Ekranı -->
+<div class="single-player-game-container" id="single-player-game-screen">
+<div class="progress-container">
+<div class="question-number" id="question-number">Soru 1/10</div>
+<div class="progress-bar">
+<div class="progress-bar-inner" id="progress-bar-inner"></div>
+</div>
+</div>
+<div class="timer-container">
+<div class="timer" id="timer">45</div>
+</div>
+<div class="question-container">
+<img alt="Soru Resmi" class="question-image" id="question-image" src="" style="display: none;"/>
+<div class="question-text" id="question-text">Soru metni burada olacak.</div>
+</div>
+<div class="options-container" id="options-container"></div>
+<div class="explanation-container" id="explanation-container" style="display:none"></div>
+<div class="score-container" id="score-container">
+<span data-score="0" id="score"></span>
+<div class="score-message" id="score-message"></div>
+<img alt="Sonuç Resmi" class="final-image" id="score-image" style="display:none;"/>
+<!-- "Geri Dön" butonu -->
+<button class="end-game-button" id="final-back-button">Geri Dön</button>
+<button class="end-game-button play-again-button" id="btnTekrar">Tekrar Oyna</button><button class="lesson-video-button" id="lesson-video-button">🎬 Ders videosunu izle</button>
+</div>
+</div>
+<!-- Düello Seçim Ekranı -->
+<div class="duel-selection-container" id="duel-selection-screen">
+<div class="countdown-container">
+<div class="countdown" id="duelCountdown">10</div>
+</div>
+<div class="selecting-student-banner" id="selecting-student-banner"></div>
+<div class="table-section">
+<h3>Konu Belirlendi.</h3>
+<label for="duel-class-select">Sınıfınız:</label>
+<select id="duel-class-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="duel-subject-select">Düello Dersi:</label>
+<select id="duel-subject-select">
+<option value="">Seçiniz</option>
+</select>
+<label for="duel-topic-select">Düello Konusu:</label>
+<select id="duel-topic-select">
+<option value="">Seçiniz</option>
+</select>
+</div>
+<div class="duel-bottom-info">
+<div class="duel-player-info" id="duel-inviter-info">
+<img class="duel-player-photo" id="duel-inviter-photo" src=""/>
+<div class="duel-player-name" id="duel-inviter-name"></div>
+<div class="star-frame" id="duel-inviter-stars"></div>
+<div class="rank-label" id="duel-inviter-rank"></div>
+</div>
+<div class="duel-player-info" id="duel-invited-info">
+<img class="duel-player-photo" id="duel-invited-photo" src=""/>
+<div class="duel-player-name" id="duel-invited-name"></div>
+<div class="star-frame" id="duel-invited-stars"></div>
+<div class="rank-label" id="duel-invited-rank"></div>
+</div>
+<div class="duel-controls">
+<button class="duel-start-button" disabled="" id="duel-start-button" style="display:none;">Düelloya Başla</button>
+</div>
+</div>
+</div>
+<!-- Yeni modal ekranları - body etiketinin sonuna, diğer modallardan önce eklenecek -->
+<div class="registration-overlay" id="registrationOverlay" style="display: none;">
+<div class="registration-content">
+<div class="registration-header">
+<div>
+<h2>Yeni Hesap Oluştur</h2>
+<p class="registration-subtitle">3 adımda hesabını aç ve hemen düelloya katıl.</p>
+</div>
+<button class="close-button" id="closeRegistration">✖</button>
+</div>
+<div class="registration-form">
+<select class="registration-input" id="registerClassSelect">
+<option value="">Sınıf Seçin</option>
+</select>
+<input class="registration-input" id="registerUsername" maxlength="11" placeholder="Kullanıcı Adı (max 11 karakter)" type="text"/>
+<input class="registration-input" id="registerPassword" placeholder="Şifre (en az 6 karakter, harf ve rakam içermeli)" type="password"/>
+<p class="registration-tip">Şifren güçlü olsun: en az 1 harf + 1 rakam.</p>
+<input class="registration-input" id="registerEmail" placeholder="E-posta Adresi" type="email"/>
+<p class="registration-tip">Doğrulama bağlantısı bu adrese gönderilir.</p>
+<button class="registration-submit" disabled="" id="submitRegistration">
+                Kayıt Ol
+            </button>
+</div>
+<div class="registration-error" id="registrationError"></div>
+</div>
+</div>
+<div class="verification-overlay" id="verificationOverlay" style="display: none;">
+<div class="verification-content">
+<h3>Şahane Kayıt Başarılı 🎉</h3>
+<p>Doğrulama e-postası gönderildi.</p>
+<p>Onayladıktan sonra giriş yapıp mücadeleye hemen başlayabilirsin.</p>
+</div>
+</div>
+<div class="matchmaking-screen nova-duel-arena" id="matchmakingScreen">
+<div class="matchmaking-content nova-auto-match-shell">
+<div class="auto-match-ambient" aria-hidden="true"></div>
+<div class="auto-match-hero">
+<div class="auto-match-pulse-ring" aria-hidden="true">
+<div class="searching-animation"></div>
+</div>
+<div class="auto-match-icon-wrap" aria-hidden="true"><span class="auto-match-icon">⚔️</span></div>
+<h2 class="auto-match-title" id="autoMatchTitle">Müsait Oyuncu Aranıyor</h2>
+<p class="auto-match-sub" id="autoMatchSubtext">Sistem, şu an düello arayan oyuncular arasından sana uygun bir rakip seçecek.</p>
+<div class="auto-match-hints" id="autoMatchHints">
+<span class="auto-match-chip">🔒 Tek rakiple eşleşme</span>
+<span class="auto-match-chip">✨ Rastgele eşleştirme</span>
+<span class="auto-match-chip">⚡ Otomatik başlatma</span>
+</div>
+</div>
+<div class="auto-match-found-overlay" id="autoMatchFoundOverlay" hidden>
+<div class="auto-match-found-card">
+<div class="auto-match-found-title">Rakip bulundu, bekleyin</div>
+<div class="auto-match-found-count" id="autoMatchFoundCount">3</div>
+</div>
+</div>
+<button type="button" class="cancel-search-button" id="cancelSearchButton">Vazgeç</button>
+</div>
+</div>
+<!-- Düello Oyun Ekranı -->
+<div class="duel-game-container" id="duel-game-screen">
+<!-- NOVA VS HUD (MK-style health bars with counters) -->
+<div id="nova-vs-hud" class="nova-vs-hud" aria-hidden="false">
+  <div class="nova-hud-side left">
+    <div class="nova-name" id="novaLeftName">Oyuncu 1</div>
+    <div class="nova-hp">
+      <div class="nova-hp-fill" id="novaLeftHP"></div>
+      <div class="nova-hp-gloss"></div>
+      <div class="nova-hp-count" id="novaLeftCount">0</div>
+    </div>
+  </div>
+  <div class="nova-center-badge" title="Düello">VS</div>
+  <div class="nova-hud-side right">
+    <div class="nova-name" id="novaRightName">Oyuncu 2</div>
+    <div class="nova-hp mirror">
+      <div class="nova-hp-fill" id="novaRightHP"></div>
+      <div class="nova-hp-gloss"></div>
+      <div class="nova-hp-count" id="novaRightCount">0</div>
+    </div>
+  </div>
+</div>
+<!-- /NOVA VS HUD -->
+
+<div class="progress-container">
+<div class="question-number" id="duel-question-number">Soru 1/10</div>
+<div class="progress-bar">
+<div class="progress-bar-inner" id="duel-progress-bar-inner"></div>
+</div>
+</div>
+<div class="timer-container">
+<div class="timer" id="duel-timer">45</div>
+</div>
+<div class="question-container">
+<img alt="Soru Resmi" class="question-image" id="duel-question-image" src="" style="display: none;"/>
+<div class="question-text" id="duel-question-text">Soru metni burada olacak.</div>
+</div>
+<div class="options-container" id="duel-options-container"></div>
+<div class="players-info-row">
+<div class="duel-player-score" id="duel-player-inviter-score">
+<img id="duel-player-inviter-photo" src=""/>
+<div class="duel-player-name" id="duel-player-inviter-name"></div>
+<div class="star-frame" id="duel-player-inviter-stars-ingame"></div>
+<div class="rank-label" id="duel-player-inviter-rank-ingame"></div>
+<div class="duel-player-correct-count" id="inviter-correct-count">0</div>
+</div>
+<div class="duel-player-score" id="duel-player-invited-score">
+<img id="duel-player-invited-photo" src=""/>
+<div class="duel-player-name" id="duel-player-invited-name"></div>
+<div class="star-frame" id="duel-player-invited-stars-ingame"></div>
+<div class="rank-label" id="duel-player-invited-rank-ingame"></div>
+<div class="duel-player-correct-count" id="invited-correct-count">0</div>
+</div>
+</div>
+<div class="score-container" id="duel-final-container">
+<div class="winner-message" id="winner-message"></div>
+<button class="end-game-button" id="duel-final-back-button">Oyunu Sonlandır</button>
+</div>
+</div>
+<!-- Alert Modal -->
+<div class="alert-overlay" id="alertOverlay">
+<div class="alert-content">
+<div class="alert-message" id="alertMessage"></div>
+<button class="alert-ok-button" id="alertOkButton">Tamam</button>
+</div>
+</div>
+<!-- Prompt Modal -->
+<div class="prompt-overlay" id="promptOverlay">
+<div class="prompt-content">
+<div class="prompt-message" id="promptMessage"></div>
+<input class="prompt-input" id="promptInput" type="text"/>
+<div class="prompt-buttons">
+<button class="prompt-cancel-button" id="promptCancelButton">İptal</button>
+<button class="prompt-ok-button" id="promptOkButton">Tamam</button>
+</div>
+</div>
+</div>
+<!-- Davet Modalı -->
+<div class="invitation-overlay" id="invitationOverlay">
+<div class="invitation-content">
+<div class="invitation-message" id="invitationMessage"></div>
+<div class="invitation-buttons">
+<button class="invitation-decline-button" id="invitationDeclineButton">Reddet</button>
+<button class="invitation-accept-button" id="invitationAcceptButton">Kabul Et</button>
+</div>
+</div>
+</div>
+<div class="character-inventory-overlay" id="characterInventoryOverlay" aria-hidden="true" style="display:none;">
+<div class="character-inventory-surface" role="dialog" aria-modal="true" aria-labelledby="char_inv_title">
+<div class="char-inv-bg" aria-hidden="true"></div>
+<header class="char-inv-header">
+<div>
+<p class="char-inv-kicker">Senin sandığın</p>
+<h2 id="char_inv_title">KARAKTER</h2>
+</div>
+<div class="char-inv-header-actions">
+<button type="button" class="char-inv-lesson-btn" id="char_inv_lesson_status">📘 DERS DURUMUM</button>
+<button type="button" class="char-inv-goto-store" id="char_inv_open_store">🛒 Mağaza</button>
+<button type="button" class="char-inv-close" id="char_inv_close" aria-label="Kapat">✖</button>
+</div>
+</header>
+<section class="char-inv-hero" id="char_inv_hero" aria-live="polite"></section>
+<nav class="char-inv-tabs" role="tablist" aria-label="Envanter sekmeleri">
+<button type="button" role="tab" class="char-inv-tab active" id="char_tab_photos" data-char-tab="photos" aria-selected="true" aria-controls="char_inv_panel_photos">🎭 Avatarların</button>
+<button type="button" role="tab" class="char-inv-tab" id="char_tab_frames" data-char-tab="frames" aria-selected="false" aria-controls="char_inv_panel_frames">✨ Çerçeveler</button>
+</nav>
+<div class="char-inv-panel" id="char_inv_panel_photos" role="tabpanel" aria-labelledby="char_tab_photos"></div>
+<div class="char-inv-panel" id="char_inv_panel_frames" role="tabpanel" aria-labelledby="char_tab_frames" hidden></div>
+<div class="char-lesson-status-panel" id="char_lesson_status_panel" hidden>
+<div class="char-lesson-status-head">
+<button type="button" class="char-lesson-back" id="char_lesson_status_back" aria-label="Geri">← Geri</button>
+<h3 class="char-lesson-status-title">📘 Ders durumum</h3>
+</div>
+<div class="char-lesson-status-body" id="char_lesson_status_body"></div>
+</div>
+</div>
+</div>
+<div class="profile-change-overlay" id="profileChangeOverlay">
+<!-- Elmas Takas Modal (Minimal, layoutı bozmaz) -->
+<div id="diamondExchangeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;">
+<div style="max-width:420px;margin:8vh auto;background:#0b1220;border:2px solid #1f2a44;border-radius:16px;box-shadow: 0 6px 18px rgba(0,0,0,.5);padding:18px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+<div style="font-size:20px;font-weight:800;color:#e5e7eb;">💱 Elmas Takas</div>
+<button aria-label="Kapat" onclick="closeDiamondExchangeModal()" style="background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;">✖</button>
+</div>
+<div style="font-size:13px;color:#94a3b8;margin-bottom:12px;">
+      Takas türü seçin:
+      <b style="color:#fef08a">100 💎 → 5 🏆</b>
+      veya
+      <b style="color:#f0f9ff">100 💎 → 30 düello kredisi</b>
+      <span style="display:block;margin-top:6px;color:#64748b;font-size:12px;">Her &quot;adet&quot; bir pakettir (ör. 2 adet = 200 💎). Günde en fazla <b style="color:#cbd5e1">3 adet</b> takas.</span>
+</div>
+<div id="exchange-daily-takas" style="font-size:12px;color:#94a3b8;margin:-4px 0 10px;">Bugün takas: …</div>
+<div style="display:flex;align-items:center;gap:8px;margin:8px 0 10px;">
+<label for="exchange-type-select" style="color:#cbd5e1;font-size:14px;">Takas</label>
+<select id="exchange-type-select" style="flex:1;padding:10px;border-radius:10px;border:2px solid #334155;background:#0b1220;color:#e2e8f0;font-size:14px;">
+  <option value="diamond_to_cup">100 💎 → 5 🏆</option>
+  <option value="diamond_to_credits">100 💎 → 30 düello kredisi</option>
+</select>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin:10px 0 14px;">
+<label for="exchange-count-input" style="color:#cbd5e1;font-size:14px;">Adet</label>
+<input id="exchange-count-input" min="1" style="flex:0 0 120px;padding:10px;border-radius:10px;border:2px solid #ff8a00;font-size:1.05em;text-align:center;background:#0b1220;color:#e2e8f0;" type="number" value="1"/>
+<span id="exchange-current-credits" style="margin-left:auto;font-size:13px;color:#94a3b8;">Mevcut Kredin: ...</span>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:-8px;margin-bottom:12px;font-size:13px;color:#94a3b8;">
+<span id="exchange-current-diamonds">Mevcut Elmasın: ...</span>
+<span id="exchange-current-cups">Mevcut Kupan: ...</span>
+</div>
+<button type="button" id="diamond_exchange_btn" onclick="handleDiamondExchangeModal()" style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer;">
+      Takas Yap
+    </button>
+<div style="margin-top:10px;font-size:12px;color:#64748b;">İşlem onayından sonra elmas ve krediler anında güncellenir.</div>
+</div>
+</div>
+<div class="profile-change-content nova-store-shell">
+<div class="nova-store-ambient" aria-hidden="true"></div>
+<header class="profile-change-header nova-store-header">
+<div class="nova-store-title-block">
+<p class="nova-store-kicker">NASK GAME</p>
+<h2 class="store-title">Mağaza <span class="cart-icon" aria-hidden="true">🛒</span></h2>
+<p class="nova-store-sub">Avatar, çerçeve ve dahası burada.</p>
+</div>
+<div class="store-controls nova-store-actions">
+<div class="current-diamonds nova-store-wallet">
+<span class="diamond-icon" aria-hidden="true">💎</span>
+<span class="diamond-amount" id="currentDiamonds">0</span>
+</div>
+<button type="button" id="openExchangeButton" onclick="openDiamondExchangeModal()">💱 Elmas Takas</button>
+<button type="button" id="profileCloseButton" aria-label="Mağazayı kapat">✖</button>
+</div>
+</header>
+<section class="nova-store-cat-section" aria-label="Mağaza kategorileri">
+<div class="nova-store-cat-head">
+<span class="nova-store-cat-label">Koleksiyonlar</span>
+<span class="nova-store-cat-hint">Kaydır</span>
+</div>
+<div class="profile-categories nova-store-categories">
+<!-- Buttons will be rendered from DB by renderStoreCategoryButtons() -->
+</div>
+</section>
+<div class="nova-store-stage">
+<!-- Düello Hakları Mağazası -->
+<div class="duel-credits-store" id="duelCreditsStore" style="display: none;">
+<div class="credits-packages-container">
+<!-- 100 Hak Paketi -->
+<div class="credit-package">
+<div class="package-header">
+<span class="package-amount">🎫 100 Düello Bileti</span>
+</div>
+<div class="package-price">
+<span class="diamond-amount">100</span>
+<span class="diamond-icon">💎</span>
+</div>
+<button class="buy-button" onclick="purchaseCredits(100, 100)">
+                        Satın Al
+                    </button>
+</div>
+<!-- 300 Hak Paketi -->
+<div class="credit-package">
+<div class="package-header">
+<span class="package-amount">🎫 300 Düello Bileti</span>
+</div>
+<div class="package-price">
+<span class="diamond-amount">250</span>
+<span class="diamond-icon">💎</span>
+</div>
+<button class="buy-button" onclick="purchaseCredits(300, 250)">
+                        Satın Al
+                    </button>
+</div>
+<!-- 750 Hak Paketi -->
+<div class="credit-package">
+<div class="package-header">
+<span class="package-amount">🎫 750 Düello Bileti</span>
+</div>
+<div class="package-price">
+<span class="diamond-amount">500</span>
+<span class="diamond-icon">💎</span>
+</div>
+<button class="buy-button" onclick="purchaseCredits(750, 500)">
+                        Satın Al
+                    </button>
+</div>
+</div>
+</div>
+<!-- Profil Fotoğrafları Konteyneri -->
+<div class="profile-photos-container nova-store-products" id="profilePhotosContainer"></div>
+</div>
+</div>
+</div>
+<!-- Arka Plan Müziği için Audio Elementi -->
+<audio id="duelBackgroundMusic" preload="none" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/dllo%20mz.mp3"></audio>
+<!-- Kazanan Ekranı için Yeni Audio Elementi -->
+<audio id="winnerMusic" preload="none" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/win%20mz.mp3"></audio>
+<!-- Tek Kişilik Oyun Müziği için Yeni Audio Elementi -->
+<audio id="singlePlayerQuestionMusic" preload="none" src="https://github.com/d4rkd4y76/OYUN-MZK/raw/refs/heads/main/oyun%20tek%20mz.mp3"></audio>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="js/core/007-invite-ban-utils.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="js/screens/007-script-007.js?v=20260413q1"></script>
+<script src="js/core/008-script-008.js"></script>
+<script src="js/core/009-script-009.js"></script>
+<script src="js/core/010-script-010.js"></script>
+<script src="js/ui/011-script-011.js"></script>
+<script src="js/core/012-script-012.js"></script>
+<script src="js/core/013-nova-defer-init.js"></script>
+<script src="js/core/014-script-014.js"></script>
+<!-- Nova: Ders Videosu Ekranı (Single Player) -->
+<div class="lesson-video-screen" id="lesson-video-screen">
+<div class="lesson-video-header">
+<div class="lesson-pill" id="lesson-video-breadcrumb">Ders &amp; Konu</div>
+<div class="video-title" id="lesson-video-title">Ders Videosu</div>
+</div>
+<div class="video-frame">
+<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" referrerpolicy="strict-origin-when-cross-origin" id="lesson-video-iframe" src="" title="Ders Videosu"></iframe>
+</div>
+<div class="lesson-video-fallback-wrap" id="lesson-video-fallback-wrap" hidden>
+<a class="lesson-video-open-youtube" id="lesson-video-open-youtube" href="#" target="_blank" rel="noopener noreferrer">Videoyu YouTube’da aç</a>
+<span style="display:block;margin-top:4px;font-size:.78rem;color:#64748b;font-weight:500">Bilgisayarda gömülü oynatıcı hata verirse (reklam engelleyici / tarayıcı koruması) bu bağlantıyı kullanın.</span>
+</div>
+<div class="lesson-video-actions">
+<button class="lesson-video-back" id="lesson-video-back">Geri</button>
+</div>
+</div>
+<!-- Nova: RTDB Adapter for Lesson Video URL (supports Firebase v8 & v9) -->
+<script src="js/core/015-script-015.js"></script>
+<script src="js/core/016-script-016.js"></script>
+<!-- Nova: precise duel analytics hook (wraps updateDuelScore) -->
+<script src="js/core/017-script-017.js"></script>
+<!-- Nova: Topic performance logger (<=4 correct -> record, keep last 25) -->
+<script src="js/core/018-script-018.js"></script>
+<script src="js/screens/019-script-019.js"></script>
+<link rel="stylesheet" href="styles/049-style-049.css" />
+<script src="js/core/020-script-020.js"></script>
+<script src="js/core/021-script-021.js"></script>
+<script src="js/screens/022-nova-kids-login-js.js"></script>
+<!-- === Nova: Premium Bitiş Özeti (HTML v3) === -->
+<div aria-live="polite" id="nova-summary">
+<div class="nz-row">
+<div class="nz-card">
+<div class="nz-kpi"><span class="label">Doğru</span><span class="value ok" id="nz-kpi-correct">0</span></div>
+</div>
+<div class="nz-card">
+<div class="nz-kpi"><span class="label">Toplam</span><span class="value" id="nz-kpi-total">0</span></div>
+</div>
+<div class="nz-card">
+<div class="nz-kpi"><span class="label">Yüzde</span><span class="value" id="nz-kpi-rate">0%</span></div>
+</div>
+</div>
+<div class="nz-gauge">
+<canvas aria-label="Başarı göstergesi" height="240" id="nzGauge" role="img" width="240"></canvas>
+<div class="nz-badge" id="nzBadge">BRONZ</div>
+</div>
+<div class="nz-row">
+<div class="nz-card" style="flex:1 1 100%">
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+<strong style="font-size:1.05rem"></strong>
+<div class="nz-actions">
+<button class="nz-btn nz-primary" id="nzRepeatBtn">Yanlışları Tekrar Et</button>
+<button class="nz-btn nz-secondary" id="nzVideoBtn">Ders Videosu</button>
+</div>
+</div>
+<div class="nz-wrong-list" id="nzWrongList"></div>
+</div>
+</div>
+</div>
+<!-- Modal -->
+<div id="nova-modal">
+<div class="modal-card">
+<div class="modal-header">
+<div class="modal-title">Tüm Yanlışlar</div>
+<button class="modal-close" onclick="document.getElementById('nova-modal').style.display='none'">Kapat</button>
+</div>
+<div class="modal-list" id="nzModalList"></div>
+</div>
+</div>
+<!-- === Nova: Premium Bitiş Özeti (JS v3) === -->
+<script src="js/core/023-script-023.js"></script>
+<!-- === Nova: Responsive & Symmetric Layout Patch (v4 CSS) === -->
+<link rel="stylesheet" href="styles/050-style-050.css" />
+<!-- === Nova: Score Container Replace & Strict Single-UI (v4 JS) === -->
+<script src="js/core/024-script-024.js"></script>
+<!-- === Nova: Overlap Fix & Typography Tune (v5 CSS) === -->
+<link rel="stylesheet" href="styles/051-style-051.css" />
+<!-- === Nova: Question Stem Support & Safer Canvas Size (v5 JS) === -->
+<script src="js/core/025-script-025.js"></script>
+<!-- === Nova: Gauge Redraw & Video CTA Styling (v6 CSS) === -->
+<link rel="stylesheet" href="styles/052-style-052.css" />
+<!-- === Nova: Mount Redraw & Robust Percentage (v6 JS) === -->
+<script src="js/core/026-script-026.js"></script>
+<!-- === Nova v7 CSS: Compact Gauge, Hide Bottom Gauge, CTA, Layout === -->
+<link rel="stylesheet" href="styles/053-style-053.css" />
+<!-- === Nova v7 JS: Compact Gauge, Play Again, Stronger Video Open, Percent Fix === -->
+<script src="js/core/027-script-027.js"></script>
+<script src="js/core/028-script-028.js"></script>
+<!-- === NOVA PATCH: Single Player Result Ring & Badge Cleanup === -->
+<script src="js/core/029-script-029.js"></script>
+<!-- === NOVA PATCH END === -->
+
+<script src="js/core/030-script-030.js"></script>
+
+
+<!-- Nova v5b: Teacher Advice Card -->
+<script src="js/core/031-script-031.js"></script>
+
+<!-- NOVA_DUEL_ENHANCEMENTS_START -->
+<script src="js/core/032-script-032.js"></script>
+<!-- NOVA_DUEL_ENHANCEMENTS_END -->
+
+
+<!-- === NOVA: Duel Dark Theme & FX (non-destructive add-on) === -->
+<link rel="stylesheet" href="styles/054-nova-duel-dark-style.css" />
+
+<script src="js/ui/033-nova-duel-dark-script.js"></script>
+<!-- === /NOVA add-on === -->
+
+<!-- === NOVA: Space Upgrade v2 === -->
+<link rel="stylesheet" href="styles/055-nova-duel-space-upgrade-style.css" />
+
+<script src="js/screens/034-nova-duel-space-upgrade-script.js"></script>
+<!-- === /NOVA Space Upgrade v2 === -->
+
+<script src="js/core/035-script-035.js"></script>
+
+<script src="js/screens/036-nova-matchmaking-boot.js"></script>
+
+
+<script src="js/core/037-nova-duel-start-init.js"></script>
+
+
+    <!-- NOVA_RESULT_SCRIPT_START -->
+    <script src="js/core/038-script-038.js"></script>
+    <!-- NOVA_RESULT_SCRIPT_END -->
+    
+
+<!-- NOVA v5 overlay -->
+<div id="duel-intro-overlay" class="nova-duel-arena" role="dialog" aria-label="Düello Başlangıç Ekranı">
+  <div class="nova-backdrop"><div class="nova-stars"></div></div>
+  <div class="arena">
+    <div class="player-card" id="nova-playerA">
+      <img class="player-photo" id="nova-pA-photo" src="" alt="Oyuncu A">
+      <div class="player-name" id="nova-pA-name">Oyuncu A</div>
+      <div class="player-meta">
+        <span class="star-frame" id="nova-pA-stars"></span>
+        <span class="rank-label" id="nova-pA-rank"></span>
+        <span class="cup-pill" id="nova-pA-cups-wrap" data-empty="1">
+          <span class="cup-emoji" aria-hidden="true">🏆</span>
+          <span id="nova-pA-cups">0</span>
+        </span>
+      </div>
+    </div>
+    <div class="vs">
+      <div class="vs-badge">VS</div>
+      <div class="ring-wrap">
+        <div class="ring" id="nova-ring" style="--pct:0%"></div>
+        <div class="ring-center"><div class="countdown"><span id="nova-count">10</span>s</div></div>
+      </div>
+    </div>
+    <div class="player-card" id="nova-playerB">
+      <img class="player-photo" id="nova-pB-photo" src="" alt="Oyuncu B">
+      <div class="player-name" id="nova-pB-name">Oyuncu B</div>
+      <div class="player-meta">
+        <span class="star-frame" id="nova-pB-stars"></span>
+        <span class="rank-label" id="nova-pB-rank"></span>
+        <span class="cup-pill" id="nova-pB-cups-wrap" data-empty="1">
+          <span class="cup-emoji" aria-hidden="true">🏆</span>
+          <span id="nova-pB-cups">0</span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+
+<script src="js/screens/039-script-039.js"></script>
+
+
+<!-- Nova Advice Guard v2: show ONLY on result screen -->
+<script src="js/core/040-nova-advice-guard.js"></script>
+
+
+<!-- NOVA: Duel Scale Toolbar Script (safe) -->
+
+
+
+<!-- NOVA: Duel Scale Script v3 (no wrapper; scale element directly) -->
+<script src="js/screens/041-nova-duel-scale-script.js"></script>
+
+
+<!-- NOVA: Duel Scale Toolbar -->
+<div id="nova-duel-scale-toolbar" aria-hidden="true">
+  <span class="label">Ölçek</span>
+  <div class="group grow">
+    <button class="btn small" data-act="minus">−</button>
+    <input id="nova-duel-scale-range" type="range" min="70" max="120" value="100" step="1" />
+    <button class="btn small" data-act="plus">+</button>
+  </div>
+  <span class="pct badge" id="nova-duel-scale-pct">100%</span>
+  <div class="sep"></div>
+  <button class="btn" data-act="fit">Sığdır</button>
+  <button class="btn" data-act="reset">Sıfırla</button>
+</div>
+
+
+<script src="js/core/042-nova-image-cap-js.js"></script>
+
+
+<!-- === NOVA HOMEWORK MODULE === -->
+<link rel="stylesheet" href="styles/056-style-056.css" />
+<div id="homework-screen" role="dialog" aria-modal="true" aria-labelledby="hw_title">
+  <div class="hw-wrap">
+    <aside class="hw-left">
+      <div class="hw-topbar">
+        <div style="font-weight:800; letter-spacing:.4px">📚 Ödevlerim</div>
+        <button class="hw-close" id="hw_close">✖</button>
+      </div>
+      <ul class="hw-list" id="hw_list"></ul>
+    </aside>
+    <section class="hw-right">
+      <div class="hw-title" id="hw_title">Ödev seçiniz</div>
+      <div class="hw-desc" id="hw_desc">Öğretmeninizin verdiği ödev burada görünecek.</div>
+      <div style="padding:0 18px 8px">
+        <div class="hw-meta" id="hw_meta"></div>
+      </div>
+      <div class="hw-actions">
+        <button class="hw-btn secondary" id="hw_video">🎬 Ders Videosu</button>
+        <button class="hw-btn" id="hw_start">🚀 Sorulara Geç</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Deneme kuralları (tam ekran) → kapatınca 3-2-1 -->
+<div id="deneme-intro-rules" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Deneme kuralları">
+  <div id="deneme-intro-rules-inner">
+    <button type="button" id="deneme-intro-rules-close" aria-label="Kapat ve devam et">✕</button>
+    <img id="deneme-intro-rules-img" src="https://i.ibb.co/5xXcDxRR/Gemini-Generated-mage-drdxbodrdxbodrdx.jpg" alt="Düellomatik mini deneme kuralları" width="1080" height="1920" decoding="async" fetchpriority="high"/>
+    <video id="deneme-intro-rules-video" playsinline preload="auto"></video>
+  </div>
+</div>
+<div id="deneme-intro-countdown" aria-hidden="true" aria-live="polite">
+  <p id="deneme-intro-count-msg">Denemeniz başlıyor</p>
+  <div id="deneme-intro-count-num" aria-hidden="true">3</div>
+</div>
+<!-- === NOVA DENEME EXAM (ilkokul dostu ayrı ekran) === -->
+<div id="deneme-exam-screen" aria-hidden="true" style="display:none">
+  <div class="deneme-kids-bg" aria-hidden="true"></div>
+  <div class="deneme-kids-inner">
+    <header class="deneme-kids-top">
+      <div class="deneme-kids-title">Mini Deneme</div>
+      <div class="deneme-kids-meta">
+        <span id="deneme_prog_label">Soru 0 / 0</span>
+        <span id="deneme_time_label">⏱ 0:00</span>
+      </div>
+      <div class="deneme-kids-progress"><div id="deneme_prog_bar"></div></div>
+    </header>
+    <main class="deneme-kids-main">
+      <div id="deneme_question_wrap"></div>
+      <div id="deneme_options_grid" class="deneme-options-grid"></div>
+      <button type="button" id="deneme_optik_btn" class="deneme-optik-fab">📝 Optik</button>
+      <div id="deneme_optik_panel" class="deneme-optik-panel" aria-hidden="true">
+        <div class="deneme-optik-card">
+          <div class="deneme-optik-top">
+            <div class="deneme-optik-title">Optik Form</div>
+            <button type="button" id="deneme_optik_close" class="deneme-optik-close">Kapat</button>
+          </div>
+          <div id="deneme_optik_q" class="deneme-optik-q">Optik form hazirlaniyor...</div>
+          <div id="deneme_optik_choices" class="deneme-optik-sheet"></div>
+          <div class="deneme-optik-help">Cevaplari yalnizca bu optik formdan isaretleyin.</div>
+        </div>
+      </div>
+      <div id="deneme_optik_warn" class="deneme-optik-warn">Lutfen optik forma isleyin.</div>
+      <div id="deneme_explain" style="display:none"></div>
+      <div class="deneme-nav" id="deneme_nav">
+        <button type="button" class="deneme-nav-btn prev" id="deneme_prev_btn">◀ Önceki</button>
+        <div class="deneme-nav-mid" id="deneme_nav_mid">Cevaplanan: 0/0</div>
+        <button type="button" class="deneme-nav-btn next" id="deneme_next_btn2">Sonraki ▶</button>
+      </div>
+      <button type="button" class="deneme-finish-early" id="deneme_finish_early_btn">Denemeyi Bitir</button>
+      <div id="deneme_finish" class="deneme-finish-card" style="display:none">
+        <div style="font-size:3rem">🎉</div>
+        <h3 id="deneme_finish_title">Harika!</h3>
+        <div class="deneme-finish-stats" id="deneme_finish_stats"></div>
+        <div id="deneme_answers_wrap" style="display:none"></div>
+        <button type="button" class="deneme-finish-back" id="deneme_finish_back">Ana ekrana dön</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="js/core/043-script-043.js"></script>
+<!-- === /NOVA HOMEWORK MODULE === -->
+
+<script src="js/core/044-script-044.js"></script>
+
+<script src="js/core/045-nova-weekly-quests.js"></script>
+
+<script src="js/features/046-nova-move-homework-above-photo.js"></script>
+
+
+<!-- NOVA OPTIMIZATIONS: DROP-IN EGRESS REDUCER -->
+<script src="js/screens/047-script-047.js"></script>
+
+
+<script src="js/features/048-script-048.js"></script>
+
+<!-- NOVA: Duel Wait Overlay (covers gap between 10s intro and 3-2-1 intro) -->
+<link rel="stylesheet" href="styles/057-nova-wait-style.css" />
+<div id="duel-wait-overlay" role="alert" aria-live="polite" aria-label="Lütfen bekleyiniz">
+  <div class="wait-spinner"></div>
+  <div class="wait-text">LÜTFEN BEKLEYİNİZ...</div>
+</div>
+<script src="js/ui/049-nova-wait-script.js"></script>
+<link rel="stylesheet" href="styles/058-style-058.css?v=20260413q1" />
+<script src="js/screens/050-script-050.js"></script>
+<!-- === /NOVA PATCH === -->
+<script src="js/core/051-script-051.js"></script>
+<script src="js/core/052-script-052.js"></script>
+<script src="js/features/053-script-053.js"></script>
+<script src="js/core/054-nova-single-result-screen-guard.js"></script>
+<link rel="stylesheet" href="styles/059-login-premium.css?v=2" />
+<style id="nova-login-final-override">
+#student-selection-screen.nova-kids-login .card{
+  border:1px solid rgba(255,255,255,.78) !important;
+  box-shadow:0 24px 60px rgba(15,23,42,.22), inset 0 1px 0 rgba(255,255,255,.82) !important;
+  background:linear-gradient(180deg,#ffffff,#f8fbff) !important;
+}
+#student-selection-screen.nova-kids-login .hero{
+  border:1px solid rgba(255,255,255,.75) !important;
+  box-shadow:0 22px 56px rgba(15,23,42,.18), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+#student-selection-screen.nova-kids-login .cta.active{
+  box-shadow:0 16px 34px rgba(91,140,255,.36), inset 0 1px 0 rgba(255,255,255,.4) !important;
+}
+.registration-content,
+.verification-content{
+  border:1px solid rgba(255,255,255,.78) !important;
+  box-shadow:0 24px 60px rgba(2,8,23,.42), inset 0 1px 0 rgba(255,255,255,.8) !important;
+  background:linear-gradient(180deg,#ffffff,#f8fbff) !important;
+}
+</style>
+<script src="js/bootstrap.js"></script>
+
+</body>
+</html>

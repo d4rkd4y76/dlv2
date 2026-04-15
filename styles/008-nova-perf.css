@@ -1,0 +1,6 @@
+/* Performance guardrails */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+.find-duel-button, .single-player, .friends-button, .surprise-box { will-change: transform; }
+/* Lighter shadows (global pass) */

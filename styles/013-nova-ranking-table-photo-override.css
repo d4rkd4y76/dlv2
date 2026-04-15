@@ -1,0 +1,24 @@
+/* Sıralama tablosu: tablo genişliğine sığan kare foto (üstteki 60×75 !important üzerine) */
+.ranking-table .ranking-player-photo {
+  width: min(100%, 40px) !important;
+  height: min(100%, 40px) !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+  aspect-ratio: 1 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.ranking-table td{ overflow: visible !important; position: relative; }
+.ranking-table .avatar-frame-wrap{
+  display: inline-block !important;
+  position: relative !important;
+  z-index: 3 !important;
+  overflow: visible !important;
+}
+.ranking-table .ranking-player-photo.avatar-framed{
+  position: relative !important;
+  z-index: 4 !important;
+}
+.ranking-table .player-name-column .rank-label {
+  min-width: 0 !important;
+}
