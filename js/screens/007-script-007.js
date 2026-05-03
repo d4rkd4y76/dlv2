@@ -3822,6 +3822,7 @@ window.onload = async () => {
     try {
         // Cleanup işlemini başlat
         startRejectedInvitesCleanup();
+        try { novaBindAdminPortalBtnOnce(); } catch (_) {}
 
         // Sınıf ve öğrenci seçimi için event listener'lar
         selectionClassSelect.addEventListener('change', () => {
@@ -3889,9 +3890,12 @@ window.onload = async () => {
             onMainScreenLoad(); // Elmas sistemini başlat
             // Reddedilen davet temizliği: startRejectedInvitesCleanup (window.onload) yeterli; çift interval kaldırıldı.
             try { if (typeof window.novaEnsureLoggedInUi === 'function') window.novaEnsureLoggedInUi(); } catch(_) {}
+            try { novaBindAdminPortalBtnOnce(); } catch(_) {}
+            try { await novaSyncAdminPortalFlag(); } catch(_) {}
 
         } else {
             studentSelectionScreen.style.display = 'flex';
+            try { novaUpdateAdminPortalBtn(); } catch(_) {}
         }
 
         // Gerekli verileri yükle
@@ -4156,6 +4160,47 @@ function novaEnsureLoggedInUi(){
 }
 try { window.novaEnsureLoggedInUi = novaEnsureLoggedInUi; } catch(_) {}
 
+/** Firebase: adminPanelUsers/{classId}/{studentId} = true → ana ekranda «Yönetici» */
+function novaUpdateAdminPortalBtn(){
+  try{
+    const btn = document.getElementById('nova_admin_portal_btn');
+    if (!btn) return;
+    const ok = !!(typeof selectedStudent !== 'undefined' && selectedStudent && selectedStudent.studentId && selectedStudent.classId && selectedStudent.adminPortal);
+    btn.hidden = !ok;
+  }catch(_){}
+}
+async function novaSyncAdminPortalFlag(){
+  try{
+    if (typeof selectedStudent === 'undefined' || !selectedStudent || !selectedStudent.classId || !selectedStudent.studentId){
+      novaUpdateAdminPortalBtn();
+      return;
+    }
+    const snap = await database.ref('adminPanelUsers/' + selectedStudent.classId + '/' + selectedStudent.studentId).once('value');
+    selectedStudent.adminPortal = !!(snap.exists() && snap.val());
+    try { localStorage.setItem('selectedStudent', JSON.stringify(selectedStudent)); } catch (_) {}
+  } catch (e) {
+    console.warn('novaSyncAdminPortalFlag', e);
+  }
+  novaUpdateAdminPortalBtn();
+}
+try { window.novaSyncAdminPortalFlag = novaSyncAdminPortalFlag; } catch (_) {}
+try { window.novaUpdateAdminPortalBtn = novaUpdateAdminPortalBtn; } catch (_) {}
+
+function novaBindAdminPortalBtnOnce(){
+  const btn = document.getElementById('nova_admin_portal_btn');
+  if (!btn || btn.dataset.novaBound) return;
+  btn.dataset.novaBound = '1';
+  btn.addEventListener('click', function () {
+    try {
+      sessionStorage.setItem('nova_admin_from_student', JSON.stringify({
+        ts: Date.now(),
+        classId: selectedStudent.classId,
+        studentId: selectedStudent.studentId
+      }));
+    } catch (_) {}
+    try { window.location.href = 'admin.html'; } catch (_) { window.location.assign('admin.html'); }
+  });
+}
 
 // Yeni input elementi için referans
 const selectionNameInput = document.getElementById('selection-name-input');
@@ -4224,7 +4269,7 @@ async function handleLogin() {
         fetchAndDisplayGameCup();
         onMainScreenLoad();
 
-        localStorage.setItem('selectedStudent', JSON.stringify(selectedStudent));
+        await novaSyncAdminPortalFlag();
 
     } catch (error) {
         console.error("Login hatası:", error);
