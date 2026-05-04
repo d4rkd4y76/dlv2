@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geometri Atölyesi - İlkokul 3. Sınıf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Geometri Atölyesi</h1>
+    <p>Geometrik cisimleri döndür, açılımını izle, yüzey-ayrıt-köşeyi keşfet.</p>
+  </header>
+
+  <main class="layout">
+    <aside class="panel controls">
+      <h2>Cisimler</h2>
+      <div id="shapeButtons" class="shape-list"></div>
+
+      <h3>Kontroller</h3>
+      <div class="actions">
+        <button id="toggleOpenBtn" class="btn primary">Açılımı Aç</button>
+        <button id="toggleRotateBtn" class="btn">Otomatik Döndür</button>
+        <button id="toggleExplodeBtn" class="btn">Parçalara Ayır</button>
+        <button id="resetBtn" class="btn danger">Sıfırla</button>
+      </div>
+
+      <h3>Göster / Gizle</h3>
+      <label class="check"><input id="showFaces" type="checkbox" checked> Yüzeyler</label>
+      <label class="check"><input id="showEdges" type="checkbox" checked> Ayrıtlar</label>
+      <label class="check"><input id="showVertices" type="checkbox" checked> Köşeler</label>
+      <label class="check"><input id="strictMode" type="checkbox" checked> Öğretmen Modu (Matematiksel Doğruluk)</label>
+    </aside>
+
+    <section class="panel viewer">
+      <h2 id="shapeTitle">Küp</h2>
+      <p id="shapeDesc"></p>
+
+      <div class="canvas-card">
+        <h3>3B Görünüm</h3>
+        <canvas id="mainCanvas"></canvas>
+      </div>
+
+      <div class="canvas-card">
+        <h3>Açılım Animasyonu</h3>
+        <canvas id="netCanvas"></canvas>
+      </div>
+    </section>
+
+    <aside class="panel info">
+      <h2>Özellikler</h2>
+      <ul id="shapeProps"></ul>
+      <p id="shapeNote" class="note"></p>
+      <div class="learn-box">
+        <h3>3. Sınıf Anlatım</h3>
+        <p id="shapeKidInfo"></p>
+      </div>
+      <div class="learn-box">
+        <h3>Günlük Hayat Örnekleri</h3>
+        <ul id="shapeExamples"></ul>
+      </div>
+      <div class="learn-box">
+        <h3>Mini Soru</h3>
+        <p id="shapeQuestion"></p>
+      </div>
+      <div class="legend">
+        <span><i class="dot face"></i> Yüzey</span>
+        <span><i class="dot edge"></i> Ayrıt</span>
+        <span><i class="dot vertex"></i> Köşe</span>
+      </div>
+      <p class="tip">İpucu: Fare veya parmağınla 3B şekli döndürebilirsin.</p>
+    </aside>
+  </main>
+
+  <footer class="signature">NASK GAMES</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

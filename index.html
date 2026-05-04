@@ -1099,15 +1099,38 @@
 </style>
 <style id="nask-tools-style">
 #tools-open-button{
-  background:linear-gradient(135deg,#16a34a,#22c55e);
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,#ff7a18,#ff2d95 45%, #5b8cff);
   color:#fff;
   border:none;
-  border-radius:12px;
-  padding:10px 16px;
+  border-radius:14px;
+  padding:11px 18px;
   font-weight:800;
-  box-shadow:0 8px 20px rgba(34,197,94,.28);
+  letter-spacing:.3px;
+  box-shadow:0 10px 24px rgba(255,45,149,.38), 0 0 0 2px rgba(255,255,255,.2) inset;
+  animation:naskToolsPulse 2s ease-in-out infinite;
 }
-#tools-open-button:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+#tools-open-button::after{
+  content:"";
+  position:absolute;
+  top:-40%;
+  left:-25%;
+  width:40%;
+  height:180%;
+  transform:rotate(18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  animation:naskToolsShine 2.4s linear infinite;
+}
+#tools-open-button:hover{ filter:brightness(1.08); transform:translateY(-1px) scale(1.02); }
+@keyframes naskToolsShine{
+  0%{ left:-35%; }
+  100%{ left:120%; }
+}
+@keyframes naskToolsPulse{
+  0%,100%{ box-shadow:0 10px 24px rgba(255,45,149,.38), 0 0 0 2px rgba(255,255,255,.2) inset; }
+  50%{ box-shadow:0 16px 32px rgba(91,140,255,.42), 0 0 0 2px rgba(255,255,255,.28) inset; }
+}
 
 .tools-modal{
   position:fixed;
@@ -1193,7 +1216,7 @@
   });
 
   geometryBtn.addEventListener("click", () => {
-    window.open("../geometri/index.html", "_blank", "noopener,noreferrer");
+    window.open("./tools/geometri/index.html", "_blank", "noopener,noreferrer");
   });
 })();
 </script>
