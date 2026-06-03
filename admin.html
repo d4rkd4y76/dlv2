@@ -106,6 +106,115 @@
   .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
   .sticky-actions{position:sticky; bottom:0; display:flex; gap:10px; padding-top:10px; background:linear-gradient(180deg, transparent, rgba(10,14,30,.9));}
   .hr{height:1px; background:var(--border); margin:10px 0}
+  /* Soru / Deneme / Mağaza — kutucuk yerine çizgi ile ayrım */
+  #questionsView .card,
+  #denemeView .card,
+  #storeView .card{
+    background:transparent;
+    border:none;
+    border-radius:0;
+    box-shadow:none;
+    padding:20px 0;
+    margin:0;
+  }
+  #questionsView .card + .card,
+  #denemeView .card + .card,
+  #storeView .card + .card{
+    border-top:1px solid rgba(148,163,184,.16);
+    margin-top:2px;
+    padding-top:24px;
+  }
+  #questionsView .card h3,
+  #denemeView .card h3,
+  #storeView .card h3{
+    margin:0 0 14px;
+    padding-bottom:10px;
+    border-bottom:1px solid rgba(110,168,255,.14);
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.02em;
+  }
+  #questionsView .row > .col + .col,
+  #denemeView .row > .col + .col,
+  #storeView .row > .col + .col{
+    border-left:1px solid rgba(148,163,184,.12);
+    padding-left:22px;
+  }
+  #questionsView .list,
+  #denemeView .list,
+  #storeView .list{
+    border:none;
+    border-radius:0;
+    border-top:1px solid rgba(148,163,184,.12);
+    padding-top:10px;
+    background:transparent;
+  }
+  #questionsView .hr,
+  #denemeView .hr,
+  #storeView .hr{
+    height:1px;
+    margin:16px 0;
+    background:linear-gradient(90deg, transparent, rgba(110,168,255,.22) 20%, rgba(110,168,255,.22) 80%, transparent);
+    border:none;
+  }
+  .nova-admin-store-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0 !important;
+    margin:8px 0 20px !important;
+    padding:0;
+    border-bottom:1px solid rgba(148,163,184,.2);
+  }
+  .nova-admin-store-tab{
+    appearance:none;
+    background:transparent !important;
+    border:none !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+    border-bottom:2px solid transparent !important;
+    margin-bottom:-1px;
+    padding:11px 18px !important;
+    color:var(--muted) !important;
+    font-weight:600;
+    letter-spacing:.04em;
+    font-size:12px;
+    cursor:pointer;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .nova-admin-store-tab:hover{
+    color:var(--ink) !important;
+    filter:none !important;
+  }
+  .nova-admin-store-tab.active{
+    color:var(--ink) !important;
+    border-bottom-color:var(--acc) !important;
+    background:transparent !important;
+  }
+  .nova-admin-info-line{
+    background:transparent;
+    border:none;
+    border-left:3px solid rgba(110,168,255,.55);
+    border-radius:0;
+    box-shadow:none;
+    padding:10px 0 10px 14px;
+    margin-top:12px;
+  }
+  .nova-admin-info-line h4{
+    margin:0 0 6px;
+    font-size:13px;
+    font-weight:700;
+  }
+  @media (max-width:900px){
+    #questionsView .row > .col + .col,
+    #denemeView .row > .col + .col,
+    #storeView .row > .col + .col{
+      border-left:none;
+      padding-left:0;
+      border-top:1px solid rgba(148,163,184,.14);
+      margin-top:8px;
+      padding-top:20px;
+    }
+  }
   .list{max-height:380px; overflow:auto; border:1px solid var(--border); border-radius:12px}
   .soft{opacity:.85}
   .skeleton{background:linear-gradient(90deg, #0f1532, #0c112e, #0f1532); background-size:200% 100%; animation:s 1.4s infinite}
@@ -496,10 +605,10 @@ window.NovaAdminExport = (function(){
       <h2>3) Mağaza</h2>
       <div class="sub">Öğrenci mağazası <b>AVATAR</b> · <b>ÇERÇEVELER</b> · <b>KAHRAMANLAR</b> sekmeleriyle açılır. Veri: <span class="mono">store/profilePhotos</span>, <span class="mono">store/nameFrames</span>, <span class="mono">store/battleHeroes</span>.</div>
 
-      <div class="nova-admin-store-tabs" role="tablist" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px">
-        <button type="button" class="btn acc nova-admin-store-tab active" data-admin-store-tab="avatars">AVATAR</button>
-        <button type="button" class="btn nova-admin-store-tab" data-admin-store-tab="frames">ÇERÇEVELER</button>
-        <button type="button" class="btn nova-admin-store-tab" data-admin-store-tab="heroes">KAHRAMANLAR</button>
+      <div class="nova-admin-store-tabs" role="tablist">
+        <button type="button" class="nova-admin-store-tab active" data-admin-store-tab="avatars">AVATAR</button>
+        <button type="button" class="nova-admin-store-tab" data-admin-store-tab="frames">ÇERÇEVELER</button>
+        <button type="button" class="nova-admin-store-tab" data-admin-store-tab="heroes">KAHRAMANLAR</button>
       </div>
 
       <div id="adminStorePanelAvatars" class="nova-admin-store-panel">
@@ -591,8 +700,8 @@ window.NovaAdminExport = (function(){
           <div class="card">
             <h3>Savaş kahramanları</h3>
             <div class="sub" style="margin-bottom:8px">RTDB: <span class="mono">store/battleHeroes/{id}</span> · Öğrencide <span class="mono">battleHero</span>, <span class="mono">purchasedBattleHeroes/{id}</span> → <span class="mono">{ level: 1-4 }</span></div>
-            <div class="card mt12" style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:12px">
-              <h4 style="margin:0 0 8px">⚔️ Kahraman seviye sistemi</h4>
+            <div class="nova-admin-info-line">
+              <h4>⚔️ Kahraman seviye sistemi</h4>
               <div class="small">Satın alınca <b>Seviye 1</b> (giriş). Yükseltme: Sv.2 → 5000💎+1000🎫 (%50) · Sv.3 → 5000💎+2000🎫 (%20) · Sv.4 → 5000💎+2500🎫 (%5). Başarısız denemede kaynak harcanır.</div>
             </div>
             <div class="toolbar">
