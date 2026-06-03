@@ -7,7 +7,7 @@
 
   var state = {
     active: false,
-    queued: false,
+    playQueued: false,
     config: null,
     configAt: 0,
     prefetchStarted: false
@@ -53,6 +53,26 @@
     }
   }
 
+  /** Başlangıç (sprite boot) animasyonu bitmeden hikaye açılmasın */
+  function isBootBlockingStory() {
+    if (window.__novaSpriteBootActive) return true;
+    try {
+      if (document.body.classList.contains('nova-sprite-boot-active')) return true;
+    } catch (_) {}
+    var ov = document.getElementById('nova_sprite_boot_overlay');
+    if (!ov) return false;
+    if (ov.hidden || ov.hasAttribute('hidden')) return false;
+    try {
+      var st = window.getComputedStyle(ov);
+      if (st.display === 'none') return false;
+      if (st.visibility === 'hidden') return false;
+      if (parseFloat(st.opacity || '1') < 0.08) return false;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   function normalizeLibraryName(name) {
     var n = String(name || '').trim();
     if (!n) return '';
@@ -69,13 +89,32 @@
     return host.length >= 8;
   }
 
-  function buildBunnyEmbedUrl(libraryId, videoId) {
+  function isMobilePlayback() {
+    try {
+      if (typeof window.novaSpritePerfIsPhone === 'function') {
+        return window.novaSpritePerfIsPhone();
+      }
+    } catch (_) {}
+    var w = window.innerWidth || 0;
+    if (w > 0 && w <= 900) return true;
+    try {
+      return 'ontouchstart' in window && w <= 1024;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function buildBunnyEmbedUrl(libraryId, videoId, opts) {
+    opts = opts || {};
+    var muted = opts.muted === true || (opts.muted !== false && isMobilePlayback());
     return (
       'https://iframe.mediadelivery.net/embed/' +
       libraryId +
       '/' +
       videoId +
-      '?autoplay=true&loop=false&muted=false&preload=true&responsive=true&rememberPosition=false'
+      '?autoplay=true&loop=false&muted=' +
+      (muted ? 'true' : 'false') +
+      '&preload=true&responsive=true&rememberPosition=false'
     );
   }
 
@@ -95,18 +134,21 @@
     if (!videoId) return null;
 
     var libraryId = String(cfg.libraryId || '').trim();
+    var host = normalizeLibraryName(cfg.libraryName);
+    var mobile = isMobilePlayback();
+
     if (libraryId) {
       return {
         mode: 'iframe',
-        src: buildBunnyEmbedUrl(libraryId, videoId)
+        src: buildBunnyEmbedUrl(libraryId, videoId, { muted: mobile })
       };
     }
 
-    var host = normalizeLibraryName(cfg.libraryName);
     if (isUsableLibraryHost(host)) {
       return {
         mode: 'video',
-        src: buildBunnyMp4Candidates(host, videoId)[1]
+        src: buildBunnyMp4Candidates(host, videoId)[mobile ? 2 : 1],
+        startMuted: mobile
       };
     }
 
@@ -164,6 +206,7 @@
   }
 
   function shouldPlayStory() {
+    if (isBootBlockingStory()) return Promise.resolve(false);
     if (!getStoredStudent()) return Promise.resolve(false);
     if (!isMainScreenReady()) return Promise.resolve(false);
     try {
@@ -253,12 +296,14 @@
     }
   }
 
-  function tryPlayVideo(video, overlay) {
+  function tryPlayVideo(video, overlay, startMuted) {
     try {
       video.controls = false;
-      video.muted = false;
-      video.volume = 1;
+      video.muted = !!startMuted;
+      video.volume = startMuted ? 0 : 1;
       video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
     } catch (_) {}
     var p;
     try {
@@ -281,8 +326,10 @@
               if (p2 && typeof p2.catch === 'function') p2.catch(function () {});
             } catch (_) {}
             overlay.removeEventListener('click', unlock);
+            overlay.removeEventListener('touchend', unlock);
           };
           overlay.addEventListener('click', unlock, { once: true });
+          overlay.addEventListener('touchend', unlock, { once: true, passive: true });
         } catch (_) {}
       });
     }
@@ -347,6 +394,10 @@
 
   function showHikayeStoryVideo() {
     if (state.active) return Promise.resolve(false);
+    if (isBootBlockingStory()) {
+      queueStoryAfterBoot();
+      return Promise.resolve(false);
+    }
 
     return shouldPlayStory().then(function (ok) {
       if (!ok) return false;
@@ -414,7 +465,7 @@
             els.video.onended = function () {
               done();
             };
-            tryPlayVideo(els.video, els.overlay);
+            tryPlayVideo(els.video, els.overlay, play.startMuted);
           }
 
           if (els.video.src === play.src && els.video.readyState >= 2) {
@@ -449,7 +500,17 @@
                 els.iframe.src = embed.src;
                 return;
               }
-              done();
+              setLoadingVisible(els, false);
+              if (typeof window.showAlert === 'function') {
+                window.showAlert('Hikaye videosu yüklenemedi. Sağ üstten geçebilir veya ekrana dokunup tekrar deneyebilirsiniz.');
+              }
+              els.overlay.addEventListener(
+                'click',
+                function retryTap() {
+                  loadVideoSource(els.video, mp4List).then(onReady).catch(function () {});
+                },
+                { once: true }
+              );
             });
         });
       });
@@ -457,12 +518,57 @@
   }
 
   function queueStoryAfterBoot() {
-    if (state.queued || state.active) return;
-    state.queued = true;
-    setTimeout(function () {
-      state.queued = false;
-      showHikayeStoryVideo();
-    }, 380);
+    if (state.active) return;
+    if (isBootBlockingStory()) {
+      if (state.playQueued) return;
+      state.playQueued = true;
+      var bootWait = 0;
+      var bootMax = 40;
+      function waitBoot() {
+        bootWait += 1;
+        if (!isBootBlockingStory()) {
+          state.playQueued = false;
+          queueStoryAfterBoot();
+          return;
+        }
+        if (bootWait < bootMax) setTimeout(waitBoot, 250);
+        else state.playQueued = false;
+      }
+      setTimeout(waitBoot, 200);
+      return;
+    }
+    if (state.playQueued) return;
+    state.playQueued = true;
+
+    var attempts = 0;
+    var maxAttempts = 16;
+
+    function tryShow() {
+      if (isBootBlockingStory()) {
+        if (attempts < maxAttempts) {
+          attempts += 1;
+          setTimeout(tryShow, 300);
+          return;
+        }
+        state.playQueued = false;
+        return;
+      }
+      attempts += 1;
+      shouldPlayStory().then(function (ok) {
+        if (ok) {
+          state.playQueued = false;
+          showHikayeStoryVideo();
+          return;
+        }
+        if (attempts < maxAttempts) {
+          setTimeout(tryShow, 400);
+          return;
+        }
+        state.playQueued = false;
+      });
+    }
+
+    setTimeout(tryShow, 520);
   }
 
   function bindEvents() {
@@ -480,6 +586,9 @@
       },
       { passive: true }
     );
+    if (window.__novaSpriteBootDone && !isBootBlockingStory()) {
+      queueStoryAfterBoot();
+    }
   }
 
   window.novaShowHikayeStoryVideo = showHikayeStoryVideo;
@@ -493,9 +602,7 @@
     bindEvents();
   }
 
-  if (window.__novaSpriteBootDone) {
-    shouldPlayStory().then(function (ok) {
-      if (ok) queueStoryAfterBoot();
-    });
+  if (window.__novaSpriteBootDone && !isBootBlockingStory()) {
+    queueStoryAfterBoot();
   }
 })();

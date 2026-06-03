@@ -842,6 +842,7 @@
     if (!hasStoredStudentSession()) return;
     if (!shouldRunBoot()) {
       markBootDone();
+      dispatchBootComplete();
       return;
     }
     window.novaStartSpriteBoot({ trigger: 'remembered' });

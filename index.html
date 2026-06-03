@@ -1110,15 +1110,7 @@
   <p id="deneme-intro-count-msg">Denemeniz başlıyor</p>
   <div id="deneme-intro-count-num" aria-hidden="true">3</div>
 </div>
-<!-- Hikaye videosu (Bunny Stream — admin /hikayeVideo) -->
-<div id="nova-hikaye-video-overlay" class="nova-hikaye-video-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Hikaye videosu">
-  <video id="nova-hikaye-video-el" class="nova-hikaye-video-overlay__video" playsinline webkit-playsinline preload="auto" hidden></video>
-  <div id="nova-hikaye-video-iframe-wrap" class="nova-hikaye-video-overlay__iframe-wrap" hidden>
-    <iframe id="nova-hikaye-video-iframe" class="nova-hikaye-video-overlay__iframe" title="Hikaye videosu" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-  </div>
-  <p id="nova-hikaye-video-loading" class="nova-hikaye-video-overlay__loading" hidden>Yükleniyor…</p>
-  <button type="button" id="nova-hikaye-video-skip" class="nova-hikaye-video-overlay__skip" aria-label="Hikaye videosunu geç">HİKAYE VİDEOSUNU GEÇ</button>
-</div>
+<!-- Hikaye videosu taşındı: body sonu (mobil z-index / stacking) -->
 <!-- === NOVA DENEME EXAM (ilkokul dostu ayrı ekran) === -->
 <div id="deneme-exam-screen" aria-hidden="true" style="display:none">
   <div class="deneme-kids-bg" aria-hidden="true"></div>
@@ -1362,8 +1354,8 @@
 <script src="js/ui/012z-nova-epic-dragon-shared.js?v=20260530epic1"></script>
 <script src="js/ui/008-nova-battle-hero.js?v=20260602testeco1"></script>
 <script src="js/ui/nova-main-screen-boot-prep.js?v=20260602mainprep2"></script>
-<script src="js/ui/nova-sprite-preload-boot.js?v=20260602boot9"></script>
-<script src="js/ui/nova-hikaye-story-video.js?v=20260602hikaye4"></script>
+<script src="js/ui/nova-sprite-preload-boot.js?v=20260602boot10"></script>
+<script src="js/ui/nova-hikaye-story-video.js?v=20260602hikaye6"></script>
 <script src="js/ui/013-nova-hero-level-system.js?v=20260602testeco1"></script>
 <script src="js/ui/014-nova-hero-main-ui.js?v=20260602rtdb1"></script>
 <script src="js/ui/015-nova-store-detail.js?v=20260604storebtn1"></script>
@@ -1379,7 +1371,7 @@
 <link rel="stylesheet" href="styles/108-nova-perf-no-zoom-flash.css?v=20260602perf1" />
 <link rel="stylesheet" href="styles/109-nova-main-top-dock.css?v=20260602topdock3" />
 <link rel="stylesheet" href="styles/110-nova-admin-portal-footer.css?v=20260602adminfoot1" />
-<link rel="stylesheet" href="styles/111-nova-hikaye-story-video.css?v=20260602hikaye2" />
+<link rel="stylesheet" href="styles/111-nova-hikaye-story-video.css?v=20260602hikaye6" />
 <style id="nova-login-final-override">
 #student-selection-screen.nova-kids-login .card{
   border:1px solid rgba(255,255,255,.78) !important;
@@ -1878,6 +1870,16 @@
 })();
 </script>
 <script src="js/bootstrap.js"></script>
+
+<!-- Hikaye videosu (Bunny Stream — admin /platformMeta/hikayeVideo) -->
+<div id="nova-hikaye-video-overlay" class="nova-hikaye-video-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Hikaye videosu">
+  <video id="nova-hikaye-video-el" class="nova-hikaye-video-overlay__video" playsinline webkit-playsinline preload="auto" hidden></video>
+  <div id="nova-hikaye-video-iframe-wrap" class="nova-hikaye-video-overlay__iframe-wrap" hidden>
+    <iframe id="nova-hikaye-video-iframe" class="nova-hikaye-video-overlay__iframe" title="Hikaye videosu" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  <p id="nova-hikaye-video-loading" class="nova-hikaye-video-overlay__loading" hidden>Yükleniyor…</p>
+  <button type="button" id="nova-hikaye-video-skip" class="nova-hikaye-video-overlay__skip" aria-label="Hikaye videosunu geç">HİKAYE VİDEOSUNU GEÇ</button>
+</div>
 
 </body>
 </html>
